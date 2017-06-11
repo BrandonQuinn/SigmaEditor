@@ -11,4 +11,9 @@ package sigma.editor;
 public class Constants {
 	public static final String EDITOR_TITLE = "Sigma Editor - Dev";
 	public static final String EDITOR_VERSION = "0.0.1";
+	
+	/**
+	 * Directories.
+	 */
+	public static final String CONFIG_DIRECTORY = "configuration/";
 }
