@@ -1,18 +1,13 @@
 package sigma.editor.ui;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Image;
-import java.awt.Toolkit;
 
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JProgressBar;
 import javax.swing.JLabel;
 import java.awt.Font;
-import java.awt.Window.Type;
 
 /**
  * 

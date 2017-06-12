@@ -1,16 +1,13 @@
 package sigma.editor.ui;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import com.google.gson.JsonIOException;
-
-import sigma.editor.control.conf.EntityConfLoader;
-import sigma.editor.model.conf.EntityConfModel;
+import sigma.editor.Constants;
+import sigma.editor.rendering.RenderUpdateThread;
 
 import javax.swing.BoxLayout;
 import javax.swing.JMenuBar;
@@ -22,12 +19,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Toolkit;
-import java.io.IOException;
-import java.util.ArrayList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import java.awt.List;
+import javax.swing.SwingConstants;
+import javax.swing.JButton;
+import javax.swing.ImageIcon;
 
 /**
+ * The main window which holds everything.
  * 
  * @author Brandon Quinn
  * @version 0.1
@@ -39,6 +39,15 @@ public class MainWindow extends JFrame {
 
 	private JPanel contentPane;
 	private JComboBox<String> comboBox;
+	private RenderPanel renderPanel;
+	
+	/**
+	 * Icons
+	 */
+	private ImageIcon selectToolIcon;
+	private ImageIcon moveToolIcon;
+	private ImageIcon rotateToolIcon;
+	
 	/**
 	 * Get the default toolkit to resize the application.
 	 */
@@ -48,10 +57,18 @@ public class MainWindow extends JFrame {
 	 * Create the frame.
 	 */
 	public MainWindow() {
-		setTitle("Sigma Editor");
+		setTitle(Constants.EDITOR_TITLE + " " + Constants.EDITOR_VERSION);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(toolkit.getScreenSize().width / 2, toolkit.getScreenSize().height / 2);
+		setSize((int)(toolkit.getScreenSize().width / 1.3f), 
+				(int)(toolkit.getScreenSize().height / 1.3f));
 		setLocationRelativeTo(null);
+		
+		/**
+		 * Initialise Icons
+		 */
+		selectToolIcon = new ImageIcon("res\\icons\\selectTool.png");
+		moveToolIcon = new ImageIcon("res\\icons\\moveTool.png");
+		rotateToolIcon = new ImageIcon("res\\icons\\rotateTool.png");
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -73,7 +90,20 @@ public class MainWindow extends JFrame {
 		toolBar.setFloatable(false);
 		contentPane.add(toolBar, BorderLayout.NORTH);
 		
+		JButton selectToolBtn = new JButton();
+		selectToolBtn.setIcon(selectToolIcon);
+		toolBar.add(selectToolBtn);
+		
+		JButton moveToolBtn = new JButton();
+		moveToolBtn.setIcon(moveToolIcon);
+		toolBar.add(moveToolBtn);
+		
+		JButton rotateToolBtn = new JButton();
+		rotateToolBtn.setIcon(rotateToolIcon);
+		toolBar.add(rotateToolBtn);
+		
 		JSplitPane splitPane = new JSplitPane();
+		splitPane.setContinuousLayout(true);
 		contentPane.add(splitPane, BorderLayout.CENTER);
 		
 		JSplitPane leftSplitPane = new JSplitPane();
@@ -102,7 +132,8 @@ public class MainWindow extends JFrame {
 		leftSideSouthPanel.setLayout(new BorderLayout(0, 0));
 		
 		JLabel lblProperties = new JLabel("Properties");
-		lblProperties.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblProperties.setHorizontalAlignment(SwingConstants.CENTER);
+		lblProperties.setFont(new Font("Tahoma", Font.BOLD, 11));
 		leftSideSouthPanel.add(lblProperties, BorderLayout.NORTH);
 		
 		JPanel propertiesPanel = new JPanel();
@@ -114,13 +145,44 @@ public class MainWindow extends JFrame {
 		panel.setLayout(new BorderLayout(0, 0));
 		
 		JSplitPane splitPane_1 = new JSplitPane();
+		splitPane_1.setContinuousLayout(true);
 		splitPane_1.setResizeWeight(0.9);
 		panel.add(splitPane_1, BorderLayout.CENTER);
 		
-		JSplitPane splitPane_2 = new JSplitPane();
-		splitPane_2.setResizeWeight(0.5);
-		splitPane_2.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		splitPane_1.setRightComponent(splitPane_2);
+		JSplitPane rightSplitPane = new JSplitPane();
+		rightSplitPane.setContinuousLayout(true);
+		
+		rightSplitPane.setResizeWeight(0.5);
+		rightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		
+		renderPanel = new RenderPanel();
+		
+		/*
+		 * Create the thread which will be used to continuously re-render the editor frame.
+		 */
+		RenderUpdateThread renUpThread = new RenderUpdateThread(renderPanel);
+		Thread thread = new Thread(renUpThread);
+		
+		splitPane_1.setLeftComponent(renderPanel);
+		splitPane_1.setRightComponent(rightSplitPane);
+		
+		JPanel layerPanel = new JPanel();
+		rightSplitPane.setLeftComponent(layerPanel);
+		layerPanel.setLayout(new BorderLayout(0, 0));
+		
+		JToolBar layerToolBar = new JToolBar();
+		layerToolBar.setFloatable(false);
+		layerPanel.add(layerToolBar, BorderLayout.SOUTH);
+		
+		List list = new List();
+		layerPanel.add(list, BorderLayout.CENTER);
+		
+		JLabel lblLayers = new JLabel("Layers");
+		lblLayers.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblLayers.setHorizontalAlignment(SwingConstants.CENTER);
+		layerPanel.add(lblLayers, BorderLayout.NORTH);
+		
+		thread.start();
 	}
 
 }

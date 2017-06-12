@@ -2,10 +2,9 @@ package sigma.editor.control;
 
 import java.io.IOException;
 
-import com.google.gson.JsonIOException;
+import org.json.simple.parser.ParseException;
 
 import sigma.editor.control.conf.EntityConfLoader;
-import sigma.editor.debug.StackTraceUtil;
 import sigma.editor.exception.EditorLoadingException;
 import sigma.editor.ui.EngineLoadingDialog;
 
@@ -31,15 +30,11 @@ public class EditorLoader {
 		
 		try {
 			entityConfLoader.load();
-		} catch (JsonIOException | IOException e) {
-			EditorLoadingException ex = new EditorLoadingException();
-			ex.setMessage("Error loading entity configuration from JSON file: " + entityConfLoader.getFilePath()
-					+ ", perhaps you could try locating the file and inspecting it for anything that looks incorrect.");
-			ex.setStackTraceMessage(StackTraceUtil.stackTraceToString(e));
-			
-			throw ex;
+		} catch (IOException | ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
+
 		eld.setProgress(100);
 	}
 }

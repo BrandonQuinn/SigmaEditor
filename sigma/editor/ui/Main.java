@@ -8,7 +8,7 @@ import sigma.editor.debug.StackTraceUtil;
 import sigma.editor.exception.EditorLoadingException;
 
 /**
- * A level editor for the Sigma game.
+ * A level editor for the "Project Sigma" game.
  * 
  * @author Brandon Quinn
  * @version 0.1
