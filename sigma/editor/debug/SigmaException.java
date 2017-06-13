@@ -1,4 +1,4 @@
-package sigma.editor.exception;
+package sigma.editor.debug;
 
 /**
  * 

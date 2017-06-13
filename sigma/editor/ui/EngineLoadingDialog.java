@@ -21,6 +21,7 @@ public class EngineLoadingDialog extends JDialog {
 	
 	private final JPanel contentPanel = new JPanel();
 	private JProgressBar progressBar;
+	JLabel lblStatus;
 	
 	/**
 	 * Create the dialog.
@@ -28,7 +29,7 @@ public class EngineLoadingDialog extends JDialog {
 	public EngineLoadingDialog() {
 		setType(Type.POPUP);
 		setBounds(100, 100, 309, 124);
-		setSize(309, 124);
+		setSize(309, 104);
 		setLocationRelativeTo(null);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -37,13 +38,14 @@ public class EngineLoadingDialog extends JDialog {
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		
 		progressBar = new JProgressBar();
-		progressBar.setBounds(10, 52, 273, 22);
+		progressBar.setStringPainted(true);
+		progressBar.setToolTipText("");
+		progressBar.setBounds(10, 11, 273, 22);
 		contentPanel.add(progressBar);
 		
-		JLabel lblLoadingEditor = new JLabel("Loading Editor...");
-		lblLoadingEditor.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lblLoadingEditor.setBounds(86, 19, 136, 22);
-		contentPanel.add(lblLoadingEditor);
+		lblStatus = new JLabel("Status:");
+		lblStatus.setBounds(10, 44, 273, 14);
+		contentPanel.add(lblStatus);
 	}
 	
 	/**
@@ -52,5 +54,13 @@ public class EngineLoadingDialog extends JDialog {
 	 */
 	public void setProgress(int progress) {
 		this.progressBar.setValue(progress);
+	}
+	
+	/**
+	 * Set the message under the loading bar.
+	 * @param text The message
+	 */
+	public void setText(String text) {
+		lblStatus.setText(text);
 	}
 }

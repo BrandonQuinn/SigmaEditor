@@ -4,8 +4,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import sigma.editor.control.EditorLoader;
+import sigma.editor.debug.EditorLoadingException;
 import sigma.editor.debug.StackTraceUtil;
-import sigma.editor.exception.EditorLoadingException;
 
 /**
  * A level editor for the "Project Sigma" game.

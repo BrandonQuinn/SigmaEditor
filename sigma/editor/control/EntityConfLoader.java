@@ -1,9 +1,11 @@
-package sigma.editor.control.conf;
+package sigma.editor.control;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.json.simple.parser.JSONParser;
@@ -12,7 +14,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import sigma.editor.Constants;
-import sigma.editor.model.conf.EntityConfModel;
+import sigma.editor.model.EntityConfModel;
 
 /**
  * Loads the configuration for entities and their meta properties
@@ -46,6 +48,8 @@ public class EntityConfLoader {
 		JSONObject jsonObject = (JSONObject) obj;
 		
 		JSONArray types = (JSONArray) jsonObject.get("entityTypes");
+		
+		@SuppressWarnings("unchecked")
 		Iterator<String> iterator =  types.iterator();
 		
 		while(iterator.hasNext()) {
@@ -58,8 +62,21 @@ public class EntityConfLoader {
 	 * @throws JsonIOException
 	 * @throws IOException
 	 */
-	public void save() {
-		
+	@SuppressWarnings("unchecked")
+	public void save() throws IOException {
+        JSONObject obj = new JSONObject();
+
+        JSONArray entityList = new JSONArray();
+        
+        ArrayList<String> entityTypes = EntityConfModel.getTypeList();
+        for (String type : entityTypes) entityList.add(type);
+
+        obj.put("entityTypes", entityList);
+
+        FileWriter file = new FileWriter(configFile.getAbsolutePath());
+        file.write(obj.toJSONString());
+        file.flush();
+        file.close();
 	}
 	
 	/**

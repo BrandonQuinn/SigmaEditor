@@ -1,4 +1,4 @@
-package sigma.editor.model.conf;
+package sigma.editor.model;
 
 import java.util.ArrayList;
 

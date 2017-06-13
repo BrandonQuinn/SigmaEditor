@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import sigma.editor.Constants;
+import sigma.editor.model.EntityConfModel;
 import sigma.editor.rendering.RenderUpdateThread;
 
 import javax.swing.BoxLayout;
@@ -19,6 +20,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Toolkit;
+import java.util.ArrayList;
+
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.List;
@@ -117,11 +120,17 @@ public class MainWindow extends JFrame {
 		leftSideNorthPanel.setLayout(new BorderLayout(0, 0));
 		
 		comboBox = new JComboBox<String>();
+		
+		// init combo box
+		ArrayList<String> entityTypes = EntityConfModel.getTypeList();
+		for (String type : entityTypes) comboBox.addItem(type);
+		
 		leftSideNorthPanel.add(comboBox, BorderLayout.NORTH);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		leftSideNorthPanel.add(scrollPane, BorderLayout.CENTER);
 		
+		@SuppressWarnings("rawtypes")
 		JList entityList = new JList();
 		entityList.setVisibleRowCount(5);
 		scrollPane.setViewportView(entityList);

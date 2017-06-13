@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.json.simple.parser.ParseException;
 
-import sigma.editor.control.conf.EntityConfLoader;
-import sigma.editor.exception.EditorLoadingException;
+import sigma.editor.debug.EditorLoadingException;
+import sigma.editor.debug.StackTraceUtil;
 import sigma.editor.ui.EngineLoadingDialog;
 
 /**
@@ -28,11 +28,15 @@ public class EditorLoader {
 	public static void load(EngineLoadingDialog eld) throws EditorLoadingException {
 		EntityConfLoader entityConfLoader = new EntityConfLoader();
 		
+		eld.setText("Loading entity configuration");
+		
 		try {
 			entityConfLoader.load();
 		} catch (IOException | ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			EditorLoadingException ex = new EditorLoadingException();
+			ex.setMessage("Could not load entity configuration.");
+			ex.setStackTraceMessage(StackTraceUtil.stackTraceToString(e));
+			throw ex;
 		}
 
 		eld.setProgress(100);
