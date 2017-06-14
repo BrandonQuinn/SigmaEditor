@@ -15,5 +15,5 @@ public class Constants {
 	/**
 	 * Directories.
 	 */
-	public static final String CONFIG_DIRECTORY = "enginedat/";
+	public static final String CONFIG_DIRECTORY = "config/";
 }

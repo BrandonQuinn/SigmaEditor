@@ -26,7 +26,9 @@ import javax.swing.JComponent;
  * @since 12 Jun 2017
  */
 
-public class RenderPanel extends JComponent implements KeyListener, MouseListener, MouseMotionListener {
+public class RenderPanel extends JComponent implements KeyListener, 
+														MouseListener, 
+														MouseMotionListener {
 	private static final long serialVersionUID = 1L;
 	
 	/*

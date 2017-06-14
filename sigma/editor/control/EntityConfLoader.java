@@ -27,9 +27,9 @@ import sigma.editor.model.EntityConfModel;
  * @since 11 Jun 2017
  */
 
-public class EntityConfLoader {
+public class EntityConfLoader extends ConfLoader {
 	private static final String ENTITY_CONF_FILE 
-		= Constants.CONFIG_DIRECTORY + "conf_entities.json";
+		= Constants.CONFIG_DIRECTORY + "entities.conf";
 	
 	private static File configFile = new File(ENTITY_CONF_FILE);
 	
