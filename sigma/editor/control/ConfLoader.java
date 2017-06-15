@@ -19,5 +19,5 @@ public abstract class ConfLoader {
 										IOException, 
 										ParseException;
 	public abstract void save() throws IOException;
-	public abstract void getFilePath();
+	public abstract String getFilePath();
 }

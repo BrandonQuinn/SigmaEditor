@@ -8,5 +8,6 @@ package sigma.editor.debug;
  */
 
 public class EditorLoadingException extends SigmaException {
+	private static final long serialVersionUID = 1L;
 	
 }

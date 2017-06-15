@@ -26,6 +26,30 @@ public class EditorLoader {
 	 * @throws EditorLoadingException
 	 */
 	public static void load(EngineLoadingDialog eld) throws EditorLoadingException {
+
+		/*
+		 * Load general configuration.
+		 */
+		
+		GeneralConfLoader generalConfigLoader = new GeneralConfLoader();
+		
+		eld.setText("Loading entity configuration");
+		
+		try {
+			generalConfigLoader.load();
+		} catch (IOException | ParseException e) {
+			EditorLoadingException ex = new EditorLoadingException();
+			ex.setMessage("Could not load general configuration.");
+			ex.setStackTraceMessage(StackTraceUtil.stackTraceToString(e));
+			throw ex;
+		}
+		
+		eld.setProgress(50);
+		
+		/*
+		 * Load entity configuration.
+		 */
+		
 		EntityConfLoader entityConfLoader = new EntityConfLoader();
 		
 		eld.setText("Loading entity configuration");

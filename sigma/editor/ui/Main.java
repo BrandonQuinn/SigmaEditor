@@ -28,6 +28,11 @@ public class Main {
 			eDialog.setVisible(true);
 		}
 		
+		/*
+		 * Load the configurations and anything else that needs loading before the editor
+		 * recieves input.
+		 */
+		
 		EngineLoadingDialog eld = new EngineLoadingDialog();
 		eld.setVisible(true);
 		
@@ -37,7 +42,7 @@ public class Main {
 			ErrorDialog eDialog = new ErrorDialog(e.getMessage(), e.getStackTraceMessage());
 			eDialog.setVisible(true);
 		}
-		
+
 		eld.setVisible(false);
 		
 		MainWindow mainWindow = new MainWindow();
