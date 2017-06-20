@@ -34,6 +34,10 @@ public class GeneralConfLoader extends ConfLoader {
 		Object obj = parser.parse(new FileReader(configFile.getAbsolutePath()));
 		JSONObject jsonObject = (JSONObject) obj;
 		
+		/**********************************************
+		 * Asset and save directories.
+		 **********************************************/
+		
 		/*
 		 * Load data which tells the application where it's safe to store new levels.
 		 * 
@@ -78,6 +82,17 @@ public class GeneralConfLoader extends ConfLoader {
 					GeneralConfModel.setAssetsDirectory(GeneralConfModel.getDefaultAssetsDir_LINUX().getAbsolutePath());
 			}
 		}
+		
+		/**********************************************
+		 * Load Simple Error Reporter Config
+		 **********************************************/
+		
+		JSONObject serJson = (JSONObject) jsonObject.get("ser2000");
+		String serAddress = (String) serJson.get("address");
+		String serProjectName = (String) serJson.get("projectName");
+		
+		GeneralConfModel.setSERAddress(serAddress);
+		GeneralConfModel.setSERProjectName(serProjectName);
 	}
 
 	@Override

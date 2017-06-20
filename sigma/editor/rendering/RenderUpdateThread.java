@@ -14,7 +14,6 @@ import sigma.editor.ui.RenderPanel;
 public class RenderUpdateThread implements Runnable {
 	private static final long WAIT_TIME = 16;
 	private static boolean updating = true;
-	
 	private RenderPanel renderPanel;
 	
 	public RenderUpdateThread(RenderPanel renderPanel) {
@@ -24,7 +23,7 @@ public class RenderUpdateThread implements Runnable {
 	@Override
 	public void run() {
 		while(updating) {
-
+			
 			try {
 				Thread.sleep(WAIT_TIME);
 			} catch (InterruptedException e) {

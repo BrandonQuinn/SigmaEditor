@@ -90,4 +90,42 @@ public class GeneralConfModel {
 	public static File getDefaultAssetsDir_LINUX() {
 		return defaultGameAssetsDir_LINUX;
 	}
+	
+	/*
+	 * SER 2000 Error Reporter config.
+	 */
+	private static String address = "";
+	private static String projectName = "";
+	
+	/**
+	 * Set the address for Simple Error Report library.
+	 * @param address
+	 */
+	public static void setSERAddress(String address) {
+		GeneralConfModel.address = address;
+	}
+	
+	/**
+	 * Get the address for Simple Error Report library.
+	 * @return
+	 */
+	public static String getSERAddress() {
+		return address;
+	}
+	
+	/**
+	 * Set the project name for Simple Error Reporter library.
+	 * @param name
+	 */
+	public static void setSERProjectName(String name) {
+		GeneralConfModel.projectName = name;
+	}
+	
+	/**
+	 * Get the project name for Simple Error Reporter library.
+	 * @return
+	 */
+	public static String getSERProjectName() {
+		return projectName;
+	}
 }

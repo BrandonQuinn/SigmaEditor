@@ -19,6 +19,10 @@ public class Main {
 	
 	public static void main(String args[]) {
 		
+		/*
+		 * Load system look and feel, not the java cross platform one.
+		 */
+		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
@@ -42,7 +46,7 @@ public class Main {
 			ErrorDialog eDialog = new ErrorDialog(e.getMessage(), e.getStackTraceMessage());
 			eDialog.setVisible(true);
 		}
-
+		
 		eld.setVisible(false);
 		
 		MainWindow mainWindow = new MainWindow();
