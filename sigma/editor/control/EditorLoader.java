@@ -19,18 +19,14 @@ import sigma.editor.ui.EngineLoadingDialog;
 public class EditorLoader {
 	
 	/**
-	 * Loads the configuration for the editor.
+	 * Loads the configuration for the editor and updates loading dialog as it goes.
 	 * 
 	 * @param eld Takes in a dialog which can be used to display the progress of how far
 	 * everything has loaded.
 	 * @throws EditorLoadingException
 	 */
 	public static void load(EngineLoadingDialog eld) throws EditorLoadingException {
-
-		/*
-		 * Load general configuration.
-		 */
-		
+		// load general config
 		GeneralConfLoader generalConfigLoader = new GeneralConfLoader();
 		
 		eld.setText("Loading entity configuration");
@@ -45,15 +41,10 @@ public class EditorLoader {
 		}
 		
 		eld.setProgress(50);
-		
-		/*
-		 * Load entity configuration.
-		 */
-		
-		EntityConfLoader entityConfLoader = new EntityConfLoader();
-		
 		eld.setText("Loading entity configuration");
 		
+		// load entity config
+		EntityConfLoader entityConfLoader = new EntityConfLoader();
 		try {
 			entityConfLoader.load();
 		} catch (IOException | ParseException e) {

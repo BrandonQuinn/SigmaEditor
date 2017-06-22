@@ -13,9 +13,7 @@ public class SigmaException extends Exception {
 	private String message = "No message set.";
 	private String stackTraceMessage = "No stack trace output set.";
 	
-	public SigmaException() {
-		
-	}
+	public SigmaException() {}
 	
 	public void setMessage(String message) {
 		this.message = message;

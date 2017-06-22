@@ -42,13 +42,13 @@ public class EntityConfLoader extends ConfLoader {
 	 * @throws IOException
 	 */
 	public void load() throws FileNotFoundException, IOException, ParseException {
+		// get list of entity types from JSON file
 		JSONParser parser = new JSONParser();
-		
 		Object obj = parser.parse(new FileReader(configFile.getAbsolutePath()));
 		JSONObject jsonObject = (JSONObject) obj;
-		
 		JSONArray types = (JSONArray) jsonObject.get("entityTypes");
 		
+		// add types to model
 		@SuppressWarnings("unchecked")
 		Iterator<String> iterator =  types.iterator();
 		
@@ -64,15 +64,15 @@ public class EntityConfLoader extends ConfLoader {
 	 */
 	@SuppressWarnings("unchecked")
 	public void save() throws IOException {
-        JSONObject obj = new JSONObject();
-
+		JSONObject obj = new JSONObject();
         JSONArray entityList = new JSONArray();
         
+        // get types and create json from it
         ArrayList<String> entityTypes = EntityConfModel.getTypeList();
         for (String type : entityTypes) entityList.add(type);
-
         obj.put("entityTypes", entityList);
 
+        // write out conf
         FileWriter file = new FileWriter(configFile.getAbsolutePath());
         file.write(obj.toJSONString());
         file.flush();

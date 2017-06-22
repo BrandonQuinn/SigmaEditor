@@ -16,30 +16,22 @@ import sigma.editor.debug.StackTraceUtil;
  */
 
 public class Main {
-	
+
 	public static void main(String args[]) {
-		
-		/*
-		 * Load system look and feel, not the java cross platform one.
-		 */
-		
+		// load the system look and feel
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
 				| UnsupportedLookAndFeelException e) {
-			ErrorDialog eDialog = new ErrorDialog("Could not load the system look and feel.", 
-					StackTraceUtil.stackTraceToString(e));	
-			eDialog.setVisible(true);
+			ErrorDialog eDialog = new ErrorDialog("Could not load the system look and feel.",
+					StackTraceUtil.stackTraceToString(e));
+			eDialog.setVisible(true); // error dialog probably not needed
 		}
-		
-		/*
-		 * Load the configurations and anything else that needs loading before the editor
-		 * receives input.
-		 */
-		
+
 		EngineLoadingDialog eld = new EngineLoadingDialog();
 		eld.setVisible(true);
 		
+		// start loading editor configs and anything else needed
 		try {
 			EditorLoader.load(eld);
 		} catch (EditorLoadingException e) {
@@ -48,8 +40,8 @@ public class Main {
 		}
 		
 		eld.setVisible(false);
-		
+
 		MainWindow mainWindow = new MainWindow();
-		mainWindow.setVisible(true);
+		mainWindow.setVisible(true); // GO!
 	}
 }

@@ -22,15 +22,14 @@ public class RenderUpdateThread implements Runnable {
 	
 	@Override
 	public void run() {
+		// repaint thread after WAIT_TIME passed
 		while(updating) {
-			
 			try {
 				Thread.sleep(WAIT_TIME);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
 			renderPanel.repaint();
 		}
 	}
