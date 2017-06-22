@@ -34,7 +34,7 @@ public class Main {
 		
 		/*
 		 * Load the configurations and anything else that needs loading before the editor
-		 * recieves input.
+		 * receives input.
 		 */
 		
 		EngineLoadingDialog eld = new EngineLoadingDialog();
