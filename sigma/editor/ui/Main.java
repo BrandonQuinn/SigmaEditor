@@ -28,6 +28,17 @@ public class Main {
 			eDialog.setVisible(true); // error dialog probably not needed
 		}
 
+		initialise();
+
+		MainWindow mainWindow = new MainWindow();
+		mainWindow.setVisible(true); // GO!
+	}
+	
+	/**
+	 * Do anything that the editor needs to before showing the interface and allowing
+	 * interaction.
+	 */
+	private static void initialise() {
 		EngineLoadingDialog eld = new EngineLoadingDialog();
 		eld.setVisible(true);
 		
@@ -40,8 +51,5 @@ public class Main {
 		}
 		
 		eld.setVisible(false);
-
-		MainWindow mainWindow = new MainWindow();
-		mainWindow.setVisible(true); // GO!
 	}
 }
