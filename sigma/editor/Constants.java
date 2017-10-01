@@ -1,3 +1,4 @@
+
 package sigma.editor;
 
 /**
@@ -8,11 +9,12 @@ package sigma.editor;
  * @since 8 Jun 2017
  */
 
-public class Constants {
+public class Constants
+{
 	// Editor-wide
 	public static final String EDITOR_TITLE = "Sigma Editor";
 	public static final String EDITOR_VERSION = "0.0.1 Development Branch";
-	
+
 	// Directories
 	public static final String CONFIG_DIRECTORY = "config/";
 }

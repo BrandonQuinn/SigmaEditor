@@ -1,3 +1,4 @@
+
 package sigma.editor.debug;
 
 /**
@@ -7,6 +8,7 @@ package sigma.editor.debug;
  * @since 11 Jun 2017
  */
 
-public class EditorLoadingException extends SigmaException {
+public class EditorLoadingException extends SigmaException
+{
 	private static final long serialVersionUID = 1L;
 }

@@ -1,123 +1,196 @@
+/**
+ * Author: Brandon
+ * Date Created: 1 Oct. 2017
+ * File : NewProjectDialog.java
+ */
+
 package sigma.editor.ui;
 
 import java.awt.BorderLayout;
+import java.awt.FileDialog;
 import java.awt.FlowLayout;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
-import java.awt.Font;
 import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.UIManager;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
- * 
- * @author Brandon Quinn
- * @version 0.1
- * @since 16 Jun 2017
+ * NewProjectDialog
+ *
+ * Description:
  */
-
-public class NewProjectDialog extends JDialog {
+public class NewProjectDialog extends JDialog
+{
 	private static final long serialVersionUID = 1L;
-	
-	private final JPanel contentPanel = new JPanel();
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			NewProjectDialog dialog = new NewProjectDialog();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	private String projectName;
+	private int worldWidth = -1;
+	private int worldHeight = -1;
+	private String projectLocation;
+
+	private final JPanel contentPanel = new JPanel();
+	private JTextField projectNameField;
+	private JComboBox<String> widthCBox = new JComboBox<String>();
+	private JComboBox<String> heightCBox = new JComboBox<String>();
+	private JTextField locationField;
 
 	/**
 	 * Create the dialog.
 	 */
-	public NewProjectDialog() {
-		setTitle("Create New Level/Map");
-		setAlwaysOnTop(true);
-		setResizable(false);
+	public NewProjectDialog()
+	{
+		setTitle("New Project");
+		setBounds(100, 100, 417, 280);
+		setLocationRelativeTo(null);
 		setModal(true);
-		setBounds(100, 100, 305, 333);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		getContentPane().add(contentPanel,
+				BorderLayout.CENTER);
 		contentPanel.setLayout(null);
-		
-		JLabel lblCreateNewProject = new JLabel("Create New Project");
-		lblCreateNewProject.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lblCreateNewProject.setBounds(10, 11, 279, 20);
-		contentPanel.add(lblCreateNewProject);
-		
-		JLabel lblProjectName = new JLabel("Project Name (Level/Map Name)");
-		lblProjectName.setBounds(10, 42, 279, 14);
-		contentPanel.add(lblProjectName);
-		
-		textField = new JTextField();
-		textField.setBounds(10, 67, 279, 20);
-		contentPanel.add(textField);
-		textField.setColumns(10);
-		
-		JLabel lblNewLabel = new JLabel("Size");
-		lblNewLabel.setBounds(10, 98, 269, 14);
-		contentPanel.add(lblNewLabel);
-		
-		JLabel lblW = new JLabel("W:");
-		lblW.setBounds(10, 123, 23, 14);
-		contentPanel.add(lblW);
-		
-		textField_1 = new JTextField();
-		textField_1.setBounds(30, 120, 103, 20);
-		contentPanel.add(textField_1);
-		textField_1.setColumns(10);
-		
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
-		textField_2.setBounds(186, 120, 103, 20);
-		contentPanel.add(textField_2);
-		
-		JLabel lblH = new JLabel("H:");
-		lblH.setBounds(162, 123, 23, 14);
-		contentPanel.add(lblH);
-		
-		JLabel lblSaveLocation = new JLabel("Save Location (Not Recommened to Change)");
-		lblSaveLocation.setBounds(10, 159, 279, 14);
-		contentPanel.add(lblSaveLocation);
-		
-		textField_3 = new JTextField();
-		textField_3.setEditable(false);
-		textField_3.setBounds(10, 184, 279, 20);
-		contentPanel.add(textField_3);
-		textField_3.setColumns(10);
-		
-		JButton btnChange = new JButton("Change");
-		btnChange.setBounds(10, 215, 89, 23);
-		contentPanel.add(btnChange);
+		{
+			JLabel lblProjectName = new JLabel("Project Name");
+			lblProjectName.setBounds(10, 11, 64, 14);
+			contentPanel.add(lblProjectName);
+		}
+		{
+			projectNameField = new JTextField();
+			projectNameField.setBounds(10, 29, 266, 20);
+			contentPanel.add(projectNameField);
+			projectNameField.setColumns(10);
+		}
+		{
+			JLabel lblWorldSize = new JLabel("World Size");
+			lblWorldSize.setBounds(10, 60, 50, 14);
+			contentPanel.add(lblWorldSize);
+		}
+		{
+			JLabel lblNewLabel = new JLabel("Width");
+			lblNewLabel.setBounds(10, 85, 28, 14);
+			contentPanel.add(lblNewLabel);
+		}
+		{
+			JLabel lblHeight = new JLabel("Height");
+			lblHeight.setBounds(149, 85, 31, 14);
+			contentPanel.add(lblHeight);
+		}
+		widthCBox.setBounds(48, 82, 86, 20);
+		widthCBox.setModel(new DefaultComboBoxModel<String>(new String[] { "100", "200", "500",
+				"1000" }));
+		contentPanel.add(widthCBox);
+		{
+			heightCBox = new JComboBox<String>();
+			heightCBox.setBounds(190, 82, 86, 20);
+			heightCBox.setModel(new DefaultComboBoxModel<String>(new String[] { "100", "200", "500",
+					"1000" }));
+			contentPanel.add(heightCBox);
+		}
+
+		JLabel lblProjectLocation = new JLabel("Project Location");
+		lblProjectLocation.setBounds(10, 119, 86, 14);
+		contentPanel.add(lblProjectLocation);
+
+		locationField = new JTextField();
+		locationField.setEditable(false);
+		locationField.setBounds(10, 138, 384, 20);
+		contentPanel.add(locationField);
+		locationField.setColumns(10);
+
+		JButton changeLocBtn = new JButton("Change Location");
+		changeLocBtn.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent arg0)
+			{
+				// open a file dialog to select a directory to create the project
+				JFileChooser fc = new JFileChooser();
+				fc.setDialogTitle("Select Project Directory");
+				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				fc.showOpenDialog(null);
+
+				projectLocation = fc.getSelectedFile().getAbsolutePath();
+				locationField.setText(projectLocation);
+			}
+		});
+		changeLocBtn.setBounds(10, 169, 148, 23);
+		contentPanel.add(changeLocBtn);
 		{
 			JPanel buttonPane = new JPanel();
-			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			buttonPane.setBackground(UIManager.getColor("Button.light"));
+			buttonPane.setLayout(new FlowLayout(
+					FlowLayout.RIGHT));
+			getContentPane().add(buttonPane,
+					BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("Create");
+				okButton.addActionListener(new ActionListener()
+				{
+					@Override
+					public void actionPerformed(ActionEvent arg0)
+					{
+						projectName = projectNameField.getText();
+						worldWidth = Integer.valueOf((String) widthCBox.getSelectedItem());
+						worldHeight = Integer.valueOf((String) heightCBox.getSelectedItem());
+						setVisible(false);
+					}
+				});
+
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
+				cancelButton.addActionListener(new ActionListener()
+				{
+					@Override
+					public void actionPerformed(ActionEvent arg0)
+					{
+						setVisible(false);
+					}
+				});
+
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}
 		}
+	}
+
+	public boolean isComplete()
+	{
+		if (projectName == null ||
+				worldWidth == -1 ||
+				worldHeight == -1 ||
+				projectLocation == null) {
+			return false;
+		}
+		return true;
+	}
+
+	public String projectName()
+	{
+		return projectName;
+	}
+
+	public int worldWidth()
+	{
+		return worldWidth;
+	}
+
+	public int worldHeight()
+	{
+		return worldHeight;
+	}
+
+	public String projectLocation()
+	{
+		return projectLocation;
 	}
 }

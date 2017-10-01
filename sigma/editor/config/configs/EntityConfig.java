@@ -1,4 +1,5 @@
-package sigma.editor.model;
+
+package sigma.editor.config.configs;
 
 import java.util.ArrayList;
 
@@ -10,27 +11,34 @@ import java.util.ArrayList;
  * @since 11 Jun 2017
  */
 
-public class EntityConfModel {
+public class EntityConfig
+{
 	private static ArrayList<String> entityTypes = new ArrayList<String>();
-	
+
 	/**
 	 * Single static private instance.
 	 */
-	private EntityConfModel() {}
-	
+	private EntityConfig()
+	{
+	}
+
 	/**
 	 * Add a type to the entity list.
+	 * 
 	 * @param type
 	 */
-	public static void addType(String type) {
+	public static void addType(String type)
+	{
 		entityTypes.add(type);
 	}
-	
+
 	/**
-	 * Get the list of entity types 
+	 * Get the list of entity types
+	 * 
 	 * @return a String[] of all entity types
 	 */
-	public static ArrayList<String> getTypeList() {
+	public static ArrayList<String> getTypeList()
+	{
 		return entityTypes;
 	}
 }

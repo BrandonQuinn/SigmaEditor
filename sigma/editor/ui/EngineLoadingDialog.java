@@ -1,7 +1,7 @@
+
 package sigma.editor.ui;
 
 import java.awt.BorderLayout;
-
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -15,17 +15,19 @@ import javax.swing.JLabel;
  * @since 11 Jun 2017
  */
 
-public class EngineLoadingDialog extends JDialog {
+public class EngineLoadingDialog extends JDialog
+{
 	private static final long serialVersionUID = 1L;
-	
+
 	private final JPanel contentPanel = new JPanel();
 	private JProgressBar progressBar;
 	JLabel lblStatus;
-	
+
 	/**
 	 * Create the dialog.
 	 */
-	public EngineLoadingDialog() {
+	public EngineLoadingDialog()
+	{
 		setType(Type.POPUP);
 		setBounds(100, 100, 309, 124);
 		setSize(309, 104);
@@ -35,31 +37,37 @@ public class EngineLoadingDialog extends JDialog {
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-		
+
 		progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
 		progressBar.setToolTipText("");
 		progressBar.setBounds(10, 11, 273, 22);
 		contentPanel.add(progressBar);
-		
+
 		lblStatus = new JLabel("Status:");
 		lblStatus.setBounds(10, 44, 273, 14);
 		contentPanel.add(lblStatus);
 	}
-	
+
 	/**
 	 * Simply set the progress of the progress bar.
-	 * @param progress progress as an integer percentage out of 100
+	 * 
+	 * @param progress
+	 *            progress as an integer percentage out of 100
 	 */
-	public void setProgress(int progress) {
+	public void setProgress(int progress)
+	{
 		this.progressBar.setValue(progress);
 	}
-	
+
 	/**
 	 * Set the message under the loading bar.
-	 * @param text The message
+	 * 
+	 * @param text
+	 *            The message
 	 */
-	public void setText(String text) {
+	public void setText(String text)
+	{
 		lblStatus.setText(text);
 	}
 }

@@ -1,5 +1,7 @@
+
 package sigma.editor.rendering;
 
+import sigma.editor.ui.Main;
 import sigma.editor.ui.RenderPanel;
 
 /**
@@ -11,33 +13,37 @@ import sigma.editor.ui.RenderPanel;
  * @since 12 Jun 2017
  */
 
-public class RenderUpdateThread implements Runnable {
+public class RenderUpdateThread implements Runnable
+{
 	private static final long WAIT_TIME = 16; // milliseconds
 	private static boolean updating = true;
 	private RenderPanel renderPanel;
-	
-	public RenderUpdateThread(RenderPanel renderPanel) {
+
+	public RenderUpdateThread(RenderPanel renderPanel)
+	{
 		this.renderPanel = renderPanel;
 	}
-	
+
 	@Override
-	public void run() {
+	public void run()
+	{
 		// repaint thread after WAIT_TIME passed
-		while(updating) {
+		while (updating) {
 			try {
 				Thread.sleep(WAIT_TIME);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
 			}
 			renderPanel.repaint();
 		}
 	}
-	
+
 	/**
 	 * Stop the thread from updating the RenderPanel
 	 */
-	public synchronized void stopUpdating() {
+	public synchronized void stopUpdating()
+	{
 		updating = false;
 	}
 }

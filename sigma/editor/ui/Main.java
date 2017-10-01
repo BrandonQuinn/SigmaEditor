@@ -1,11 +1,13 @@
+
 package sigma.editor.ui;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-
-import sigma.editor.control.EditorLoader;
+import sigma.editor.config.loaders.EditorLoader;
 import sigma.editor.debug.EditorLoadingException;
+import sigma.editor.debug.LogType;
 import sigma.editor.debug.StackTraceUtil;
+import sigma.editor.debug.StaticLogs;
 
 /**
  * A level editor for the "Project Sigma" game.
@@ -15,9 +17,11 @@ import sigma.editor.debug.StackTraceUtil;
  * @since 8 Jun 2017
  */
 
-public class Main {
+public class Main
+{
 
-	public static void main(String args[]) {
+	public static void main(String args[])
+	{
 		// load the system look and feel
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -33,23 +37,26 @@ public class Main {
 		MainWindow mainWindow = new MainWindow();
 		mainWindow.setVisible(true); // GO!
 	}
-	
+
 	/**
-	 * Do anything that the editor needs to before showing the interface and allowing
+	 * Do anything that the editor needs to before showing the interface and
+	 * allowing
 	 * interaction.
 	 */
-	private static void initialise() {
+	private static void initialise()
+	{
 		EngineLoadingDialog eld = new EngineLoadingDialog();
 		eld.setVisible(true);
-		
+
 		// start loading editor configs and anything else needed
 		try {
+			StaticLogs.debug.log(LogType.INFO, ".");
 			EditorLoader.load(eld);
 		} catch (EditorLoadingException e) {
 			ErrorDialog eDialog = new ErrorDialog(e.getMessage(), e.getStackTraceMessage());
 			eDialog.setVisible(true);
 		}
-		
+
 		eld.setVisible(false);
 	}
 }
