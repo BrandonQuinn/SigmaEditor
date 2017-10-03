@@ -12,6 +12,7 @@ import sigma.editor.debug.SigmaException;
 import sigma.editor.debug.StaticLogs;
 import sigma.editor.rendering.RenderUpdateThread;
 import sigma.project.EditingContext;
+import sigma.project.GameModel;
 import sigma.project.ProjectContext;
 import sigma.project.ProjectManager;
 import javax.swing.BoxLayout;
@@ -20,12 +21,14 @@ import javax.swing.JToolBar;
 import javax.swing.JSplitPane;
 import javax.swing.JList;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -48,8 +51,9 @@ public class MainWindow extends JFrame implements
 {
 	private static final long serialVersionUID = 1L;
 
-	private ProjectContext projectContext;
-	private EditingContext editingContext;
+	private ProjectContext projectContext = ProjectContext.projectContext();
+	private EditingContext editingContext = EditingContext.editingContext();
+	private GameModel gameModel = GameModel.gameModel();
 
 	private JPanel contentPane;
 	private JComboBox<String> comboBox;
@@ -67,7 +71,8 @@ public class MainWindow extends JFrame implements
 	/**
 	 * Menu Items
 	 */
-	JMenuItem mntmNewProject;
+	private JMenuItem newProjectItem;
+	private JMenuItem openProjectItem;
 
 	/**
 	 * Get the default toolkit to resize the application.
@@ -88,7 +93,7 @@ public class MainWindow extends JFrame implements
 						/ 1.3f));
 		setLocationRelativeTo(null);
 
-		/**
+		/*
 		 * Initialise Icons
 		 */
 		selectToolIcon = new ImageIcon(
@@ -106,9 +111,13 @@ public class MainWindow extends JFrame implements
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 
-		mntmNewProject = new JMenuItem("New Project...");
-		mntmNewProject.addActionListener(this);
-		mnFile.add(mntmNewProject);
+		newProjectItem = new JMenuItem("New Project...");
+		newProjectItem.addActionListener(this);
+		mnFile.add(newProjectItem);
+
+		openProjectItem = new JMenuItem("Open Project...");
+		openProjectItem.addActionListener(this);
+		mnFile.add(openProjectItem);
 
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
@@ -259,32 +268,87 @@ public class MainWindow extends JFrame implements
 	{
 		Object source = e.getSource();
 
-		if (source == mntmNewProject) {
+		if (source == newProjectItem) {
 			NewProjectDialog npd = new NewProjectDialog();
 			npd.setVisible(true);
 
-			projectContext = ProjectContext.projectContext();
-			editingContext = EditingContext.editingContext();
+			// fixes error when clicking x causing waiting dialog to still be
+			// created and directorie and files are also created even without
+			// complete information
+			if (!npd.isConfirmed()) {
+				return;
+			}
+
+			if (!npd.isComplete()) {
+				JOptionPane.showMessageDialog(null,
+						"One or more field were incorrect or blank.",
+						"Bad Values",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			WaitingDialog waitingDialog = new WaitingDialog("Creating new project...");
+			waitingDialog.setVisible(true);
 
 			// create a new project context which is how the editor knows where everything is
 			// and keeps tracks of assets etc.
 			ProjectManager manager = ProjectManager.manager();
 			try {
+
 				manager.createNewProject(npd.projectName(),
 						npd.projectLocation(),
 						npd.worldWidth(),
-						npd.worldHeight(),
-						editingContext,
-						projectContext);
+						npd.worldHeight());
 
-				manager.open(npd.projectLocation(), editingContext, projectContext);
+				waitingDialog.changeMessageTo("Opening project...");
+
+				manager.open(npd.projectLocation() + "/" + npd.projectName(),
+						editingContext,
+						projectContext,
+						gameModel);
+
+				waitingDialog.setVisible(false);
 			} catch (SigmaException e1) {
-				JOptionPane.showConfirmDialog(null,
-						"Could not create project. " + e1.getMessage(),
+				waitingDialog.setVisible(false);
+				JOptionPane.showMessageDialog(null,
+						"Could not create project. " + e1.getMessage()
+								+ "\nCheck the logs.",
 						"Error",
-						JOptionPane.OK_OPTION,
 						JOptionPane.ERROR_MESSAGE);
 			}
+		} else if (source == openProjectItem) {
+
+			// show a file dialog and get the chosen project directory
+			JFileChooser fc = new JFileChooser();
+			fc.setDialogTitle("Open Project");
+			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			int fcResponse = fc.showOpenDialog(null);
+
+			WaitingDialog waitingDialog = new WaitingDialog("Opening project...");
+			waitingDialog.setVisible(true);
+
+			if (fcResponse == JFileChooser.APPROVE_OPTION) {
+				File projectDirectory = fc.getSelectedFile();
+				ProjectManager manager = ProjectManager.manager();
+
+				try {
+					manager.open(projectDirectory.getAbsolutePath(),
+							editingContext,
+							projectContext,
+							gameModel);
+				} catch (SigmaException e1) {
+					waitingDialog.setVisible(false);
+					StaticLogs.debug.log(LogType.CRITICAL,
+							"Failed to open project: " + e1.message());
+					JOptionPane.showMessageDialog(null,
+							"Failed to load project: " + e1.message()
+									+ "\nCheck the logs.",
+							"Failure to Load",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
+
+			waitingDialog.setVisible(false);
 		}
 	}
 }

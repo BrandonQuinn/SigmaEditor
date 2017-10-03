@@ -18,13 +18,18 @@ public class SigmaException extends Exception
 	public SigmaException()
 	{
 	}
+	
+	public SigmaException(String message)
+	{
+		this.message = message;
+	}
 
 	public void setMessage(String message)
 	{
 		this.message = message;
 	}
 
-	public String getMessage()
+	public String message()
 	{
 		return message;
 	}
@@ -34,7 +39,7 @@ public class SigmaException extends Exception
 		this.stackTraceMessage = stackTrace;
 	}
 
-	public String getStackTraceMessage()
+	public String stackTraceMessage()
 	{
 		return stackTraceMessage;
 	}

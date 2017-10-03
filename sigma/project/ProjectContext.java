@@ -23,9 +23,11 @@ public class ProjectContext
 {
 	private static ProjectContext instance = new ProjectContext();
 
-	private static String projectName = "";
-	private static String projectDirectory = "";
-	private static File projectDirFile;
+	private boolean projectLoaded = false;
+	
+	private String projectName = "";
+	private String projectDirectory = "";
+	private File projectDirFile;
 
 	private ProjectContext()
 	{
@@ -35,11 +37,36 @@ public class ProjectContext
 	{
 		return instance;
 	}
-
-	public static ProjectContext newContext(String projectName, String projectDir)
+	
+	/**
+	 * Changes whether or not there is currently a project loaded
+	 * in the editor.
+	 * @param isLoaded
+	 */
+	public void setProjectLoaded(boolean isLoaded)
 	{
-		ProjectContext.projectName = projectName;
-		ProjectContext.projectDirectory = projectDir;
-		return instance;
+		projectLoaded = isLoaded;
+	}
+	
+	/**
+	 * Returns whether or not a project has been loaded in the editor.
+	 * @return
+	 */
+	public boolean isProjectLoaded()
+	{
+		return projectLoaded;
+	}
+
+	/**
+	 * @param projectName
+	 */
+	public void assignProjectName(String projectName)
+	{
+		this.projectName = projectName;
+	}
+	
+	public void assignProjectDirectory(String projectDirectory)
+	{
+		this.projectDirectory = projectDirectory;
 	}
 }

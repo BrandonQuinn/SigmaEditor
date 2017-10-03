@@ -50,10 +50,11 @@ public class Main
 
 		// start loading editor configs and anything else needed
 		try {
-			StaticLogs.debug.log(LogType.INFO, ".");
+			StaticLogs.debug.log(LogType.INFO, "Loading editor...");
 			EditorLoader.load(eld);
+			StaticLogs.debug.log(LogType.INFO, "Editor done loading.");
 		} catch (EditorLoadingException e) {
-			ErrorDialog eDialog = new ErrorDialog(e.getMessage(), e.getStackTraceMessage());
+			ErrorDialog eDialog = new ErrorDialog(e.getMessage(), e.stackTraceMessage());
 			eDialog.setVisible(true);
 		}
 

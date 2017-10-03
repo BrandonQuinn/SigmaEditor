@@ -6,34 +6,67 @@
 
 package sigma.project;
 
+import java.awt.image.BufferedImage;
+
 /**
  * World
  *
- * Description: Somewhat similar to the World
- * class in the actual engine, or at least it will
- * contain most of what is in that class
- * except with more fleshed out details.
+ * Description: Maintains the state of the editor
+ * in terms of tools currently selected and what
+ * the user is interacting with or changing.
  * 
- * This class is the main data structure which holds
- * everything being edited and rendered.
- * 
- * Compared to the ProjectContext class which represents
- * meta information about the project, this class
- * is the actual project.
- * 
- * TODO Start working on EditingContext
+ * TODO Work on EditingContext
  */
 public class EditingContext
 {
 	private static EditingContext context = new EditingContext();
 	
-	private int worldWidth = 100;
-	private int worldHeight = 100;
-
+	/**
+	 * EditingState
+	 *
+	 * Description: The current state of the editer.
+	 * This generally refers to the current tool being used
+	 * in the editor.
+	 */
+	enum EditingState 
+	{
+		SELECT,
+		PAINT
+	}
+	
+	/**
+	 * The current state of the editor. Or rather
+	 * which tool is being used.
+	 */
+	private EditingState state = EditingState.SELECT;
+	
+	/*===========================*
+	 * SELECT state fields        *
+	 *===========================*/
+	
+	/*===========================*
+	 * PAINT state fields        *
+	 *===========================*/
+	
+	/**
+	 * The current index of which layer/image to paint to.
+	 */
+	private int selectedGroundLayer = 0;
+	
+	/**
+	 * Current texture selected for painting.
+	 */
+	private BufferedImage selectedTexture;
+	
+	
 	// can not instantiate, do not want to
 	private EditingContext()
 	{
 	}
+	
+	/*================================================*
+	 * Getters and Setters                            *
+	 *================================================*/
 	
 	/**
 	 * Return the static intance to the editable context for
@@ -43,15 +76,5 @@ public class EditingContext
 	public static EditingContext editingContext()
 	{
 		return context;
-	}
-	
-	public int worldWidth()
-	{
-		return worldWidth;
-	}
-	
-	public int worldHeight()
-	{
-		return worldHeight;
 	}
 }
