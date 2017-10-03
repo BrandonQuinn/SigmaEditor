@@ -5,6 +5,9 @@ import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import org.omg.PortableServer.ImplicitActivationPolicyOperations;
 import sigma.editor.Constants;
 import sigma.editor.config.configs.EntityConfig;
 import sigma.editor.debug.LogType;
@@ -73,6 +76,7 @@ public class MainWindow extends JFrame implements
 	 */
 	private JMenuItem newProjectItem;
 	private JMenuItem openProjectItem;
+	private JMenuItem loadTextureItem;
 
 	/**
 	 * Get the default toolkit to resize the application.
@@ -87,21 +91,16 @@ public class MainWindow extends JFrame implements
 		setTitle(Constants.EDITOR_TITLE + " "
 				+ Constants.EDITOR_VERSION);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize((int) (toolkit.getScreenSize().width
-				/ 1.3f),
-				(int) (toolkit.getScreenSize().height
-						/ 1.3f));
+		setSize((int) (toolkit.getScreenSize().width / 1.3f),
+				(int) (toolkit.getScreenSize().height / 1.3f));
 		setLocationRelativeTo(null);
 
 		/*
 		 * Initialise Icons
 		 */
-		selectToolIcon = new ImageIcon(
-				"res\\icons\\selectTool.png");
-		moveToolIcon = new ImageIcon(
-				"res\\icons\\moveTool.png");
-		rotateToolIcon = new ImageIcon(
-				"res\\icons\\rotateTool.png");
+		selectToolIcon = new ImageIcon("res\\icons\\selectTool.png");
+		moveToolIcon = new ImageIcon("res\\icons\\moveTool.png");
+		rotateToolIcon = new ImageIcon("res\\icons\\rotateTool.png");
 		playIcon = new ImageIcon("res\\icons\\playBtn.png");
 		stopIcon = new ImageIcon("res\\icons\\stopBtn.png");
 
@@ -110,7 +109,7 @@ public class MainWindow extends JFrame implements
 
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
-
+		
 		newProjectItem = new JMenuItem("New Project...");
 		newProjectItem.addActionListener(this);
 		mnFile.add(newProjectItem);
@@ -118,9 +117,17 @@ public class MainWindow extends JFrame implements
 		openProjectItem = new JMenuItem("Open Project...");
 		openProjectItem.addActionListener(this);
 		mnFile.add(openProjectItem);
-
+		
+		JMenu mnAssets = new JMenu("Assets");
+		menuBar.add(mnAssets);
+		
+		loadTextureItem = new JMenuItem("Import Texture");
+		loadTextureItem.addActionListener(this);
+		mnAssets.add(loadTextureItem);
+		
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -154,19 +161,16 @@ public class MainWindow extends JFrame implements
 		splitPane.setLeftComponent(leftSplitPane);
 		leftSplitPane.setContinuousLayout(true);
 		leftSplitPane.setResizeWeight(0.5);
-		leftSplitPane.setOrientation(
-				JSplitPane.VERTICAL_SPLIT);
+		leftSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 
 		JPanel leftSideNorthPanel = new JPanel();
 		leftSplitPane.setLeftComponent(leftSideNorthPanel);
-		leftSideNorthPanel.setLayout(new BorderLayout(0,
-				0));
+		leftSideNorthPanel.setLayout(new BorderLayout(0, 0));
 
 		comboBox = new JComboBox<String>();
 
 		// init combo box
-		ArrayList<String> entityTypes = EntityConfig
-				.getTypeList();
+		ArrayList<String> entityTypes = EntityConfig.getTypeList();
 		for (String type : entityTypes)
 			comboBox.addItem(type);
 
@@ -174,8 +178,7 @@ public class MainWindow extends JFrame implements
 				BorderLayout.NORTH);
 
 		JScrollPane scrollPane = new JScrollPane();
-		leftSideNorthPanel.add(scrollPane,
-				BorderLayout.CENTER);
+		leftSideNorthPanel.add(scrollPane, BorderLayout.CENTER);
 
 		@SuppressWarnings("rawtypes")
 		JList entityList = new JList();
@@ -183,11 +186,9 @@ public class MainWindow extends JFrame implements
 		scrollPane.setViewportView(entityList);
 
 		JPanel leftSideSouthPanel = new JPanel();
-		leftSideSouthPanel.setBorder(new EmptyBorder(2, 2,
-				2, 2));
+		leftSideSouthPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
 		leftSplitPane.setRightComponent(leftSideSouthPanel);
-		leftSideSouthPanel.setLayout(new BorderLayout(0,
-				0));
+		leftSideSouthPanel.setLayout(new BorderLayout(0, 0));
 
 		JLabel lblProperties = new JLabel("Properties");
 		lblProperties.setHorizontalAlignment(
@@ -198,10 +199,8 @@ public class MainWindow extends JFrame implements
 				BorderLayout.NORTH);
 
 		JPanel propertiesPanel = new JPanel();
-		leftSideSouthPanel.add(propertiesPanel,
-				BorderLayout.CENTER);
-		propertiesPanel.setLayout(new BoxLayout(
-				propertiesPanel, BoxLayout.X_AXIS));
+		leftSideSouthPanel.add(propertiesPanel, BorderLayout.CENTER);
+		propertiesPanel.setLayout(new BoxLayout(propertiesPanel, BoxLayout.X_AXIS));
 
 		JPanel panel = new JPanel();
 		splitPane.setRightComponent(panel);
@@ -216,8 +215,7 @@ public class MainWindow extends JFrame implements
 		rightSplitPane.setContinuousLayout(true);
 
 		rightSplitPane.setResizeWeight(0.5);
-		rightSplitPane.setOrientation(
-				JSplitPane.VERTICAL_SPLIT);
+		rightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 
 		renderPanel = new RenderPanel();
 
@@ -244,18 +242,14 @@ public class MainWindow extends JFrame implements
 		layerPanel.add(list, BorderLayout.CENTER);
 
 		JLabel lblLayers = new JLabel("Layers");
-		lblLayers.setFont(new Font("Tahoma", Font.BOLD,
-				11));
-		lblLayers.setHorizontalAlignment(
-				SwingConstants.CENTER);
+		lblLayers.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblLayers.setHorizontalAlignment(SwingConstants.CENTER);
 		layerPanel.add(lblLayers, BorderLayout.NORTH);
 
 		thread.start();
 
-		StaticLogs.debug.log(LogType.INFO,
-				"Update thread started");
-		StaticLogs.debug.log(LogType.INFO,
-				"Main Window created");
+		StaticLogs.debug.log(LogType.INFO, "Update thread started");
+		StaticLogs.debug.log(LogType.INFO, "Main Window created");
 	}
 
 	/*
@@ -349,6 +343,25 @@ public class MainWindow extends JFrame implements
 			}
 
 			waitingDialog.setVisible(false);
+		} else if (source == loadTextureItem) {
+			JFileChooser fc = new JFileChooser();
+			fc.setDialogTitle("Import Texture");
+			fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			fc.setAcceptAllFileFilterUsed(false);
+			
+			FileNameExtensionFilter jpegFilter = new FileNameExtensionFilter("JPEG File", "jpg", "jpeg");
+			FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("PNG File", "png");
+			fc.addChoosableFileFilter(jpegFilter);
+			fc.addChoosableFileFilter(pngFilter);
+			
+			int fcResponse = fc.showOpenDialog(null);
+			
+			if (fcResponse == JFileChooser.APPROVE_OPTION) {
+				File selectedImage = fc.getSelectedFile();
+				
+				// TODO Load texture in to project directory
+				// TODO Load texture in to model
+			}
 		}
 	}
 }

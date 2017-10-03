@@ -7,6 +7,7 @@
 package sigma.editor.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -125,7 +126,7 @@ public class NewProjectDialog extends JDialog
 		contentPanel.add(changeLocBtn);
 		{
 			JPanel buttonPane = new JPanel();
-			buttonPane.setBackground(UIManager.getColor("Button.light"));
+			buttonPane.setBackground(new Color(220, 220, 220));
 			buttonPane.setLayout(new FlowLayout(
 					FlowLayout.RIGHT));
 			getContentPane().add(buttonPane,
