@@ -118,10 +118,10 @@ public class RenderPanel extends JComponent implements
 		// ready to draw rectangle
 		if (mousePressed && startSet) {
 			// draw border
-			g2d.setColor(new Color(66, 138, 255, 98));
+			g2d.setColor(new Color(66, 138, 255, 180));
 			g2d.drawRect(startX, startY, mouseX - startX, mouseY - startY);
 
-			g2d.setColor(new Color(66, 138, 255, 50));
+			g2d.setColor(new Color(66, 138, 255, 100));
 			// draw center
 			g2d.fillRect(startX + 1, startY + 1, mouseX - startX - 1, mouseY - startY - 1);
 

@@ -12,6 +12,7 @@ import sigma.editor.debug.SigmaException;
 import sigma.editor.debug.StaticLogs;
 import sigma.editor.rendering.RenderUpdateThread;
 import sigma.project.EditingContext;
+import sigma.project.GameModel;
 import sigma.project.ProjectContext;
 import sigma.project.ProjectManager;
 import javax.swing.BoxLayout;
@@ -26,6 +27,8 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -50,6 +53,7 @@ public class MainWindow extends JFrame implements
 
 	private ProjectContext projectContext;
 	private EditingContext editingContext;
+	private GameModel gameModel;
 
 	private JPanel contentPane;
 	private JComboBox<String> comboBox;
@@ -263,21 +267,41 @@ public class MainWindow extends JFrame implements
 			NewProjectDialog npd = new NewProjectDialog();
 			npd.setVisible(true);
 
-			projectContext = ProjectContext.projectContext();
+			// fixes error when clicking x causing waiting dialog to still be
+			// created and directorie and files are also created even without
+			// complete information
+			if (!npd.isConfirmed()) {
+				return;
+			}
+			
+			if (!npd.isComplete()) {
+				JOptionPane.showMessageDialog(null, "One or more field were incorrect or blank.", 
+						"Bad Values", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			
+			gameModel = GameModel.gameModel();
 			editingContext = EditingContext.editingContext();
-
+			projectContext = ProjectContext.projectContext();
+			
 			// create a new project context which is how the editor knows where everything is
 			// and keeps tracks of assets etc.
 			ProjectManager manager = ProjectManager.manager();
 			try {
+				WaitingDialog waitingDialog = new WaitingDialog("Creating new project...");
+				waitingDialog.setVisible(true);
+				
 				manager.createNewProject(npd.projectName(),
 						npd.projectLocation(),
 						npd.worldWidth(),
-						npd.worldHeight(),
-						editingContext,
-						projectContext);
+						npd.worldHeight());
 
-				manager.open(npd.projectLocation(), editingContext, projectContext);
+				waitingDialog.changeMessageTo("Opening project...");
+				
+				manager.open(npd.projectLocation(), editingContext, projectContext, gameModel);
+				
+				waitingDialog.setVisible(false);
 			} catch (SigmaException e1) {
 				JOptionPane.showConfirmDialog(null,
 						"Could not create project. " + e1.getMessage(),

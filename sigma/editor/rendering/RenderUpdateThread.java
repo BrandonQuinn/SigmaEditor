@@ -1,7 +1,6 @@
 
 package sigma.editor.rendering;
 
-import sigma.editor.ui.Main;
 import sigma.editor.ui.RenderPanel;
 
 /**

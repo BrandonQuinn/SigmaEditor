@@ -7,7 +7,6 @@
 package sigma.editor.ui;
 
 import java.awt.BorderLayout;
-import java.awt.FileDialog;
 import java.awt.FlowLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -42,11 +41,14 @@ public class NewProjectDialog extends JDialog
 	private JComboBox<String> heightCBox = new JComboBox<String>();
 	private JTextField locationField;
 
+	private boolean confirmed = false;
+
 	/**
 	 * Create the dialog.
 	 */
 	public NewProjectDialog()
 	{
+		setModalityType(ModalityType.APPLICATION_MODAL);
 		setTitle("New Project");
 		setBounds(100, 100, 417, 280);
 		setLocationRelativeTo(null);
@@ -138,6 +140,7 @@ public class NewProjectDialog extends JDialog
 						projectName = projectNameField.getText();
 						worldWidth = Integer.valueOf((String) widthCBox.getSelectedItem());
 						worldHeight = Integer.valueOf((String) heightCBox.getSelectedItem());
+						confirmed = true;
 						setVisible(false);
 					}
 				});
@@ -163,6 +166,11 @@ public class NewProjectDialog extends JDialog
 		}
 	}
 
+	public boolean isConfirmed()
+	{
+		return confirmed;
+	}
+	
 	public boolean isComplete()
 	{
 		if (projectName == null ||
