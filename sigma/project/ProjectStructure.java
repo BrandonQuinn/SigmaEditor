@@ -18,9 +18,18 @@ public class ProjectStructure
 	public static final String CONFIG_FILE = "project.config";
 	
 	/**
+	 * Default project configuration JSON format.
+	 */
+	public static final String CONFIG_JSON_TEMPLATE = "{\n" + 
+				"\t\"projectName\": \"Untitled\",\n" + 
+				"\t\"worldWidth\": 100,\n" + 
+				"\t\"worldHeight\": 100\n" + 
+			"}";
+	
+	/**
 	 * List of directories inside a project on disk.
 	 */
-	private static String[] directoryList = {
+	public static String[] directoryList = {
 			"assets",
 			"assets/images",
 			"assets/sounds",
@@ -30,21 +39,7 @@ public class ProjectStructure
 	/**
 	 * List of required files inside a project.
 	 */
-	private static String[] fileList = {
+	public static String[] fileList = {
 			CONFIG_FILE
 	};
-	
-	/*================================================*
-	 * Getters and Setters                            *
-	 *================================================*/
-	
-	public static String[] getDirectoryList()
-	{
-		return directoryList;
-	}
-	
-	public static String[] getFileList()
-	{
-		return fileList;
-	}
 }

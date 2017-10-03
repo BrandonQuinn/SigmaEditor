@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -29,9 +30,22 @@ public class ProjectManager
 	private static ProjectManager instance = new ProjectManager();
 
 	/**
+	 * Just a simple class to store information to identify
+	 * a past project.
+	 * RecentProject
+	 *
+	 * Description: Just stores the most basic information to
+	 * identify a project.
+	 */
+	public class RecentProject {
+		public String projectName;
+		public String projectPath;
+	}
+	
+	/**
 	 * Provide a list of recently opening projects.
 	 */
-	private ArrayList<String> recentProjects;
+	private ArrayList<RecentProject> recentProjects = new ArrayList<RecentProject>();
 
 	private ProjectManager()
 	{
@@ -52,16 +66,14 @@ public class ProjectManager
 	{
 		// create the directory structure
 		File tempDir;
-		String[] directoryList = ProjectStructure.getDirectoryList();
-		for (String directory : directoryList) {
+		for (String directory : ProjectStructure.directoryList) {
 			tempDir = new File(projectLocation + "/" + projectName + "/" + directory);
 			tempDir.mkdirs();
 		}
 
 		// create files
-		String[] fileList = ProjectStructure.getFileList();
 		File tempFile;
-		for (String fileStr : fileList) {
+		for (String fileStr : ProjectStructure.fileList) {
 			tempFile = new File(projectLocation + "/" + projectName + "/" + fileStr);
 			try {
 				tempFile.createNewFile();
@@ -69,6 +81,23 @@ public class ProjectManager
 				throw new SigmaException("Could not create file in project directory: "
 						+ fileStr);
 			}
+		}
+
+		// write JSON template configuration
+		File configFile = new File(projectLocation + "/" + projectName + "/"
+				+ ProjectStructure.CONFIG_FILE);
+		StaticLogs.debug.log(LogType.INFO,
+				"Creating project configuration: " + configFile.getAbsolutePath());
+
+		try {
+			PrintWriter writer = new PrintWriter(configFile);
+			writer.println(ProjectStructure.CONFIG_JSON_TEMPLATE);
+			writer.close();
+		} catch (IOException e) {
+			StaticLogs.debug.log(LogType.CRITICAL,
+					"Failed to write project configuration template: " + configFile
+							.getAbsolutePath());
+			throw new SigmaException("IOExcetion while writer template JSON");
 		}
 
 		// TODO Set values in project.config on new project creation
@@ -94,13 +123,14 @@ public class ProjectManager
 	{
 		StaticLogs.debug.log(LogType.INFO, "Opening project at: " + projectLocation);
 
-		// TODO Open project
 		try {
 			loadConfiguration(projectLocation, editingContext, projectContext, model);
 		} catch (IOException | ParseException e) {
 			StaticLogs.debug.log(LogType.CRITICAL, "Failed to load project configuration");
-			throw new SigmaException("Failed to load project configuration.");
+			throw new SigmaException("Failed to load project configuration. " + e.getMessage());
 		}
+
+		// TODO Use config to setup contexts
 
 		StaticLogs.debug.log(LogType.INFO, "Project opened '" + projectLocation + "'");
 	}
@@ -130,21 +160,27 @@ public class ProjectManager
 				+ ProjectStructure.CONFIG_FILE));
 		JSONObject jsonObject = (JSONObject) obj;
 
-		// Get values
-
 		String projectName = (String) jsonObject.get("projectName");
-		int worldWidth = (int) jsonObject.get("worldWidth");
-		int worldHeight = (int) jsonObject.get("worldHeight");
-		
+		int worldWidth = ((Long) jsonObject.get("worldWidth")).intValue();
+		int worldHeight = ((Long) jsonObject.get("worldHeight")).intValue();
+
 		projectContext.assignProjectName(projectName);
 		projectContext.assignProjectDirectory(projectLocation);
 		model.assignWorldWidth(worldWidth);
 		model.assignWorldHeight(worldHeight);
+	}	
+	
+	/**
+	 * Returns a list of recent projects.
+	 * @return
+	 */
+	public ArrayList<RecentProject> recentProjects()
+	{
+		return recentProjects;
 	}
 
 	public static ProjectManager manager()
 	{
 		return instance;
 	}
-
 }

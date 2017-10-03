@@ -7,8 +7,6 @@
 package sigma.project;
 
 import java.io.File;
-import sigma.editor.debug.LogType;
-import sigma.editor.debug.StaticLogs;
 
 /**
  * ProjectContext
