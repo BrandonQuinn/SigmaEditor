@@ -31,7 +31,7 @@ public class EditingContext
 	enum EditingState 
 	{
 		SELECT,
-		PAINT
+		TEXTURE_PAINT
 	}
 	
 	/**
@@ -56,7 +56,7 @@ public class EditingContext
 	/**
 	 * Current texture selected for painting.
 	 */
-	private BufferedImage selectedTexture;
+	private Texture selectedTexture;
 	
 	
 	// can not instantiate, do not want to

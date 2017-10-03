@@ -130,6 +130,8 @@ public class ProjectManager
 			throw new SigmaException("Failed to load project configuration. " + e.getMessage());
 		}
 
+		projectContext.setProjectLoaded(true);
+		
 		// TODO Use config to setup contexts
 
 		StaticLogs.debug.log(LogType.INFO, "Project opened '" + projectLocation + "'");

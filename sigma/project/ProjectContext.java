@@ -7,6 +7,7 @@
 package sigma.project;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * ProjectContext
@@ -28,6 +29,11 @@ public class ProjectContext
 	private String projectName = "";
 	private String projectDirectory = "";
 	private File projectDirFile;
+	
+	/**
+	 * List of loaded textures which can be used.
+	 */
+	private ArrayList<Texture> textures = new ArrayList<Texture>();
 
 	private ProjectContext()
 	{
@@ -68,5 +74,25 @@ public class ProjectContext
 	public void assignProjectDirectory(String projectDirectory)
 	{
 		this.projectDirectory = projectDirectory;
+	}
+
+	/**
+	 * Add a texture to the project.
+	 * 
+	 * @param texture
+	 */
+	public void addTexture(Texture texture)
+	{
+		textures.add(texture);
+	}
+
+	public File projectDirectoryFile()
+	{
+		return projectDirFile;
+	}
+
+	public String projectPath()
+	{
+		return projectDirectory;
 	}
 }

@@ -14,10 +14,13 @@ import sigma.editor.debug.LogType;
 import sigma.editor.debug.SigmaException;
 import sigma.editor.debug.StaticLogs;
 import sigma.editor.rendering.RenderUpdateThread;
+import sigma.project.AssetLoader;
+import sigma.project.AssetType;
 import sigma.project.EditingContext;
 import sigma.project.GameModel;
 import sigma.project.ProjectContext;
 import sigma.project.ProjectManager;
+import sigma.project.Texture;
 import javax.swing.BoxLayout;
 import javax.swing.JMenuBar;
 import javax.swing.JToolBar;
@@ -32,6 +35,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -344,23 +348,41 @@ public class MainWindow extends JFrame implements
 
 			waitingDialog.setVisible(false);
 		} else if (source == loadTextureItem) {
-			JFileChooser fc = new JFileChooser();
-			fc.setDialogTitle("Import Texture");
-			fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			fc.setAcceptAllFileFilterUsed(false);
-			
-			FileNameExtensionFilter jpegFilter = new FileNameExtensionFilter("JPEG File", "jpg", "jpeg");
-			FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("PNG File", "png");
-			fc.addChoosableFileFilter(jpegFilter);
-			fc.addChoosableFileFilter(pngFilter);
-			
-			int fcResponse = fc.showOpenDialog(null);
-			
-			if (fcResponse == JFileChooser.APPROVE_OPTION) {
-				File selectedImage = fc.getSelectedFile();
+			if (projectContext.isProjectLoaded()) {
+				JFileChooser fc = new JFileChooser();
+				fc.setDialogTitle("Import Texture");
+				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				fc.setAcceptAllFileFilterUsed(false);
 				
-				// TODO Load texture in to project directory
-				// TODO Load texture in to model
+				FileNameExtensionFilter jpegFilter = new FileNameExtensionFilter("JPEG File", "jpg", "jpeg");
+				FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("PNG File", "png");
+				fc.addChoosableFileFilter(jpegFilter);
+				fc.addChoosableFileFilter(pngFilter);
+				
+				int fcResponse = fc.showOpenDialog(null);
+				
+				if (fcResponse == JFileChooser.APPROVE_OPTION) {
+					File selectedImage = fc.getSelectedFile();
+					String texName = JOptionPane.showInputDialog(null, "Enter the name of the texture", "Texture name", JOptionPane.PLAIN_MESSAGE);
+					
+					// TODO Load texture in to project directory
+					try {
+						Texture loadedTexture = AssetLoader.loadTexture(texName, selectedImage);
+						// TODO add loaded texture to interface
+					} catch (IOException e1) {
+						JOptionPane.showMessageDialog(null, 
+								"Failed to load texture", 
+								"IOException", 
+								JOptionPane.ERROR_MESSAGE);
+						StaticLogs.debug.log(LogType.ERROR, "Failed to load texture, " + e1.getMessage());
+						return;
+					}
+				}
+			} else { // no project is loaded, show a warning
+				JOptionPane.showMessageDialog(null, 
+						"There is currently no project loaded.", 
+						"No Project", 
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
