@@ -12,8 +12,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -47,6 +47,7 @@ public class ProjectManager
 	
 	/**
 	 * Provide a list of recently opening projects.
+	 * TODO Manage recent projects
 	 */
 	private ArrayList<RecentProject> recentProjects = new ArrayList<RecentProject>();
 
@@ -68,6 +69,10 @@ public class ProjectManager
 			int worldWidth,
 			int worldHeight) throws SigmaException
 	{
+		ProjectContext projContext = ProjectContext.projectContext();
+		projContext.assignProjectName(projectName);
+		projContext.assignProjectDirectory(projectLocation);
+		
 		// create the directory structure
 		File tempDir;
 		for (String directory : ProjectStructure.directoryList) {
@@ -204,9 +209,59 @@ public class ProjectManager
 
 		projectContext.assignProjectName(projectName);
 		projectContext.assignProjectDirectory(projectLocation);
+		
 		model.assignWorldWidth(worldWidth);
 		model.assignWorldHeight(worldHeight);
-	}	
+		
+		// load textures
+		JSONArray array = (JSONArray) jsonObject.get("textureList");
+		
+		for (int i = 0; i < array.size(); i++) {
+			JSONObject textureInfo = (JSONObject) array.get(i);
+			String textureName = (String) textureInfo.get("name");
+			String textureFilename = (String) textureInfo.get("filename");
+			
+			File textureFile = new File(projectLocation + "/assets/images/textures/" + textureFilename);
+			
+			// check if the file exists and then add it
+			if (textureFile.exists()) {
+				AssetLoader.loadTexture(textureName, textureFile);
+			} else {
+				array.remove(i);
+				StaticLogs.debug.log(LogType.WARNING, "Texture could not be found, it has been removed: " 
+						+ textureName + ", " + textureFilename);
+			}
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void addTextureToConfig(String name, File textureFile) throws SigmaException
+	{
+		ProjectContext projContext = ProjectContext.projectContext();
+		String projectLoc = projContext.projectPath();
+		File configFile = new File(projectLoc + "/"
+				+ ProjectStructure.CONFIG_FILE);
+
+		JSONParser parser = new JSONParser();
+		try {
+			JSONObject configObj = (JSONObject) parser.parse(new FileReader(configFile));
+			JSONArray textureList = (JSONArray) configObj.get("textureList");
+			JSONObject newTexObj = new JSONObject();
+			newTexObj.put("name", name);
+			newTexObj.put("filename", textureFile.getName());
+			textureList.add(newTexObj);
+			
+			// write out
+			PrintWriter writer = new PrintWriter(configFile);
+			writer.print(JSONFormatter.makePretty(configObj.toJSONString()));
+			writer.close();
+		} catch (IOException | ParseException e) {
+			StaticLogs.debug.log(LogType.ERROR, "Failed to add texture '" + textureFile.getAbsolutePath() 
+					+ "' to project configuration");
+			throw new SigmaException("Failed to add texture '" + textureFile.getAbsolutePath()  
+					+ "' to project configuration");
+		}
+	}
 	
 	/**
 	 * Returns a list of recent projects.

@@ -4,8 +4,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import javax.imageio.ImageIO;
+import sigma.editor.debug.SigmaException;
 
 /*============================================================*
 	Author: brq
@@ -25,10 +28,12 @@ public class AssetLoader
 	 * @param selectedImage
 	 * @return
 	 * @throws IOException
+	 * @throws SigmaException 
 	 */
-	public static Texture loadTexture(String name, File selectedImage) throws IOException
+	public static Texture loadTexture(String name, File selectedImage) throws IOException, SigmaException
 	{
 		ProjectContext projectContext = ProjectContext.projectContext();
+		ProjectManager manager = ProjectManager.manager();
 		Texture texture = null;
 		
 		// only load a texture if an actual project is loaded,
@@ -36,13 +41,14 @@ public class AssetLoader
 		if (projectContext.isProjectLoaded()) {
 			// copy the texture in to the project
 			File newFile = new File(projectContext.projectPath() + "/assets/images/textures/" + selectedImage.getName());
-			Files.createFile(newFile.toPath());
-			Files.copy(selectedImage.toPath(), new FileOutputStream(newFile));
+			Files.copy(selectedImage.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
 			// load the texture
 			BufferedImage bufferedImage = ImageIO.read(newFile);
 			texture = new Texture(name, newFile, bufferedImage);
 			projectContext.addTexture(texture);
+			
+			manager.addTextureToConfig(name, newFile);
 		}
 		
 		return texture;

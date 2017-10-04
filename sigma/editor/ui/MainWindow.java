@@ -394,13 +394,13 @@ public class MainWindow extends JFrame implements
 						// add the new texture to the JList
 						textureList.addTexture(loadedTexture);
 						
-					} catch (IOException e1) {
+					} catch (IOException | SigmaException e2) {
 						JOptionPane.showMessageDialog(null,
 								"Failed to load texture",
-								"IOException",
+								"IOException | SigmaException",
 								JOptionPane.ERROR_MESSAGE);
 						StaticLogs.debug.log(LogType.ERROR,
-								"Failed to load texture, " + e1.getMessage());
+								"Failed to load texture, " + e2.getMessage());
 						return;
 					}
 				}
