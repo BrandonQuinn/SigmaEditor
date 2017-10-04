@@ -89,10 +89,11 @@ public class ProjectManager
 		StaticLogs.debug.log(LogType.INFO,
 				"Creating project configuration: " + configFile.getAbsolutePath());
 
+		PrintWriter writer = null;
 		try {
-			PrintWriter writer = new PrintWriter(configFile);
+			writer = new PrintWriter(configFile);
 			writer.println(ProjectStructure.CONFIG_JSON_TEMPLATE);
-			writer.close();
+			
 		} catch (IOException e) {
 			StaticLogs.debug.log(LogType.CRITICAL,
 					"Failed to write project configuration template: " + configFile
@@ -101,7 +102,22 @@ public class ProjectManager
 		}
 
 		// TODO Set values in project.config on new project creation
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("projectName", projectName);
+		jsonObject.put("worldWidth", worldWidth);
+		jsonObject.put("worldHeight", worldHeight);
+		
+		try {
+			jsonObject.writeJSONString(writer);
+		} catch (IOException e) {
+			StaticLogs.debug.log(LogType.CRITICAL,
+					"Failed to write project configuration: " + configFile
+							.getAbsolutePath());
+			throw new SigmaException("IOExcetion while writing project configuration");
+		}
 
+		writer.close();
+		
 		StaticLogs.debug.log(LogType.INFO,
 				"New project created '" + projectName + "' in "
 						+ projectLocation);
