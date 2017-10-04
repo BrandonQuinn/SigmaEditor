@@ -157,11 +157,12 @@ public class ProjectManager
 	 * @param projectContext
 	 * @throws SigmaException
 	 */
-	public void open(String projectLocation,
-			EditingContext editingContext,
-			ProjectContext projectContext,
-			GameModel model) throws SigmaException
+	public void open(String projectLocation) throws SigmaException
 	{
+		EditingContext editingContext = EditingContext.editingContext();
+		ProjectContext projectContext = ProjectContext.projectContext();
+		GameModel model = GameModel.gameModel();
+		
 		StaticLogs.debug.log(LogType.INFO, "Opening project at: " + projectLocation);
 
 		try {
@@ -234,6 +235,15 @@ public class ProjectManager
 		}
 	}
 	
+	/**
+	 * Adds a texture to the project configuration,
+	 * this is just for integrity, and easier finding of textures
+	 * that have been intentionally imported.
+	 * 
+	 * @param name
+	 * @param textureFile
+	 * @throws SigmaException
+	 */
 	@SuppressWarnings("unchecked")
 	public void addTextureToConfig(String name, File textureFile) throws SigmaException
 	{

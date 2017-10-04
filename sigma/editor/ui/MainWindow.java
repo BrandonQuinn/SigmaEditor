@@ -296,23 +296,17 @@ public class MainWindow extends JFrame implements
 			// and keeps tracks of assets etc.
 			ProjectManager manager = ProjectManager.manager();
 			try {
-
 				manager.createNewProject(npd.projectName(),
 						npd.projectLocation(),
 						npd.worldWidth(),
 						npd.worldHeight());
 
 				waitingDialog.changeMessageTo("Opening project...");
-
-				manager.open(npd.projectLocation() + "/" + npd.projectName(),
-						editingContext,
-						projectContext,
-						gameModel);
-
+				manager.open(npd.projectLocation() + "/" + npd.projectName());
 				waitingDialog.setVisible(false);
 			
-				statusLabel.setText(npd.projectName() + " | " + npd.worldWidth() + "x" + npd
-						.worldHeight());
+				statusLabel.setText(npd.projectName() + " | " + npd.worldWidth() + "x" 
+						+ npd.worldHeight());
 			} catch (SigmaException e1) {
 				waitingDialog.setVisible(false);
 				JOptionPane.showMessageDialog(null,
@@ -343,10 +337,7 @@ public class MainWindow extends JFrame implements
 				ProjectManager manager = ProjectManager.manager();
 
 				try {
-					manager.open(projectDirectory.getAbsolutePath(),
-							editingContext,
-							projectContext,
-							gameModel);
+					manager.open(projectDirectory.getAbsolutePath());
 				} catch (SigmaException e1) {
 					waitingDialog.setVisible(false);
 					StaticLogs.debug.log(LogType.CRITICAL,
@@ -420,7 +411,7 @@ public class MainWindow extends JFrame implements
 			String selectedItem = (String) comboBox.getSelectedItem();
 			
 			if (selectedItem.equals("Texture")) {
-				// swap the left panel list to display the texture list
+				// TODO Swap lists with combo box
 			}
 			
 		}
