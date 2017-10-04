@@ -2,48 +2,42 @@
 package sigma.editor.ui;
 
 import java.awt.BorderLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import org.omg.PortableServer.ImplicitActivationPolicyOperations;
-import sigma.editor.Constants;
-import sigma.editor.config.configs.EntityConfig;
-import sigma.editor.debug.LogType;
-import sigma.editor.debug.SigmaException;
-import sigma.editor.debug.StaticLogs;
-import sigma.editor.rendering.RenderUpdateThread;
-import sigma.project.AssetLoader;
-import sigma.project.AssetType;
-import sigma.project.EditingContext;
-import sigma.project.GameModel;
-import sigma.project.ProjectContext;
-import sigma.project.ProjectManager;
-import sigma.project.Texture;
-import javax.swing.BoxLayout;
-import javax.swing.JMenuBar;
-import javax.swing.JToolBar;
-import javax.swing.JSplitPane;
-import javax.swing.JList;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JScrollPane;
-import javax.swing.JLabel;
 import java.awt.Font;
+import java.awt.List;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import java.awt.List;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
-import javax.swing.JButton;
-import javax.swing.ImageIcon;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import sigma.editor.Constants;
+import sigma.editor.debug.LogType;
+import sigma.editor.debug.SigmaException;
+import sigma.editor.debug.StaticLogs;
+import sigma.editor.rendering.RenderUpdateThread;
+import sigma.project.AssetLoader;
+import sigma.project.EditingContext;
+import sigma.project.GameModel;
+import sigma.project.ProjectContext;
+import sigma.project.ProjectManager;
+import sigma.project.Texture;
 
 /**
  * The main window which holds everything.
@@ -65,6 +59,9 @@ public class MainWindow extends JFrame implements
 	private JPanel contentPane;
 	private JComboBox<String> comboBox;
 	private RenderPanel renderPanel;
+	private JLabel statusLabel;
+	
+	private TextureJList textureList;
 
 	/**
 	 * Icons
@@ -113,7 +110,7 @@ public class MainWindow extends JFrame implements
 
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
-		
+
 		newProjectItem = new JMenuItem("New Project...");
 		newProjectItem.addActionListener(this);
 		mnFile.add(newProjectItem);
@@ -121,17 +118,17 @@ public class MainWindow extends JFrame implements
 		openProjectItem = new JMenuItem("Open Project...");
 		openProjectItem.addActionListener(this);
 		mnFile.add(openProjectItem);
-		
+
 		JMenu mnAssets = new JMenu("Assets");
 		menuBar.add(mnAssets);
-		
+
 		loadTextureItem = new JMenuItem("Import Texture");
 		loadTextureItem.addActionListener(this);
 		mnAssets.add(loadTextureItem);
-		
+
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
-		
+
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -174,9 +171,7 @@ public class MainWindow extends JFrame implements
 		comboBox = new JComboBox<String>();
 
 		// init combo box
-		ArrayList<String> entityTypes = EntityConfig.getTypeList();
-		for (String type : entityTypes)
-			comboBox.addItem(type);
+		comboBox.addItem("Texture");
 
 		leftSideNorthPanel.add(comboBox,
 				BorderLayout.NORTH);
@@ -184,10 +179,9 @@ public class MainWindow extends JFrame implements
 		JScrollPane scrollPane = new JScrollPane();
 		leftSideNorthPanel.add(scrollPane, BorderLayout.CENTER);
 
-		@SuppressWarnings("rawtypes")
-		JList entityList = new JList();
-		entityList.setVisibleRowCount(5);
-		scrollPane.setViewportView(entityList);
+		textureList = new TextureJList();
+		textureList.setVisibleRowCount(5);
+		scrollPane.setViewportView(textureList);
 
 		JPanel leftSideSouthPanel = new JPanel();
 		leftSideSouthPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
@@ -250,6 +244,12 @@ public class MainWindow extends JFrame implements
 		lblLayers.setHorizontalAlignment(SwingConstants.CENTER);
 		layerPanel.add(lblLayers, BorderLayout.NORTH);
 
+		JPanel statusPanel = new JPanel();
+		statusPanel.setLayout(new BorderLayout());
+		statusLabel = new JLabel("No project loaded.");
+		statusPanel.add(statusLabel);
+		contentPane.add(statusPanel, BorderLayout.SOUTH);
+
 		thread.start();
 
 		StaticLogs.debug.log(LogType.INFO, "Update thread started");
@@ -266,6 +266,10 @@ public class MainWindow extends JFrame implements
 	{
 		Object source = e.getSource();
 
+		/*==============================================*
+		 * CREATE NEW PROJECT
+		 *==============================================*/
+		
 		if (source == newProjectItem) {
 			NewProjectDialog npd = new NewProjectDialog();
 			npd.setVisible(true);
@@ -306,6 +310,9 @@ public class MainWindow extends JFrame implements
 						gameModel);
 
 				waitingDialog.setVisible(false);
+			
+				statusLabel.setText(npd.projectName() + " | " + npd.worldWidth() + "x" + npd
+						.worldHeight());
 			} catch (SigmaException e1) {
 				waitingDialog.setVisible(false);
 				JOptionPane.showMessageDialog(null,
@@ -314,7 +321,13 @@ public class MainWindow extends JFrame implements
 						"Error",
 						JOptionPane.ERROR_MESSAGE);
 			}
-		} else if (source == openProjectItem) {
+		} 
+		
+		/*==============================================*
+		 * OPEN EXISTING PROJECT
+		 *==============================================*/
+		
+		else if (source == openProjectItem) {
 
 			// show a file dialog and get the chosen project directory
 			JFileChooser fc = new JFileChooser();
@@ -344,44 +357,57 @@ public class MainWindow extends JFrame implements
 							"Failure to Load",
 							JOptionPane.ERROR_MESSAGE);
 				}
+				
+				statusLabel.setText(ProjectContext.projectContext().projectName() + " | " + GameModel
+						.gameModel().worldWidth() + "x" + GameModel.gameModel().worldHeight());
 			}
 
 			waitingDialog.setVisible(false);
-		} else if (source == loadTextureItem) {
+		} 
+		
+		/*==============================================*
+		 * LOAD TEXTURE
+		 *==============================================*/
+		
+		else if (source == loadTextureItem) {
 			if (projectContext.isProjectLoaded()) {
 				JFileChooser fc = new JFileChooser();
 				fc.setDialogTitle("Import Texture");
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				fc.setAcceptAllFileFilterUsed(false);
-				
-				FileNameExtensionFilter jpegFilter = new FileNameExtensionFilter("JPEG File", "jpg", "jpeg");
-				FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("PNG File", "png");
-				fc.addChoosableFileFilter(jpegFilter);
-				fc.addChoosableFileFilter(pngFilter);
-				
+
+				FileNameExtensionFilter textureFilter = new FileNameExtensionFilter("Textures", "jpg", "jpeg", "png");
+				fc.addChoosableFileFilter(textureFilter);
+
 				int fcResponse = fc.showOpenDialog(null);
-				
+
 				if (fcResponse == JFileChooser.APPROVE_OPTION) {
 					File selectedImage = fc.getSelectedFile();
-					String texName = JOptionPane.showInputDialog(null, "Enter the name of the texture", "Texture name", JOptionPane.PLAIN_MESSAGE);
-					
-					// TODO Load texture in to project directory
+					String texName = JOptionPane.showInputDialog(null,
+							"Enter the name of the texture",
+							"Texture name",
+							JOptionPane.PLAIN_MESSAGE);
+
 					try {
 						Texture loadedTexture = AssetLoader.loadTexture(texName, selectedImage);
-						// TODO add loaded texture to interface
+						
+						// add the new texture to the JList
+						textureList.addTexture(loadedTexture);
+						
 					} catch (IOException e1) {
-						JOptionPane.showMessageDialog(null, 
-								"Failed to load texture", 
-								"IOException", 
+						JOptionPane.showMessageDialog(null,
+								"Failed to load texture",
+								"IOException",
 								JOptionPane.ERROR_MESSAGE);
-						StaticLogs.debug.log(LogType.ERROR, "Failed to load texture, " + e1.getMessage());
+						StaticLogs.debug.log(LogType.ERROR,
+								"Failed to load texture, " + e1.getMessage());
 						return;
 					}
 				}
 			} else { // no project is loaded, show a warning
-				JOptionPane.showMessageDialog(null, 
-						"There is currently no project loaded.", 
-						"No Project", 
+				JOptionPane.showMessageDialog(null,
+						"There is currently no project loaded.",
+						"No Project",
 						JOptionPane.ERROR_MESSAGE);
 			}
 		}

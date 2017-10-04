@@ -1,5 +1,7 @@
 package sigma.project;
 
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -50,5 +52,30 @@ public class Texture
 	public File file()
 	{
 		return file;
+	}
+
+	/**
+	 * Scales the image to the specified size
+	 * 
+	 * @param textureWidth
+	 * @param textureHeight
+	 * @return
+	 */
+	public BufferedImage scaledTo(int scaleToWidth, int scaleToHeight)
+	{
+		if (image == null) {
+			return null;
+		}
+		
+		BufferedImage scaledBufferedImage = new BufferedImage(scaleToWidth, scaleToHeight, 
+				BufferedImage.TYPE_INT_ARGB);
+		Image scaledImage = image.getScaledInstance(scaleToWidth, scaleToHeight, 
+				BufferedImage.SCALE_DEFAULT);
+		
+		Graphics bg = scaledBufferedImage.getGraphics();
+		bg.drawImage(scaledImage, 0, 0, null);
+		bg.dispose();
+		
+		return scaledBufferedImage;
 	}
 }

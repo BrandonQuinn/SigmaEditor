@@ -15,6 +15,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import sigma.editor.input.Mouse;
+import sigma.editor.input.MouseState;
 
 /**
  * Component which actually holds the level being rendered and everything
@@ -37,15 +39,6 @@ public class RenderPanel extends JComponent implements
 	 */
 	private ImageIcon cursorImage;
 
-	private boolean mouseClicked = false;
-	private boolean mouseEntered = false;
-	private boolean mouseExited = false;
-	private boolean mousePressed = false;
-	private boolean keyPressed = false;
-	private boolean mouseReleased = false;
-
-	private int mouseX, mouseY;
-
 	public RenderPanel()
 	{
 		addMouseListener(this);
@@ -55,7 +48,7 @@ public class RenderPanel extends JComponent implements
 		// load mouse cursor
 		cursorImage = new ImageIcon("res\\icons\\cursor.png");
 
-		// transparent image
+		// transparent image to replace mouse
 		BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 
 		// blank cursor
@@ -105,30 +98,34 @@ public class RenderPanel extends JComponent implements
 	private int startX = 0, startY = 0;
 	private boolean startSet = false;
 
+	/**
+	 * Draws a selection rectangle in the render area when the mouse is 
+	 * pressed down and held.
+	 * @param g2d
+	 */
 	private void drawSelectionRectangle(Graphics2D g2d)
 	{
-
 		// get the starting position
-		if (mousePressed && !startSet) {
-			startX = mouseX;
-			startY = mouseY;
+		if (Mouse.isLeftButtonDown() && !startSet) {
+			startX = Mouse.x;
+			startY = Mouse.y;
 			startSet = true;
 		}
 
 		// ready to draw rectangle
-		if (mousePressed && startSet) {
+		if (Mouse.isLeftButtonDown() && startSet) {
 			// draw border
 			g2d.setColor(new Color(66, 138, 255, 180));
-			g2d.drawRect(startX, startY, mouseX - startX, mouseY - startY);
+			g2d.drawRect(startX, startY, Mouse.x - startX, Mouse.y - startY);
 
 			g2d.setColor(new Color(66, 138, 255, 100));
 			// draw center
-			g2d.fillRect(startX + 1, startY + 1, mouseX - startX - 1, mouseY - startY - 1);
+			g2d.fillRect(startX + 1, startY + 1, Mouse.x - startX - 1, Mouse.y - startY - 1);
 
 			g2d.setColor(Color.WHITE);
 		}
 
-		if (mouseReleased) {
+		if (!Mouse.isLeftButtonDown()) {
 			startSet = false;
 			startX = 0;
 			startY = 0;
@@ -140,76 +137,92 @@ public class RenderPanel extends JComponent implements
 	 */
 	public void drawMouseCursor(Graphics2D g2d)
 	{
-		g2d.drawImage(cursorImage.getImage(), mouseX - 8, mouseY - 8, null);
+		g2d.drawImage(cursorImage.getImage(), Mouse.x - 8, Mouse.y - 8, null);
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e)
 	{
-		mouseClicked = true;
-		mousePressed = false;
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			Mouse.setLeftButtonState(MouseState.PRESSED);
+		} else if (e.getButton() == MouseEvent.BUTTON2) {
+			Mouse.setMiddleButtonState(MouseState.PRESSED);
+		} else if (e.getButton() == MouseEvent.BUTTON3) {
+			Mouse.setRightButtonState(MouseState.PRESSED);
+		}
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e)
 	{
-		mouseEntered = true;
-		mouseExited = false;
+		
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e)
 	{
-		mouseExited = true;
-		mouseEntered = false;
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			Mouse.setLeftButtonState(MouseState.NOT_PRESSED);
+		} else if (e.getButton() == MouseEvent.BUTTON2) {
+			Mouse.setMiddleButtonState(MouseState.NOT_PRESSED);
+		} else if (e.getButton() == MouseEvent.BUTTON3) {
+			Mouse.setRightButtonState(MouseState.NOT_PRESSED);
+		}
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e)
 	{
-		mousePressed = true;
-		mouseReleased = false;
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			Mouse.setLeftButtonState(MouseState.PRESSED);
+		} else if (e.getButton() == MouseEvent.BUTTON2) {
+			Mouse.setMiddleButtonState(MouseState.PRESSED);
+		} else if (e.getButton() == MouseEvent.BUTTON3) {
+			Mouse.setRightButtonState(MouseState.PRESSED);
+		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e)
 	{
-		mouseReleased = true;
-		mousePressed = false;
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			Mouse.setLeftButtonState(MouseState.NOT_PRESSED);
+		} else if (e.getButton() == MouseEvent.BUTTON2) {
+			Mouse.setMiddleButtonState(MouseState.NOT_PRESSED);
+		} else if (e.getButton() == MouseEvent.BUTTON3) {
+			Mouse.setRightButtonState(MouseState.NOT_PRESSED);
+		}
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e)
 	{
-		// TODO Auto-generated method stub
-
+		// TODO Create key events
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e)
 	{
-		// TODO Auto-generated method stub
-
+		// TODO Create key events
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e)
 	{
-		// TODO Auto-generated method stub
-
+		// TODO Create key events
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e)
 	{
-		mouseX = e.getX();
-		mouseY = e.getY();
+		Mouse.x = e.getX();
+		Mouse.y = e.getY();
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e)
 	{
-		mouseX = e.getX();
-		mouseY = e.getY();
+		Mouse.x = e.getX();
+		Mouse.y = e.getY();
 	}
 }

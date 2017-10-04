@@ -32,6 +32,7 @@ public class ProjectContext
 	
 	/**
 	 * List of loaded textures which can be used.
+	 * TODO Change texture list to hashtable
 	 */
 	private ArrayList<Texture> textures = new ArrayList<Texture>();
 
@@ -94,5 +95,13 @@ public class ProjectContext
 	public String projectPath()
 	{
 		return projectDirectory;
+	}
+
+	/**
+	 * @return
+	 */
+	public String projectName()
+	{
+		return projectName;
 	}
 }

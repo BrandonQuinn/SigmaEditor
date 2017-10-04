@@ -46,17 +46,6 @@ public class EditorLoader
 		eld.setProgress(50);
 		eld.setText("Loading entity configuration");
 
-		// load entity config
-		EntityConfLoader entityConfLoader = new EntityConfLoader();
-		try {
-			entityConfLoader.load();
-		} catch (IOException | ParseException e) {
-			EditorLoadingException ex = new EditorLoadingException();
-			ex.setMessage("Could not load entity configuration.");
-			ex.setStackTraceMessage(StackTraceUtil.stackTraceToString(e));
-			throw ex;
-		}
-
 		eld.setProgress(100);
 	}
 }

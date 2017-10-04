@@ -18,6 +18,7 @@ import org.json.simple.parser.ParseException;
 import sigma.editor.debug.LogType;
 import sigma.editor.debug.SigmaException;
 import sigma.editor.debug.StaticLogs;
+import sigma.editor.util.JSONFormatter;
 
 /**
  * ProjectManager
@@ -59,6 +60,7 @@ public class ProjectManager
 	 * @param worldWidth
 	 * @param worldHeight
 	 */
+	@SuppressWarnings("unchecked")
 	public void createNewProject(String projectName,
 			String projectLocation,
 			int worldWidth,
@@ -93,7 +95,7 @@ public class ProjectManager
 		try {
 			writer = new PrintWriter(configFile);
 			writer.println(ProjectStructure.CONFIG_JSON_TEMPLATE);
-			
+			writer.close();
 		} catch (IOException e) {
 			StaticLogs.debug.log(LogType.CRITICAL,
 					"Failed to write project configuration template: " + configFile
@@ -101,21 +103,24 @@ public class ProjectManager
 			throw new SigmaException("IOExcetion while writer template JSON");
 		}
 
+		// reopen the writer, if we leave it open it will append
+		
+		try {
+			writer = new PrintWriter(configFile);
+		} catch (FileNotFoundException e) {
+			StaticLogs.debug.log(LogType.CRITICAL,
+					"Failed to open configuration: " + configFile
+							.getAbsolutePath());
+			throw new SigmaException("IOExcetion while writer opening config file");
+		}
+		
 		// TODO Set values in project.config on new project creation
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("projectName", projectName);
 		jsonObject.put("worldWidth", worldWidth);
 		jsonObject.put("worldHeight", worldHeight);
 		
-		try {
-			jsonObject.writeJSONString(writer);
-		} catch (IOException e) {
-			StaticLogs.debug.log(LogType.CRITICAL,
-					"Failed to write project configuration: " + configFile
-							.getAbsolutePath());
-			throw new SigmaException("IOExcetion while writing project configuration");
-		}
-
+		writer.write(JSONFormatter.makePretty(jsonObject.toJSONString()));
 		writer.close();
 		
 		StaticLogs.debug.log(LogType.INFO,

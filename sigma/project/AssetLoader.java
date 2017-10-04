@@ -35,10 +35,10 @@ public class AssetLoader
 		// otherwise we don't know where to put the texture
 		if (projectContext.isProjectLoaded()) {
 			// copy the texture in to the project
-			File newFile = new File(projectContext.projectPath() + "/assets/images/" + selectedImage.getName());
+			File newFile = new File(projectContext.projectPath() + "/assets/images/textures/" + selectedImage.getName());
 			Files.createFile(newFile.toPath());
 			Files.copy(selectedImage.toPath(), new FileOutputStream(newFile));
-			
+
 			// load the texture
 			BufferedImage bufferedImage = ImageIO.read(newFile);
 			texture = new Texture(name, newFile, bufferedImage);

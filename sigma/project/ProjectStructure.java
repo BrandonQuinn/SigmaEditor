@@ -32,6 +32,7 @@ public class ProjectStructure
 	public static String[] directoryList = {
 			"assets",
 			"assets/images",
+			"assets/images/textures",
 			"assets/sounds",
 			"logs"
 	};

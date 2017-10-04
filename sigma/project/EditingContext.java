@@ -6,8 +6,6 @@
 
 package sigma.project;
 
-import java.awt.image.BufferedImage;
-
 /**
  * World
  *
