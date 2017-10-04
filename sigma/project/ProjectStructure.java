@@ -23,7 +23,8 @@ public class ProjectStructure
 	public static final String CONFIG_JSON_TEMPLATE = "{\n" + 
 				"\t\"projectName\": \"Untitled\",\n" + 
 				"\t\"worldWidth\": 100,\n" + 
-				"\t\"worldHeight\": 100\n" + 
+				"\t\"worldHeight\": 100,\n" + 
+				"\t\"creationDate\": \"\"\n" +
 			"}";
 	
 	/**

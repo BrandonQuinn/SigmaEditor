@@ -5,7 +5,6 @@
  */
 package sigma.editor.ui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
@@ -27,6 +26,11 @@ public class TextureListRenderer extends JLabel implements ListCellRenderer<Text
 	
 	private static final int TEXTURE_WIDTH = 64;
 	private static final int TEXTURE_HEIGHT = 64;
+	
+	public TextureListRenderer()
+	{
+		setOpaque(true);
+	}
 	
 	/* (non-Javadoc)
 	 * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
@@ -51,9 +55,11 @@ public class TextureListRenderer extends JLabel implements ListCellRenderer<Text
 		setText(texture.name());
 		
 		if (isSelected) {
-			setBackground(Color.GRAY);
+			setBackground(list.getSelectionBackground());
+		} else {
+			setBackground(list.getBackground());
 		}
-		
+				
 		return this;
 	}
 	

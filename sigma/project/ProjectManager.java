@@ -11,6 +11,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -102,9 +104,28 @@ public class ProjectManager
 							.getAbsolutePath());
 			throw new SigmaException("IOExcetion while writer template JSON");
 		}
-
-		// reopen the writer, if we leave it open it will append
 		
+		// parse the JSON file to make sure when we start making changes
+		// nothing is deleted
+		JSONParser parser = new JSONParser();
+		JSONObject newObject = null;
+		try {
+			newObject = (JSONObject) parser.parse(new FileReader(configFile));
+		} catch (IOException | ParseException e1) {
+			StaticLogs.debug.log(LogType.CRITICAL, "Failed to read JSON config template");
+			throw new SigmaException("Failed to read JSON config template");
+		}
+		
+		LocalDateTime today = LocalDateTime.now();
+		
+		// modify the template with the new project's details
+		newObject.put("projectName", projectName);
+		newObject.put("worldWidth", worldWidth);
+		newObject.put("worldHeight", worldHeight);
+		newObject.put("creationDate", today.getDayOfMonth() + "/" 
+				+ today.getMonthValue() + "/" + today.getYear());
+		
+		// reopen the writer to write out changes to the JSON config file
 		try {
 			writer = new PrintWriter(configFile);
 		} catch (FileNotFoundException e) {
@@ -114,13 +135,7 @@ public class ProjectManager
 			throw new SigmaException("IOExcetion while writer opening config file");
 		}
 		
-		// TODO Set values in project.config on new project creation
-		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("projectName", projectName);
-		jsonObject.put("worldWidth", worldWidth);
-		jsonObject.put("worldHeight", worldHeight);
-		
-		writer.write(JSONFormatter.makePretty(jsonObject.toJSONString()));
+		writer.write(JSONFormatter.makePretty(newObject.toJSONString()));
 		writer.close();
 		
 		StaticLogs.debug.log(LogType.INFO,

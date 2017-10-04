@@ -410,6 +410,19 @@ public class MainWindow extends JFrame implements
 						"No Project",
 						JOptionPane.ERROR_MESSAGE);
 			}
+		} 
+		
+		/*==============================================*
+		 * SWAP LISTS
+		 *==============================================*/
+		
+		else if (source == comboBox) {
+			String selectedItem = (String) comboBox.getSelectedItem();
+			
+			if (selectedItem.equals("Texture")) {
+				// swap the left panel list to display the texture list
+			}
+			
 		}
 	}
 }
