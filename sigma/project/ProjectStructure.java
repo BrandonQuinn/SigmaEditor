@@ -25,9 +25,7 @@ public class ProjectStructure
 				"\t\"worldWidth\": 100,\n" + 
 				"\t\"worldHeight\": 100,\n" + 
 				"\t\"creationDate\": \"\"\n" +
-				"\t\"textureList\": [\n" +
-					"\t\t{\"name\":\"\", \"filename\":\"\"}" +
-				"\t]" +
+				"\t\"textureList\": []" +
 			"}";
 	
 	/**

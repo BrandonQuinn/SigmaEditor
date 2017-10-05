@@ -54,6 +54,7 @@ public class MainWindow extends JFrame implements
 
 	private ProjectContext projectContext = ProjectContext.projectContext();
 	private EditingContext editingContext = EditingContext.editingContext();
+	private ProjectManager projectManager = ProjectManager.manager();
 	private GameModel gameModel = GameModel.gameModel();
 
 	private JPanel contentPane;
@@ -303,6 +304,7 @@ public class MainWindow extends JFrame implements
 
 				waitingDialog.changeMessageTo("Opening project...");
 				manager.open(npd.projectLocation() + "/" + npd.projectName());
+				textureList.loadFromContext();
 				waitingDialog.setVisible(false);
 			
 				statusLabel.setText(npd.projectName() + " | " + npd.worldWidth() + "x" 
@@ -327,17 +329,21 @@ public class MainWindow extends JFrame implements
 			JFileChooser fc = new JFileChooser();
 			fc.setDialogTitle("Open Project");
 			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			
 			int fcResponse = fc.showOpenDialog(null);
 
 			WaitingDialog waitingDialog = new WaitingDialog("Opening project...");
-			waitingDialog.setVisible(true);
-
+			
+			
 			if (fcResponse == JFileChooser.APPROVE_OPTION) {
 				File projectDirectory = fc.getSelectedFile();
-				ProjectManager manager = ProjectManager.manager();
 
 				try {
-					manager.open(projectDirectory.getAbsolutePath());
+					
+					waitingDialog.setVisible(true);
+					projectManager.open(projectDirectory.getAbsolutePath());
+					textureList.loadFromContext();
+					
 				} catch (SigmaException e1) {
 					waitingDialog.setVisible(false);
 					StaticLogs.debug.log(LogType.CRITICAL,
@@ -371,8 +377,8 @@ public class MainWindow extends JFrame implements
 				fc.addChoosableFileFilter(textureFilter);
 
 				int fcResponse = fc.showOpenDialog(null);
-
 				if (fcResponse == JFileChooser.APPROVE_OPTION) {
+					
 					File selectedImage = fc.getSelectedFile();
 					String texName = JOptionPane.showInputDialog(null,
 							"Enter the name of the texture",
@@ -380,9 +386,9 @@ public class MainWindow extends JFrame implements
 							JOptionPane.PLAIN_MESSAGE);
 
 					try {
+						// add the texture to the project and to the texture list in the GUI
+						projectManager.addTexture(texName, selectedImage);
 						Texture loadedTexture = AssetLoader.loadTexture(texName, selectedImage);
-						
-						// add the new texture to the JList
 						textureList.addTexture(loadedTexture);
 						
 					} catch (IOException | SigmaException e2) {
@@ -395,7 +401,10 @@ public class MainWindow extends JFrame implements
 						return;
 					}
 				}
-			} else { // no project is loaded, show a warning
+				
+				setTitle("Editor | " + projectContext.projectName());
+			} else { 
+				// no project is loaded, show a warning
 				JOptionPane.showMessageDialog(null,
 						"There is currently no project loaded.",
 						"No Project",

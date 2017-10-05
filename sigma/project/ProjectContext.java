@@ -78,6 +78,15 @@ public class ProjectContext
 	}
 
 	/**
+	 * Returns a list of all currently loaded textures.
+	 * @return
+	 */
+	public ArrayList<Texture> loadedTextures()
+	{
+		return textures;
+	}
+	
+	/**
 	 * Add a texture to the project.
 	 * 
 	 * @param texture

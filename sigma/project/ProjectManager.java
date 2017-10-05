@@ -11,6 +11,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import org.json.simple.JSONArray;
@@ -223,10 +226,11 @@ public class ProjectManager
 			String textureFilename = (String) textureInfo.get("filename");
 			
 			File textureFile = new File(projectLocation + "/assets/images/textures/" + textureFilename);
-			
+
 			// check if the file exists and then add it
-			if (textureFile.exists()) {
-				AssetLoader.loadTexture(textureName, textureFile);
+			if (textureFile.exists() && !textureFilename.equals("")) {
+				Texture texture = AssetLoader.loadTexture(textureName, textureFile);
+				projectContext.addTexture(texture);
 			} else {
 				array.remove(i);
 				StaticLogs.debug.log(LogType.WARNING, "Texture could not be found, it has been removed: " 
@@ -245,13 +249,35 @@ public class ProjectManager
 	 * @throws SigmaException
 	 */
 	@SuppressWarnings("unchecked")
-	public void addTextureToConfig(String name, File textureFile) throws SigmaException
+	public void addTexture(String name, File textureFile) throws SigmaException
 	{
 		ProjectContext projContext = ProjectContext.projectContext();
+		
+		// check if the texture already exists
+		for (Texture texture : projContext.loadedTextures()) {
+			if (texture.name() == name) {
+				StaticLogs.debug.log(LogType.WARNING, "Texture with name: " + name + " already exists");
+				throw new SigmaException("Texture with name: " + name + " already exists");
+			}
+		}
+		
 		String projectLoc = projContext.projectPath();
-		File configFile = new File(projectLoc + "/"
-				+ ProjectStructure.CONFIG_FILE);
+		File configFile = new File(projectLoc + "/"+ ProjectStructure.CONFIG_FILE);
 
+		// copy the texture to the assets directory
+		File newFile = new File(projContext.projectPath() + "/assets/images/textures/" 
+				+ textureFile.getName());
+		
+		try {
+			Files.copy(textureFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e1) {
+			StaticLogs.debug.log(LogType.ERROR, "Failed to load texture in to project, texture from " 
+					+ textureFile.getAbsolutePath());
+			throw new SigmaException("Failed to load texture in to project, texture from " 
+					+ textureFile.getAbsolutePath());
+		}
+		
+		// add the texture to the project configuration
 		JSONParser parser = new JSONParser();
 		try {
 			JSONObject configObj = (JSONObject) parser.parse(new FileReader(configFile));
@@ -262,9 +288,7 @@ public class ProjectManager
 			textureList.add(newTexObj);
 			
 			// write out
-			PrintWriter writer = new PrintWriter(configFile);
-			writer.print(JSONFormatter.makePretty(configObj.toJSONString()));
-			writer.close();
+			Files.write(configFile.toPath(), JSONFormatter.makePretty(configObj.toJSONString()).getBytes(), StandardOpenOption.WRITE);
 		} catch (IOException | ParseException e) {
 			StaticLogs.debug.log(LogType.ERROR, "Failed to add texture '" + textureFile.getAbsolutePath() 
 					+ "' to project configuration");
