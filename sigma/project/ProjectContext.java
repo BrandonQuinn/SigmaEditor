@@ -32,9 +32,15 @@ public class ProjectContext
 	
 	/**
 	 * List of loaded textures which can be used.
-	 * TODO Change texture list to hashtable
 	 */
 	private ArrayList<Texture> textures = new ArrayList<Texture>();
+	
+	/**
+	 * List of sounds, but only their meta data.
+	 * Sound are loaded in as needed. They generall
+	 * don't need to be played in the editor.
+	 */
+	private ArrayList<Sound> sounds = new ArrayList<Sound>();
 
 	private ProjectContext()
 	{
@@ -112,5 +118,20 @@ public class ProjectContext
 	public String projectName()
 	{
 		return projectName;
+	}
+
+	/**
+	 * Returns a list of all sounds, but not the sounds
+	 * themselves. Only meta data. The sounds should not
+	 * be stored in memory because they may take up
+	 * too much space.
+	 * 
+	 * They will be loaded as needed.
+	 * 
+	 * @return
+	 */
+	public ArrayList<Sound> sounds()
+	{
+		return sounds;
 	}
 }

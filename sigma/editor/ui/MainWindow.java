@@ -61,6 +61,7 @@ public class MainWindow extends JFrame implements
 	private JComboBox<String> comboBox;
 	private RenderPanel renderPanel;
 	private JLabel statusLabel;
+	private JScrollPane leftScrollPane;
 	
 	private TextureJList textureList;
 
@@ -170,19 +171,20 @@ public class MainWindow extends JFrame implements
 		leftSideNorthPanel.setLayout(new BorderLayout(0, 0));
 
 		comboBox = new JComboBox<String>();
+		comboBox.addActionListener(this);
 
 		// init combo box
 		comboBox.addItem("Texture");
+		comboBox.addItem("Sound");
+		
+		leftSideNorthPanel.add(comboBox,BorderLayout.NORTH);
 
-		leftSideNorthPanel.add(comboBox,
-				BorderLayout.NORTH);
-
-		JScrollPane scrollPane = new JScrollPane();
-		leftSideNorthPanel.add(scrollPane, BorderLayout.CENTER);
+		leftScrollPane = new JScrollPane();
+		leftSideNorthPanel.add(leftScrollPane, BorderLayout.CENTER);
 
 		textureList = new TextureJList();
 		textureList.setVisibleRowCount(5);
-		scrollPane.setViewportView(textureList);
+		leftScrollPane.setViewportView(textureList);
 
 		JPanel leftSideSouthPanel = new JPanel();
 		leftSideSouthPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
@@ -225,6 +227,7 @@ public class MainWindow extends JFrame implements
 		RenderUpdateThread renUpThread = new RenderUpdateThread(
 				renderPanel);
 		Thread thread = new Thread(renUpThread);
+		thread.setName("Render Update Thread");
 
 		splitPane_1.setLeftComponent(renderPanel);
 		splitPane_1.setRightComponent(rightSplitPane);
@@ -276,7 +279,7 @@ public class MainWindow extends JFrame implements
 			npd.setVisible(true);
 
 			// fixes error when clicking x causing waiting dialog to still be
-			// created and directorie and files are also created even without
+			// created and directoriy and files are also created even without
 			// complete information
 			if (!npd.isConfirmed()) {
 				return;
@@ -339,11 +342,9 @@ public class MainWindow extends JFrame implements
 				File projectDirectory = fc.getSelectedFile();
 
 				try {
-					
 					waitingDialog.setVisible(true);
 					projectManager.open(projectDirectory.getAbsolutePath());
 					textureList.loadFromContext();
-					
 				} catch (SigmaException e1) {
 					waitingDialog.setVisible(false);
 					StaticLogs.debug.log(LogType.CRITICAL,
@@ -419,10 +420,15 @@ public class MainWindow extends JFrame implements
 		else if (source == comboBox) {
 			String selectedItem = (String) comboBox.getSelectedItem();
 			
-			if (selectedItem.equals("Texture")) {
-				// TODO Swap lists with combo box
+			if (leftScrollPane != null) {
+				if (selectedItem.equals("Texture")) {
+					textureList = new TextureJList();
+					textureList.loadFromContext();
+					leftScrollPane.setViewportView(textureList);
+				} else if (selectedItem.equals("Sound")) {
+					leftScrollPane.setViewportView(new JPanel());
+				}
 			}
-			
 		}
 	}
 }
