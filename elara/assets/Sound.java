@@ -16,6 +16,16 @@ public class Sound
 	private String name;
 	private String filename;
 	
+	/**
+	 * @param soundName
+	 * @param name2
+	 */
+	public Sound(String name, String filename)
+	{
+		this.name = name;
+		this.filename = filename;
+	}
+
 	public void assignName(String name)
 	{
 		this.name = name;
@@ -24,5 +34,14 @@ public class Sound
 	public String name()
 	{
 		return name;
+	}
+
+	/**
+	 * Returns the filename of this sound
+	 * @return
+	 */
+	public String filename()
+	{
+		return filename;
 	}
 }

@@ -136,4 +136,14 @@ public class ProjectContext
 	{
 		return sounds;
 	}
+
+	/**
+	 * Adds a sound to the project context.
+	 * 
+	 * @param newSound
+	 */
+	public void addSound(Sound newSound)
+	{
+		sounds.add(newSound);
+	}
 }

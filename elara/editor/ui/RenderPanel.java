@@ -148,9 +148,6 @@ public class RenderPanel extends JComponent implements
 							(0 - (paintx % newImage.getWidth()) + newImage.getWidth()), 
 							0 - (painty % newImage.getHeight()), null);
 						
-					System.out.println(paintx % newImage.getWidth());
-					System.out.println((0 - (paintx % newImage.getWidth()) + newImage.getWidth()));
-					
 					p2d.drawImage(editingContext.selectedTexture().image(), 
 							(0 - (paintx % newImage.getWidth()) + newImage.getWidth()), 
 							(0 - (painty % newImage.getHeight()) + newImage.getHeight()), null);
@@ -314,9 +311,6 @@ public class RenderPanel extends JComponent implements
 				paintg2d.drawImage(editingContext.selectedTexture().image(), 
 						(0 - (paintx % selectedImage.getWidth()) + selectedImage.getWidth()), 
 						0 - (painty % selectedImage.getHeight()), null);
-				
-				System.out.println(paintx % selectedImage.getWidth());
-				System.out.println((0 - (paintx % selectedImage.getWidth()) + selectedImage.getWidth()));
 				
 				paintg2d.drawImage(editingContext.selectedTexture().image(), 
 						(0 - (paintx % selectedImage.getWidth()) + selectedImage.getWidth()), 

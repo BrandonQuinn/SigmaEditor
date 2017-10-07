@@ -20,6 +20,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import elara.assets.Sound;
 import elara.assets.Texture;
 import elara.editor.debug.LogType;
 import elara.editor.debug.SigmaException;
@@ -219,10 +220,10 @@ public class ProjectManager
 		model.assignWorldHeight(worldHeight);
 		
 		// load textures
-		JSONArray array = (JSONArray) jsonObject.get("textureList");
+		JSONArray textureArray = (JSONArray) jsonObject.get("textureList");
 		
-		for (int i = 0; i < array.size(); i++) {
-			JSONObject textureInfo = (JSONObject) array.get(i);
+		for (int i = 0; i < textureArray.size(); i++) {
+			JSONObject textureInfo = (JSONObject) textureArray.get(i);
 			String textureName = (String) textureInfo.get("name");
 			String textureFilename = (String) textureInfo.get("filename");
 			
@@ -233,9 +234,30 @@ public class ProjectManager
 				Texture texture = AssetLoader.loadTexture(textureName, textureFile);
 				projectContext.addTexture(texture);
 			} else {
-				array.remove(i);
+				textureArray.remove(i);
 				StaticLogs.debug.log(LogType.WARNING, "Texture could not be found, it has been removed: " 
 						+ textureName + ", " + textureFilename);
+			}
+		}
+		
+		// load sounds
+		JSONArray soundArray = (JSONArray) jsonObject.get("soundList");
+		
+		for (int i = 0; i < soundArray.size(); i++) {
+			JSONObject soundInfo = (JSONObject) soundArray.get(i);
+			String soundName = (String) soundInfo.get("name");
+			String soundFilename = (String) soundInfo.get("filename");
+			
+			File soundFile = new File(projectLocation + "/assets/sounds/" + soundFilename);
+
+			// check if the file exists and then add it
+			if (soundFile.exists() && !soundFilename.equals("")) {
+				Sound sound = new Sound(soundName, soundFilename);
+				projectContext.addSound(sound);
+			} else {
+				soundArray.remove(i);
+				StaticLogs.debug.log(LogType.WARNING, "Sound could not be found, it has been removed: " 
+						+ soundName + ", " + soundFilename);
 			}
 		}
 	}
@@ -323,5 +345,63 @@ public class ProjectManager
 	public static ProjectManager manager()
 	{
 		return instance;
+	}
+
+	/**
+	 * @param soundName
+	 * @param sourceSoundFile
+	 * @throws SigmaException 
+	 */
+	@SuppressWarnings("unchecked")
+	public void addSound(String name, File sourceSoundFile) throws SigmaException
+	{
+		ProjectContext projContext = ProjectContext.projectContext();
+		
+		// check if the sound already exists
+		for (Sound sound : projContext.sounds()) {
+			if (sound.name() == name) {
+				StaticLogs.debug.log(LogType.WARNING, "Sound with name: " + name + " already exists");
+				throw new SigmaException("Sound with name: " + name + " already exists");
+			}
+		}
+		
+		String projectLoc = projContext.projectPath();
+		File configFile = new File(projectLoc + "/"+ ProjectStructure.CONFIG_FILE);
+
+		// copy the sound to the assets directory
+		File newFile = new File(projContext.projectPath() + "/assets/sounds/" 
+				+ sourceSoundFile.getName());
+		
+		try {
+			Files.copy(sourceSoundFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e1) {
+			StaticLogs.debug.log(LogType.ERROR, "Failed to load sound in to project, texture from " 
+					+ sourceSoundFile.getAbsolutePath());
+			throw new SigmaException("Failed to load sound in to project, texture from " 
+					+ sourceSoundFile.getAbsolutePath());
+		}
+		
+		// add the sound to the project configuration
+		JSONParser parser = new JSONParser();
+		try {
+			JSONObject configObj = (JSONObject) parser.parse(new FileReader(configFile));
+			JSONArray soundList = (JSONArray) configObj.get("soundList");
+			JSONObject newTexObj = new JSONObject();
+			newTexObj.put("name", name);
+			newTexObj.put("filename", sourceSoundFile.getName());
+			soundList.add(newTexObj);
+			
+			// write out
+			Files.write(configFile.toPath(), JSONFormatter.makePretty(configObj.toJSONString()).getBytes(), StandardOpenOption.WRITE);
+		} catch (IOException | ParseException e) {
+			StaticLogs.debug.log(LogType.ERROR, "Failed to add sound '" + sourceSoundFile.getAbsolutePath() 
+					+ "' to project configuration");
+			throw new SigmaException("Failed to add sound '" + sourceSoundFile.getAbsolutePath()  
+					+ "' to project configuration");
+		}
+		
+		// add our new sound to the project context
+		Sound newSound = new Sound(name, sourceSoundFile.getName());
+		projContext.addSound(newSound);
 	}
 }

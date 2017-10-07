@@ -221,4 +221,20 @@ public class EditingContext
 	{
 		return tiledPaintingEnabled;
 	}
+
+	/**
+	 * Enable tiled texture painting
+	 */
+	public void enableTiledTexturePlacement()
+	{
+		tiledPaintingEnabled = true;
+	}
+	
+	/**
+	 * Disable tiled texture painting
+	 */
+	public void disableTiledTexturePlacement()
+	{
+		tiledPaintingEnabled = false;
+	}
 }

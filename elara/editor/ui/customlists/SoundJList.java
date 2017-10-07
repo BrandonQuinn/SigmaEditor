@@ -11,6 +11,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import elara.assets.Sound;
 import elara.editor.ui.MainWindow;
+import elara.editor.ui.SoundPreviewDialog;
 import elara.project.ProjectContext;
 
 /**
@@ -22,6 +23,8 @@ public class SoundJList extends JList<Sound> implements ListSelectionListener
 {
 	private static final long serialVersionUID = 1L;
 	
+	private ProjectContext projectContext = ProjectContext.projectContext();
+	
 	private DefaultListModel<Sound> model = new DefaultListModel<Sound>();
 	
 	private MainWindow mainWindow;
@@ -30,7 +33,9 @@ public class SoundJList extends JList<Sound> implements ListSelectionListener
 	{
 		this.mainWindow = mainWindow;
 		setCellRenderer(new SoundListRenderer());
+		addListSelectionListener(this);
 		setModel(model);
+		loadFromContext();
 	}
 
 	/* (non-Javadoc)
@@ -45,6 +50,11 @@ public class SoundJList extends JList<Sound> implements ListSelectionListener
 		 * will then be able to be painted on to the the workspace
 		 */
 		// TODO Handle sound selection
+		
+		Sound source = model.getElementAt(getSelectedIndex());
+		
+		SoundPreviewDialog sp = new SoundPreviewDialog(source);
+		sp.setVisible(true);
 	
 		mainWindow.evaluateState();
 	}
@@ -66,8 +76,7 @@ public class SoundJList extends JList<Sound> implements ListSelectionListener
 	 */
 	public void loadFromContext()
 	{
-		ProjectContext context = ProjectContext.projectContext();
-		for (Sound sound : context.sounds()) {
+		for (Sound sound : projectContext.sounds()) {
 			addSound(sound);
 		}
 	}

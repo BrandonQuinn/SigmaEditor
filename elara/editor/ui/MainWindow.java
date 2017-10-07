@@ -26,6 +26,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import elara.assets.DefaultIcons;
+import elara.assets.Sound;
 import elara.assets.Texture;
 import elara.editor.Constants;
 import elara.editor.debug.LogType;
@@ -97,7 +98,8 @@ public class MainWindow extends JFrame implements
 	private JMenuItem newProjectItem;
 	private JMenuItem openProjectItem;
 	private JMenuItem loadTextureItem;
-
+	private JMenuItem loadSoundItem;
+	
 	/**
 	 * Get the default toolkit to resize the application.
 	 */
@@ -144,6 +146,10 @@ public class MainWindow extends JFrame implements
 		loadTextureItem = new JMenuItem("Import Texture");
 		loadTextureItem.addActionListener(this);
 		mnAssets.add(loadTextureItem);
+		
+		loadSoundItem = new JMenuItem("Import Sound");
+		loadSoundItem.addActionListener(this);
+		mnAssets.add(loadSoundItem);
 
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
@@ -373,6 +379,7 @@ public class MainWindow extends JFrame implements
 					waitingDialog.setVisible(true);
 					projectManager.open(projectDirectory.getAbsolutePath());
 					textureList.loadFromContext();
+					soundList.loadFromContext();
 				} catch (SigmaException e1) {
 					waitingDialog.setVisible(false);
 					
@@ -417,7 +424,6 @@ public class MainWindow extends JFrame implements
 
 					try {
 						// add the texture to the project and to the texture list in the GUI
-						System.out.println(selectedImage.getAbsolutePath());
 						Texture loadedTexture = AssetLoader.loadTexture(texName, selectedImage);
 						textureList.addTexture(loadedTexture);
 						projectManager.addTexture(texName, selectedImage);
@@ -442,6 +448,50 @@ public class MainWindow extends JFrame implements
 						JOptionPane.ERROR_MESSAGE);
 			}
 		} 
+		
+		/*==============================================*
+		 * LOAD SOUND
+		 *==============================================*/
+		
+		else if (source == loadSoundItem) {
+			if (projectContext.isProjectLoaded()) {
+				JFileChooser fc = new JFileChooser();
+				fc.setDialogTitle("Import Sound");
+				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				fc.setAcceptAllFileFilterUsed(false);
+				
+				FileNameExtensionFilter textureFilter = new FileNameExtensionFilter("Sounds", "ogg", "wav");
+				fc.addChoosableFileFilter(textureFilter);
+				
+				int choice = fc.showOpenDialog(this);
+				if (choice == JFileChooser.APPROVE_OPTION) {
+					File sourceSoundFile = fc.getSelectedFile();
+					
+					String soundName = JOptionPane.showInputDialog(null,
+							"Enter the name of the sound",
+							"Sound name",
+							JOptionPane.PLAIN_MESSAGE);
+					
+					Sound sound = new Sound(soundName, sourceSoundFile.getName());
+					soundList.addSound(sound);
+					
+					try {
+						projectManager.addSound(soundName, sourceSoundFile);
+					} catch (SigmaException e1) {
+						JOptionPane.showMessageDialog(null,
+								e1,
+								"Exception",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			} else {
+				// no project is loaded, show a warning
+				JOptionPane.showMessageDialog(null,
+						"There is currently no project loaded.",
+						"No Project",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		}
 		
 		/*==============================================*
 		 * SWAP LISTS

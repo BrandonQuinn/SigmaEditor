@@ -24,8 +24,9 @@ public class ProjectStructure
 				"\t\"projectName\": \"Untitled\",\n" + 
 				"\t\"worldWidth\": 100,\n" + 
 				"\t\"worldHeight\": 100,\n" + 
-				"\t\"creationDate\": \"\"\n" +
-				"\t\"textureList\": []" +
+				"\t\"creationDate\": \"\",\n" +
+				"\t\"textureList\": [],\n" +
+				"\t\"soundList\": []" +
 			"}";
 	
 	/**
