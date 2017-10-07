@@ -6,4 +6,4 @@
 
 ## Screenshot of Current Progress (7/10/2017)
 
-![Alt text](https://imgur.com/a/q4I9I "Elara Editor")
+![Oops the image broke](https://imgur.com/ZKALwWL "Elara Editor")
