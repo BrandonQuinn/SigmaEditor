@@ -40,7 +40,7 @@ public class RenderPanel extends JComponent implements
 		MouseMotionListener
 {
 	private static final long serialVersionUID = 1L;
-	
+
 	private EditingContext editingContext = EditingContext.editingContext();
 	private GameModel gameModel = GameModel.gameModel();
 
@@ -54,7 +54,7 @@ public class RenderPanel extends JComponent implements
 		addMouseListener(this);
 		addKeyListener(this);
 		addMouseMotionListener(this);
-		
+
 		// load mouse cursor
 		cursorImage = new ImageIcon("res\\icons\\cursor.png");
 
@@ -76,9 +76,9 @@ public class RenderPanel extends JComponent implements
 		Graphics2D g2d = (Graphics2D) g;
 		drawDefaultBackground(g2d);
 		g2d.setColor(Color.white);
-		
+
 		gameModel.draw(editingContext.xOffset(), editingContext.yOffset(), g2d);
-		
+
 		handleInput();
 		handleEditingState(g2d);
 		drawDebugInfo(g2d);
@@ -89,8 +89,10 @@ public class RenderPanel extends JComponent implements
 	 */
 	private void drawDebugInfo(Graphics2D g2d)
 	{
+		g2d.setColor(Color.WHITE);
 		g2d.drawString("Tool: " + editingContext.state().toString() + " | "
-				+ "Selected Texture Layer: " + (editingContext.getSelectedGroundLayerIndex() + 1), 5, 15);
+				+ "Selected Texture Layer: " + (editingContext.getSelectedGroundLayerIndex() + 1)
+				+ " | Offset x:" + editingContext.xOffset() + ", y: " + editingContext.yOffset(), 5, 15);
 	}
 
 	/**
@@ -98,8 +100,9 @@ public class RenderPanel extends JComponent implements
 	 */
 	private void handleInput()
 	{
-		// handle space bar pressed
-		if (Keyboard.SPACE_BAR == KeyState.PRESSED) {
+		// handle space bar pressed and change state only when we are just enterting this state
+		if (Keyboard.SPACE_BAR == KeyState.PRESSED 
+				&& editingContext.state() != EditingState.MOVE_WORLD) {
 			editingContext.assignState(EditingState.MOVE_WORLD);
 		}
 	}
@@ -115,50 +118,91 @@ public class RenderPanel extends JComponent implements
 	 */
 	private void handleEditingState(Graphics2D g2d)
 	{
-		switch(editingContext.state()) {
-			case SELECT:
-				drawSelectionRectangle(g2d);
-			break;
-				
-			case TEXTURE_PAINT:
-			break;
-				
-			case MOVE_WORLD:
-				if (moveStartX == null) {
-					moveStartX = Mouse.x;
-				}				
-				if (moveStartY == null) {
-					moveStartY = Mouse.y;
-				}
+		switch (editingContext.state()) {
+		case SELECT:
+			drawSelectionRectangle(g2d);
+		break;
 
-				// TODO prevent moving world too far
+		case TEXTURE_PAINT:
+			if (Mouse.isLeftButtonDown() && editingContext.getSelectedGroundLayerIndex() != -1) {
+				BufferedImage paintTexture = editingContext.selectedTexture().image();
+				BufferedImage buffIm = gameModel.groundTextureLayers().get(editingContext.getSelectedGroundLayerIndex());
+				Graphics2D big = (Graphics2D) buffIm.getGraphics();
 				
-				// detect a change and add it
-				if (Mouse.x - moveStartX != 0) {
-					editingContext.addToXOffset(Mouse.x - moveStartX);
-					moveStartX = Mouse.x;
-				}
-			
-				if (Mouse.y - moveStartY != 0) {
-					editingContext.addToYOffset(Mouse.y - moveStartY);
-					moveStartY = Mouse.y;
-				}
-			
-				if (Keyboard.SPACE_BAR == KeyState.RELEASED) {
-					moveStartX = null;
-					moveStartY= null;
-					Keyboard.SPACE_BAR = KeyState.NOT_PRESSED;
+				int paintx = (Mouse.x - (paintTexture.getWidth() >> 1)) + editingContext.xOffset() * -1;
+				int painty = (Mouse.y - (paintTexture.getHeight() >> 1)) + editingContext.yOffset() * -1;
+				
+				BufferedImage newImage 
+					= new BufferedImage(paintTexture.getWidth(), paintTexture.getHeight(), 
+							BufferedImage.TYPE_INT_ARGB);
+				
+				// create a new image which handles tiling
+				if (editingContext.tiledPaintingEnabled()) {
+					Graphics2D p2d = newImage.createGraphics();
 					
-					if (editingContext.previousState() != null 
-							&& editingContext.previousState() != EditingState.MOVE_WORLD) {
-						editingContext.assignState(editingContext.previousState());
-					} else if (editingContext.previousState() == EditingState.MOVE_WORLD) {
-						editingContext.assignState(EditingState.SELECT);
-					}
+					p2d.drawImage(editingContext.selectedTexture().image(), 
+							0 - (paintx % newImage.getWidth()), 
+							0 - (painty % newImage.getHeight()), null);
+						
+					p2d.drawImage(editingContext.selectedTexture().image(), 
+							(0 - (paintx % newImage.getWidth()) + newImage.getWidth()), 
+							0 - (painty % newImage.getHeight()), null);
+						
+					System.out.println(paintx % newImage.getWidth());
+					System.out.println((0 - (paintx % newImage.getWidth()) + newImage.getWidth()));
+					
+					p2d.drawImage(editingContext.selectedTexture().image(), 
+							(0 - (paintx % newImage.getWidth()) + newImage.getWidth()), 
+							(0 - (painty % newImage.getHeight()) + newImage.getHeight()), null);
+						
+					p2d.drawImage(editingContext.selectedTexture().image(), 
+							0 - (paintx % newImage.getWidth()), 
+							(0 - (painty % newImage.getHeight()) + newImage.getHeight()), null);
+					
+					g2d.drawImage(newImage,
+							Mouse.x - (newImage.getWidth() / 2), Mouse.y - (newImage.getHeight() / 2), null);
+					
+					big.drawImage(newImage, paintx, painty, null);
+				} else {
+					big.drawImage(paintTexture, paintx, painty, null);
 				}
-			break;
+		        
+		        
+			}
+			
+		break;
+
+		case MOVE_WORLD:
+			if (moveStartX == null) {
+				moveStartX = Mouse.x;
+			}
+			if (moveStartY == null) {
+				moveStartY = Mouse.y;
+			}
+
+			// TODO prevent moving world too far
+
+			// detect a change and add it
+			if (Mouse.x - moveStartX != 0) {
+				editingContext.addToXOffset(Mouse.x - moveStartX);
+				moveStartX = Mouse.x;
+			}
+
+			if (Mouse.y - moveStartY != 0) {
+				editingContext.addToYOffset(Mouse.y - moveStartY);
+				moveStartY = Mouse.y;
+			}
+
+			if (Keyboard.SPACE_BAR == KeyState.RELEASED) {
+				moveStartX = null;
+				moveStartY = null;
+				Keyboard.SPACE_BAR = KeyState.NOT_PRESSED;
+
+				editingContext.assignState(editingContext.previousState());
+			}
+		break;
 		}
-		
+
 		drawMouseCursor(g2d);
 	}
 
@@ -175,17 +219,19 @@ public class RenderPanel extends JComponent implements
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 
 		g2d.setColor(new Color(10, 10, 10));
-		g2d.fillRect(editingContext.xOffset(), editingContext.yOffset(), 
-				gameModel.worldWidthPixels(), gameModel.worldHeightPixels());
-		
+		g2d.fillRect(editingContext.xOffset(),
+				editingContext.yOffset(),
+				gameModel.worldWidthPixels(),
+				gameModel.worldHeightPixels());
+
 		g2d.setColor(new Color(50, 50, 50));
 
 		for (int x = 0; x < gameModel.worldWidthPixels() + 1; x += GameModel.GRID_SIZE) {
 			for (int y = 0; y < gameModel.worldHeightPixels() + 1; y += GameModel.GRID_SIZE) {
-				
-				g2d.drawLine(x + editingContext.xOffset(), 0 + editingContext.yOffset(), 
+
+				g2d.drawLine(x + editingContext.xOffset(), 0 + editingContext.yOffset(),
 						x + editingContext.xOffset(), gameModel.worldHeightPixels() + editingContext.yOffset());
-				
+
 				g2d.drawLine(0 + editingContext.xOffset(), y + editingContext.yOffset(), 
 						gameModel.worldWidthPixels() + editingContext.xOffset(), y + editingContext.yOffset());
 			}
@@ -196,8 +242,9 @@ public class RenderPanel extends JComponent implements
 	private boolean startSet = false;
 
 	/**
-	 * Draws a selection rectangle in the render area when the mouse is 
+	 * Draws a selection rectangle in the render area when the mouse is
 	 * pressed down and held.
+	 * 
 	 * @param g2d
 	 */
 	private void drawSelectionRectangle(Graphics2D g2d)
@@ -236,20 +283,63 @@ public class RenderPanel extends JComponent implements
 	 */
 	public void drawMouseCursor(Graphics2D g2d)
 	{
-		switch(editingContext.state()) {
-			case SELECT:
-				g2d.drawImage(cursorImage.getImage(), Mouse.x - 8, Mouse.y - 8, null);
-			break;
+		switch (editingContext.state()) {
+		case SELECT:
+			g2d.drawImage(cursorImage.getImage(), Mouse.x - 8, Mouse.y - 8, null);
+		break;
+
+		case TEXTURE_PAINT:
+			BufferedImage selectedImage = editingContext.selectedTexture().image();
+
+			int hypotenuse = (int) Math.sqrt(Math.pow(selectedImage.getWidth(), 2) + Math.pow(selectedImage.getHeight(), 2));
+			int paintx = (Mouse.x - (selectedImage.getWidth() >> 1)) + editingContext.xOffset() * -1;
+			int painty = (Mouse.y - (selectedImage.getHeight() >> 1)) + editingContext.yOffset() * -1;
 			
-			case TEXTURE_PAINT:
-			break;
+			BufferedImage newImage 
+				= new BufferedImage(selectedImage.getWidth(), selectedImage.getHeight(), 
+						BufferedImage.TYPE_INT_ARGB);
 			
-			case MOVE_WORLD:
-				g2d.drawImage(DefaultIcons.moveWorldIcon.getImage(), Mouse.x - 8, Mouse.y - 8, null);
-			break;
+			g2d.setColor(new Color(86, 247, 217));
+			g2d.setStroke(new BasicStroke(2.0f));
+			g2d.drawOval(Mouse.x - (hypotenuse / 2), Mouse.y - (hypotenuse / 2), hypotenuse, hypotenuse);
 			
-			default:
-				g2d.drawImage(cursorImage.getImage(), Mouse.x - 8, Mouse.y - 8, null);
+			// create a new image which handles tiling
+			if (editingContext.tiledPaintingEnabled()) {
+				Graphics2D paintg2d = newImage.createGraphics();
+				
+				paintg2d.drawImage(editingContext.selectedTexture().image(), 
+					0 - (paintx % selectedImage.getWidth()), 
+					0 - (painty % selectedImage.getHeight()), null);
+				
+				paintg2d.drawImage(editingContext.selectedTexture().image(), 
+						(0 - (paintx % selectedImage.getWidth()) + selectedImage.getWidth()), 
+						0 - (painty % selectedImage.getHeight()), null);
+				
+				System.out.println(paintx % selectedImage.getWidth());
+				System.out.println((0 - (paintx % selectedImage.getWidth()) + selectedImage.getWidth()));
+				
+				paintg2d.drawImage(editingContext.selectedTexture().image(), 
+						(0 - (paintx % selectedImage.getWidth()) + selectedImage.getWidth()), 
+						(0 - (painty % selectedImage.getHeight()) + selectedImage.getHeight()), null);
+					
+				paintg2d.drawImage(editingContext.selectedTexture().image(), 
+						0 - (paintx % selectedImage.getWidth()), 
+						(0 - (painty % selectedImage.getHeight()) + selectedImage.getHeight()), null);
+				
+				g2d.drawImage(newImage,
+						Mouse.x - (selectedImage.getWidth() / 2), Mouse.y - (selectedImage.getHeight() / 2), null);
+			} else {
+				g2d.drawImage(selectedImage,
+						Mouse.x - (selectedImage.getWidth() / 2), Mouse.y - (selectedImage.getHeight() / 2), null);
+			}
+		break;
+
+		case MOVE_WORLD:
+			g2d.drawImage(DefaultIcons.moveWorldIcon.getImage(), Mouse.x - 8, Mouse.y - 8, null);
+		break;
+
+		default:
+			g2d.drawImage(cursorImage.getImage(), Mouse.x - 8, Mouse.y - 8, null);
 		}
 	}
 
@@ -257,11 +347,11 @@ public class RenderPanel extends JComponent implements
 	public void mouseClicked(MouseEvent e)
 	{
 		if (e.getButton() == MouseEvent.BUTTON1) {
-			Mouse.setLeftButtonState(MouseState.PRESSED);
+			Mouse.setLeftButtonState(MouseState.CLICKED);
 		} else if (e.getButton() == MouseEvent.BUTTON2) {
-			Mouse.setMiddleButtonState(MouseState.PRESSED);
+			Mouse.setMiddleButtonState(MouseState.CLICKED);
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
-			Mouse.setRightButtonState(MouseState.PRESSED);
+			Mouse.setRightButtonState(MouseState.CLICKED);
 		}
 	}
 
@@ -311,12 +401,11 @@ public class RenderPanel extends JComponent implements
 	public void keyPressed(KeyEvent e)
 	{
 		int keyCode = e.getKeyCode();
-		
-		switch (keyCode)
-		{
-			case KeyEvent.VK_SPACE:
-				Keyboard.SPACE_BAR = KeyState.PRESSED;
-			break;
+
+		switch (keyCode) {
+		case KeyEvent.VK_SPACE:
+			Keyboard.SPACE_BAR = KeyState.PRESSED;
+		break;
 		}
 	}
 
@@ -324,12 +413,11 @@ public class RenderPanel extends JComponent implements
 	public void keyReleased(KeyEvent e)
 	{
 		int keyCode = e.getKeyCode();
-	
-		switch (keyCode)
-		{
-			case KeyEvent.VK_SPACE:
-				Keyboard.SPACE_BAR = KeyState.RELEASED;
-			break;
+
+		switch (keyCode) {
+		case KeyEvent.VK_SPACE:
+			Keyboard.SPACE_BAR = KeyState.RELEASED;
+		break;
 		}
 	}
 
@@ -337,12 +425,11 @@ public class RenderPanel extends JComponent implements
 	public void keyTyped(KeyEvent e)
 	{
 		int keyCode = e.getKeyCode();
-		
-		switch (keyCode)
-		{
-			case KeyEvent.VK_SPACE:
-				Keyboard.SPACE_BAR = KeyState.TYPED;
-			break;
+
+		switch (keyCode) {
+		case KeyEvent.VK_SPACE:
+			Keyboard.SPACE_BAR = KeyState.TYPED;
+		break;
 		}
 	}
 

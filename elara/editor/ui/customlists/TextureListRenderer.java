@@ -44,7 +44,6 @@ public class TextureListRenderer extends JLabel implements ListCellRenderer<Text
 	{
 		
 		// get the texture at a specific size
-		// FIXME don't scale every cell render
 		BufferedImage scaledImage = texture.scaledTo(TEXTURE_WIDTH, TEXTURE_HEIGHT);
 		
 		if (scaledImage == null) {

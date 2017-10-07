@@ -85,6 +85,13 @@ public class EditingContext
 	 */
 	private Texture selectedTexture;
 	
+	/**
+	 * This changes weather or not a texture being painting 
+	 * will automatically tiled next to itself or otherwise
+	 * just paint over what ever is being painting on.
+	 */
+	private boolean tiledPaintingEnabled = true;
+	
 	
 	// can not instantiate, do not want to
 	private EditingContext()
@@ -164,7 +171,7 @@ public class EditingContext
 	 * @param texturePaint
 	 */
 	public void assignState(EditingState state)
-	{
+	{		
 		previousState = this.state;
 		this.state = state;
 	}
@@ -205,5 +212,13 @@ public class EditingContext
 	public int getSelectedGroundLayerIndex()
 	{
 		return selectedGroundLayer;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean tiledPaintingEnabled()
+	{
+		return tiledPaintingEnabled;
 	}
 }

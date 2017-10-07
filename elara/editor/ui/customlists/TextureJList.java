@@ -11,6 +11,7 @@ import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import elara.assets.Texture;
+import elara.editor.ui.MainWindow;
 import elara.project.EditingContext;
 import elara.project.ProjectContext;
 
@@ -26,10 +27,13 @@ public class TextureJList extends JList<Texture> implements ListSelectionListene
 	private EditingContext editingContext = EditingContext.editingContext();
 	private ProjectContext projectContext = ProjectContext.projectContext();
 	
+	private MainWindow mainWindow;
+	
 	private DefaultListModel<Texture> model = new DefaultListModel<Texture>();
 	
-	public TextureJList()
+	public TextureJList(MainWindow mainWindow)
 	{
+		this.mainWindow = mainWindow;
 		setCellRenderer(new TextureListRenderer());
 		addListSelectionListener(this);
 		setModel(model);
@@ -41,7 +45,6 @@ public class TextureJList extends JList<Texture> implements ListSelectionListene
 	@Override
 	public void valueChanged(ListSelectionEvent e)
 	{
-		
 		// change the editing state and set the selected texture values
 		if (getSelectedIndex() != -1) {
 			editingContext.assignState(EditingContext.EditingState.TEXTURE_PAINT);
@@ -50,6 +53,8 @@ public class TextureJList extends JList<Texture> implements ListSelectionListene
 		} else {
 			editingContext.assignState(EditingContext.EditingState.SELECT);
 		}
+		
+		mainWindow.evaluateState();
 	}
 
 	/**

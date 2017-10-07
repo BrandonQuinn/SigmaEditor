@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -36,6 +35,7 @@ import elara.editor.rendering.RenderUpdateThread;
 import elara.editor.ui.customlists.LayerJList;
 import elara.editor.ui.customlists.SoundJList;
 import elara.editor.ui.customlists.TextureJList;
+import elara.editor.ui.propertiespanels.TexturePropsPanel;
 import elara.project.AssetLoader;
 import elara.project.EditingContext;
 import elara.project.GameModel;
@@ -65,6 +65,7 @@ public class MainWindow extends JFrame implements
 	private RenderPanel renderPanel;
 	private JLabel statusLabel;
 	private JScrollPane leftScrollPane;
+	private JPanel propertiesPanel;
 	
 	/**
 	 * Buttons
@@ -199,11 +200,11 @@ public class MainWindow extends JFrame implements
 		leftScrollPane = new JScrollPane();
 		leftSideNorthPanel.add(leftScrollPane, BorderLayout.CENTER);
 
-		textureList = new TextureJList();
+		textureList = new TextureJList(this);
 		textureList.setVisibleRowCount(5);
 		leftScrollPane.setViewportView(textureList);
 		
-		soundList = new SoundJList();
+		soundList = new SoundJList(this);
 		layerList = new LayerJList();
 		
 		JPanel leftSideSouthPanel = new JPanel();
@@ -216,9 +217,9 @@ public class MainWindow extends JFrame implements
 		lblProperties.setFont(new Font("Tahoma", Font.BOLD, 11));
 		leftSideSouthPanel.add(lblProperties, BorderLayout.NORTH);
 
-		JPanel propertiesPanel = new JPanel();
+		propertiesPanel = new JPanel();
 		leftSideSouthPanel.add(propertiesPanel, BorderLayout.CENTER);
-		propertiesPanel.setLayout(new BoxLayout(propertiesPanel, BoxLayout.X_AXIS));
+		propertiesPanel.setLayout(new BorderLayout());
 
 		JPanel panel = new JPanel();
 		splitPane.setRightComponent(panel);
@@ -416,9 +417,10 @@ public class MainWindow extends JFrame implements
 
 					try {
 						// add the texture to the project and to the texture list in the GUI
-						projectManager.addTexture(texName, selectedImage);
+						System.out.println(selectedImage.getAbsolutePath());
 						Texture loadedTexture = AssetLoader.loadTexture(texName, selectedImage);
 						textureList.addTexture(loadedTexture);
+						projectManager.addTexture(texName, selectedImage);
 						
 					} catch (IOException | SigmaException e2) {
 						JOptionPane.showMessageDialog(null,
@@ -473,6 +475,24 @@ public class MainWindow extends JFrame implements
 		else if (source == selectionToolBtn) {
 			editingContext.assignState(EditingContext.EditingState.SELECT);
 			textureList.setSelectedIndices(new int[] {});
+		}
+	}
+	
+	/**
+	 * Changes the interface to reflect the current state it's in
+	 */
+	public void evaluateState()
+	{
+		switch(editingContext.state()) {
+			case SELECT:
+			break;
+			case TEXTURE_PAINT:
+				propertiesPanel.removeAll();
+				propertiesPanel.add(new TexturePropsPanel(), BorderLayout.CENTER);
+				propertiesPanel.updateUI();
+			break;
+			case MOVE_WORLD:
+			break;
 		}
 	}
 }

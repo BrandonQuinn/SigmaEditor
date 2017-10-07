@@ -10,6 +10,7 @@ import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import elara.assets.Sound;
+import elara.editor.ui.MainWindow;
 import elara.project.ProjectContext;
 
 /**
@@ -23,8 +24,11 @@ public class SoundJList extends JList<Sound> implements ListSelectionListener
 	
 	private DefaultListModel<Sound> model = new DefaultListModel<Sound>();
 	
-	public SoundJList()
+	private MainWindow mainWindow;
+	
+	public SoundJList(MainWindow mainWindow)
 	{
+		this.mainWindow = mainWindow;
 		setCellRenderer(new SoundListRenderer());
 		setModel(model);
 	}
@@ -40,7 +44,9 @@ public class SoundJList extends JList<Sound> implements ListSelectionListener
 		 * will change to texture editing where the texture
 		 * will then be able to be painted on to the the workspace
 		 */
-		// TODO Handle texture selection
+		// TODO Handle sound selection
+	
+		mainWindow.evaluateState();
 	}
 
 	/**

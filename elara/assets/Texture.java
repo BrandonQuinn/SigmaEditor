@@ -21,6 +21,14 @@ public class Texture
 	private File file;
 	private BufferedImage image;
 	
+	/**
+	 * Store the past scaled size, if it's the same then we don't need
+	 * to scale it again.
+	 */
+	private int lastScaleWidth = 0;
+	private int lastScaleHeight = 0;
+	private BufferedImage cachedScaledImage;
+	
 	public Texture(String name, File file)
 	{
 		this.name = name;
@@ -55,7 +63,8 @@ public class Texture
 	}
 
 	/**
-	 * Scales the image to the specified size
+	 * Scales the image to the specified size. Stores a cached version
+	 * so that repeated operation don't run the algorithm too much.
 	 * 
 	 * @param textureWidth
 	 * @param textureHeight
@@ -67,6 +76,14 @@ public class Texture
 			return null;
 		}
 		
+		// if all the dimensions are the same, return the cached version
+		if (lastScaleWidth == scaleToWidth && lastScaleHeight == scaleToHeight) {
+			return cachedScaledImage;
+		}
+		
+		lastScaleWidth = scaleToWidth;
+		lastScaleHeight = scaleToHeight;
+		
 		BufferedImage scaledBufferedImage = new BufferedImage(scaleToWidth, scaleToHeight, 
 				BufferedImage.TYPE_INT_ARGB);
 		Image scaledImage = image.getScaledInstance(scaleToWidth, scaleToHeight, 
@@ -75,6 +92,8 @@ public class Texture
 		Graphics bg = scaledBufferedImage.getGraphics();
 		bg.drawImage(scaledImage, 0, 0, null);
 		bg.dispose();
+		
+		cachedScaledImage = scaledBufferedImage;
 		
 		return scaledBufferedImage;
 	}

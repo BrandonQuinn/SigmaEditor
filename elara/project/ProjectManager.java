@@ -296,6 +296,19 @@ public class ProjectManager
 			throw new SigmaException("Failed to add texture '" + textureFile.getAbsolutePath()  
 					+ "' to project configuration");
 		}
+		
+		// add our new texture to the project context
+		Texture newTex;
+		try {
+			newTex = AssetLoader.loadTexture(name, newFile);
+		} catch (IOException e) {
+			StaticLogs.debug.log(LogType.ERROR, "Failed to add texture '" + newFile.getAbsolutePath() 
+			+ "' to project context");
+			throw new SigmaException("Failed to add texture '" + newFile.getAbsolutePath()  
+			+ "' to project context");
+		}
+		
+		projContext.addTexture(newTex);
 	}
 	
 	/**

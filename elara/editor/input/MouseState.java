@@ -13,5 +13,6 @@ package elara.editor.input;
 public enum MouseState
 {
 	NOT_PRESSED,
-	PRESSED
+	PRESSED,
+	CLICKED
 }

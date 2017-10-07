@@ -85,13 +85,13 @@ public class NewProjectDialog extends JDialog
 			contentPanel.add(lblHeight);
 		}
 		widthCBox.setBounds(48, 82, 86, 20);
-		widthCBox.setModel(new DefaultComboBoxModel<String>(new String[] { "100", "200", "500",
+		widthCBox.setModel(new DefaultComboBoxModel<String>(new String[] { "50", "100", "200", "500",
 				"1000" }));
 		contentPanel.add(widthCBox);
 		{
 			heightCBox = new JComboBox<String>();
 			heightCBox.setBounds(190, 82, 86, 20);
-			heightCBox.setModel(new DefaultComboBoxModel<String>(new String[] { "100", "200", "500",
+			heightCBox.setModel(new DefaultComboBoxModel<String>(new String[] { "50", "100", "200", "500",
 					"1000" }));
 			contentPanel.add(heightCBox);
 		}
