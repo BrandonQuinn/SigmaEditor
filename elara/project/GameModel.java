@@ -6,6 +6,7 @@
 
 package elara.project;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import elara.editor.debug.SigmaException;
@@ -23,7 +24,7 @@ public class GameModel
 	 * The amount to multiply the map size by,
 	 * so basically the grid size factor.
 	 */
-	public static final int GRID_SIZE = 10;
+	public static final int GRID_SIZE = 50;
 	
 	/**
 	 * Width of the world.
@@ -107,7 +108,7 @@ public class GameModel
 					+ ".\nThis is to save memory.");
 		}
 		
-		groundImageLayers.add(new BufferedImage(worldWidth * GRID_SIZE, worldHeight * worldHeight, 
+		groundImageLayers.add(new BufferedImage(worldWidth * GRID_SIZE, worldHeight * GRID_SIZE, 
 				BufferedImage.TYPE_INT_ARGB));
 	}
 	
@@ -119,5 +120,37 @@ public class GameModel
 	public void deleteGroundTextureLayer(int index)
 	{	
 		groundImageLayers.remove(index);
+	}
+
+	/**
+	 * Draws the model on to the given Graphics2D object.
+	 * @param g2d
+	 */
+	public void draw(int xOffset, int yOffset, Graphics2D g2d)
+	{
+		// draw ground textures
+		for (BufferedImage buffImage : groundImageLayers) {
+			g2d.drawImage(buffImage, xOffset, yOffset, null);
+		}
+	}
+
+	/**
+	 * Returns the world width size in pixels
+	 * 
+	 * @return
+	 */
+	public int worldWidthPixels()
+	{
+		return GRID_SIZE * worldWidth;
+	}
+
+	/**
+	 * Returns the world height size in pixels
+	 * 
+	 * @return
+	 */
+	public int worldHeightPixels()
+	{
+		return GRID_SIZE * worldHeight;
 	}
 }

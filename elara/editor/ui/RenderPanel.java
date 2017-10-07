@@ -1,6 +1,7 @@
 
 package elara.editor.ui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -15,8 +16,14 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import elara.assets.DefaultIcons;
+import elara.editor.input.KeyState;
+import elara.editor.input.Keyboard;
 import elara.editor.input.Mouse;
 import elara.editor.input.MouseState;
+import elara.project.EditingContext;
+import elara.project.EditingContext.EditingState;
+import elara.project.GameModel;
 
 /**
  * Component which actually holds the level being rendered and everything
@@ -33,6 +40,9 @@ public class RenderPanel extends JComponent implements
 		MouseMotionListener
 {
 	private static final long serialVersionUID = 1L;
+	
+	private EditingContext editingContext = EditingContext.editingContext();
+	private GameModel gameModel = GameModel.gameModel();
 
 	/*
 	 * Mouse cursor.
@@ -44,7 +54,7 @@ public class RenderPanel extends JComponent implements
 		addMouseListener(this);
 		addKeyListener(this);
 		addMouseMotionListener(this);
-
+		
 		// load mouse cursor
 		cursorImage = new ImageIcon("res\\icons\\cursor.png");
 
@@ -66,7 +76,89 @@ public class RenderPanel extends JComponent implements
 		Graphics2D g2d = (Graphics2D) g;
 		drawDefaultBackground(g2d);
 		g2d.setColor(Color.white);
-		drawSelectionRectangle(g2d);
+		
+		gameModel.draw(editingContext.xOffset(), editingContext.yOffset(), g2d);
+		
+		handleInput();
+		handleEditingState(g2d);
+		drawDebugInfo(g2d);
+	}
+
+	/**
+	 * Displays debug info at the top of the render window
+	 */
+	private void drawDebugInfo(Graphics2D g2d)
+	{
+		g2d.drawString("Tool: " + editingContext.state().toString() + " | "
+				+ "Selected Texture Layer: " + (editingContext.getSelectedGroundLayerIndex() + 1), 5, 15);
+	}
+
+	/**
+	 * Handles any changes to input that need to be made
+	 */
+	private void handleInput()
+	{
+		// handle space bar pressed
+		if (Keyboard.SPACE_BAR == KeyState.PRESSED) {
+			editingContext.assignState(EditingState.MOVE_WORLD);
+		}
+	}
+
+	private Integer moveStartX = null;
+	private Integer moveStartY = null;
+
+	/**
+	 * Basically switch throw all the editing states and make the
+	 * edits
+	 * 
+	 * @param g2d
+	 */
+	private void handleEditingState(Graphics2D g2d)
+	{
+		switch(editingContext.state()) {
+			case SELECT:
+				drawSelectionRectangle(g2d);
+			break;
+				
+			case TEXTURE_PAINT:
+			break;
+				
+			case MOVE_WORLD:
+				if (moveStartX == null) {
+					moveStartX = Mouse.x;
+				}				
+				if (moveStartY == null) {
+					moveStartY = Mouse.y;
+				}
+
+				// TODO prevent moving world too far
+				
+				// detect a change and add it
+				if (Mouse.x - moveStartX != 0) {
+					editingContext.addToXOffset(Mouse.x - moveStartX);
+					moveStartX = Mouse.x;
+				}
+			
+				if (Mouse.y - moveStartY != 0) {
+					editingContext.addToYOffset(Mouse.y - moveStartY);
+					moveStartY = Mouse.y;
+				}
+			
+				if (Keyboard.SPACE_BAR == KeyState.RELEASED) {
+					moveStartX = null;
+					moveStartY= null;
+					Keyboard.SPACE_BAR = KeyState.NOT_PRESSED;
+					
+					if (editingContext.previousState() != null 
+							&& editingContext.previousState() != EditingState.MOVE_WORLD) {
+						editingContext.assignState(editingContext.previousState());
+					} else if (editingContext.previousState() == EditingState.MOVE_WORLD) {
+						editingContext.assignState(EditingState.SELECT);
+					}
+				}
+			break;
+		}
+		
 		drawMouseCursor(g2d);
 	}
 
@@ -79,16 +171,23 @@ public class RenderPanel extends JComponent implements
 	 */
 	private void drawDefaultBackground(Graphics2D g2d)
 	{
-		int interval = 50;
-
 		g2d.setColor(Color.BLACK);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
-		g2d.setColor(new Color(20, 20, 20));
 
-		for (int x = 0; x < getWidth(); x += interval) {
-			for (int y = 0; y < getHeight(); y += interval) {
-				g2d.drawLine(x, 0, x, getHeight());
-				g2d.drawLine(0, y, getWidth(), y);
+		g2d.setColor(new Color(10, 10, 10));
+		g2d.fillRect(editingContext.xOffset(), editingContext.yOffset(), 
+				gameModel.worldWidthPixels(), gameModel.worldHeightPixels());
+		
+		g2d.setColor(new Color(50, 50, 50));
+
+		for (int x = 0; x < gameModel.worldWidthPixels() + 1; x += GameModel.GRID_SIZE) {
+			for (int y = 0; y < gameModel.worldHeightPixels() + 1; y += GameModel.GRID_SIZE) {
+				
+				g2d.drawLine(x + editingContext.xOffset(), 0 + editingContext.yOffset(), 
+						x + editingContext.xOffset(), gameModel.worldHeightPixels() + editingContext.yOffset());
+				
+				g2d.drawLine(0 + editingContext.xOffset(), y + editingContext.yOffset(), 
+						gameModel.worldWidthPixels() + editingContext.xOffset(), y + editingContext.yOffset());
 			}
 		}
 	}
@@ -113,10 +212,12 @@ public class RenderPanel extends JComponent implements
 		// ready to draw rectangle
 		if (Mouse.isLeftButtonDown() && startSet) {
 			// draw border
-			g2d.setColor(new Color(66, 138, 255, 180));
+			g2d.setStroke(new BasicStroke(2.0f));
+			g2d.setColor(new Color(42, 216, 30, 180));
 			g2d.drawRect(startX, startY, Mouse.x - startX, Mouse.y - startY);
 
-			g2d.setColor(new Color(66, 138, 255, 100));
+			g2d.setStroke(new BasicStroke(0.0f));
+			g2d.setColor(new Color(87, 206, 78, 100));
 			// draw center
 			g2d.fillRect(startX + 1, startY + 1, Mouse.x - startX - 1, Mouse.y - startY - 1);
 
@@ -135,7 +236,21 @@ public class RenderPanel extends JComponent implements
 	 */
 	public void drawMouseCursor(Graphics2D g2d)
 	{
-		g2d.drawImage(cursorImage.getImage(), Mouse.x - 8, Mouse.y - 8, null);
+		switch(editingContext.state()) {
+			case SELECT:
+				g2d.drawImage(cursorImage.getImage(), Mouse.x - 8, Mouse.y - 8, null);
+			break;
+			
+			case TEXTURE_PAINT:
+			break;
+			
+			case MOVE_WORLD:
+				g2d.drawImage(DefaultIcons.moveWorldIcon.getImage(), Mouse.x - 8, Mouse.y - 8, null);
+			break;
+			
+			default:
+				g2d.drawImage(cursorImage.getImage(), Mouse.x - 8, Mouse.y - 8, null);
+		}
 	}
 
 	@Override
@@ -153,7 +268,7 @@ public class RenderPanel extends JComponent implements
 	@Override
 	public void mouseEntered(MouseEvent e)
 	{
-		
+		grabFocus();
 	}
 
 	@Override
@@ -195,19 +310,40 @@ public class RenderPanel extends JComponent implements
 	@Override
 	public void keyPressed(KeyEvent e)
 	{
-		// TODO Create key events
+		int keyCode = e.getKeyCode();
+		
+		switch (keyCode)
+		{
+			case KeyEvent.VK_SPACE:
+				Keyboard.SPACE_BAR = KeyState.PRESSED;
+			break;
+		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e)
 	{
-		// TODO Create key events
+		int keyCode = e.getKeyCode();
+	
+		switch (keyCode)
+		{
+			case KeyEvent.VK_SPACE:
+				Keyboard.SPACE_BAR = KeyState.RELEASED;
+			break;
+		}
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e)
 	{
-		// TODO Create key events
+		int keyCode = e.getKeyCode();
+		
+		switch (keyCode)
+		{
+			case KeyEvent.VK_SPACE:
+				Keyboard.SPACE_BAR = KeyState.TYPED;
+			break;
+		}
 	}
 
 	@Override

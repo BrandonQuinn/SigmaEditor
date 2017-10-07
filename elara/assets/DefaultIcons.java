@@ -37,6 +37,7 @@ public class DefaultIcons
 	public static ImageIcon newLayerIcon = new ImageIcon("res/icons/newLayer.png");
 	public static ImageIcon deleteLayerIcon = new ImageIcon("res/icons/deleteLayer.png");
 	public static ImageIcon textureLayersIcon = new ImageIcon("res/icons/textureLayers.png");
+	public static ImageIcon moveWorldIcon = new ImageIcon("res/icons/moveWorldTool.png");
 	
 	// check if icons exist otherwise set them to the blank
 	static {
@@ -58,6 +59,11 @@ public class DefaultIcons
 		testFile = new File("res/icons/textureLayers.png");
 		if (!testFile.exists()) {
 			textureLayersIcon.setImage(BLANK_ICON.getScaledInstance(16, 16, BufferedImage.SCALE_DEFAULT));
+		}
+		
+		testFile = new File("res/icons/moveWorldTool.png");
+		if (!testFile.exists()) {
+			moveWorldIcon.setImage(BLANK_ICON.getScaledInstance(16, 16, BufferedImage.SCALE_DEFAULT));
 		}
 	}
 }

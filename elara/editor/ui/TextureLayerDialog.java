@@ -14,6 +14,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -53,6 +54,7 @@ public class TextureLayerDialog extends JDialog
 	
 	private DefaultListModel<String> listModel;
 	private JList<String> list;
+	private JLabel selectedLayerLabel;
 	
 	/**
 	 * Create the dialog.
@@ -90,6 +92,16 @@ public class TextureLayerDialog extends JDialog
 		deleteLayerBtn = new JButton(DefaultIcons.deleteLayerIcon);
 		deleteLayerBtn.addActionListener(this);
 		toolBar.add(deleteLayerBtn);
+		
+		selectedLayerLabel = new JLabel("Selected Layer: none");
+		toolBar.add(selectedLayerLabel);
+		
+		// setup defaults
+		Integer selectedIndex = editingContext.getSelectedGroundLayerIndex();
+		if (selectedIndex != null && selectedIndex  > -1) {
+			list.setSelectedIndex(selectedIndex);
+			selectedLayerLabel.setText("Selected Layer: Layer " + (selectedIndex + 1));
+		}
 	}
 
 	private void loadListModel()
@@ -109,6 +121,12 @@ public class TextureLayerDialog extends JDialog
 	public void valueChanged(ListSelectionEvent e)
 	{
 		editingContext.setSelectedGroundTextureLayer(list.getSelectedIndex());
+		if (list.getSelectedIndex() == -1) {
+			selectedLayerLabel.setText("Selected Layer: none");
+			return;
+		}
+		
+		selectedLayerLabel.setText("Selected Layer: " + (list.getSelectedIndex() + 1));
 	}
 
 	/* (non-Javadoc)
@@ -119,7 +137,6 @@ public class TextureLayerDialog extends JDialog
 	{
 		Object source = e.getSource();
 		if (source == newLayerBtn) {
-			
 			if (!projectContext.isProjectLoaded()) {
 				JOptionPane.showMessageDialog(this, "No project loaded.", "No project loaded", 
 						JOptionPane.INFORMATION_MESSAGE);
@@ -131,11 +148,14 @@ public class TextureLayerDialog extends JDialog
 			} catch (SigmaException e1) {
 				JOptionPane.showMessageDialog(this, e1.message(), "Max layers reached!", 
 						JOptionPane.INFORMATION_MESSAGE);
+				return;
 			}
 			
 			loadListModel();
-		} else if (source == deleteLayerBtn) {
 			
+			// ensure one is always selected to we don't have the user needed to keep reselecting
+			list.setSelectedIndex(model.groundTextureLayers().size() - 1);
+		} else if (source == deleteLayerBtn) {
 			if (!projectContext.isProjectLoaded()) {
 				JOptionPane.showMessageDialog(this, "No project loaded.", "No project loaded", 
 						JOptionPane.INFORMATION_MESSAGE);
@@ -152,6 +172,13 @@ public class TextureLayerDialog extends JDialog
 			
 			model.deleteGroundTextureLayer(selectedIndex);
 			loadListModel();
+			
+			if (model.groundTextureLayers().size() == 0) {
+				selectedLayerLabel.setText("Selected Layer: none");
+			}
+			
+			// ensure one is always selected to we don't have the user needed to keep reselecting
+			list.setSelectedIndex(model.groundTextureLayers().size() - 1);
 		}
 	}
 }

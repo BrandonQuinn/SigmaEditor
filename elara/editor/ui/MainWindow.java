@@ -69,6 +69,7 @@ public class MainWindow extends JFrame implements
 	/**
 	 * Buttons
 	 */
+	private JButton selectionToolBtn;
 	private JButton newLayerBtn;
 	private JButton deleteLayerBtn;
 	private JButton textureLayersBtn;
@@ -155,9 +156,10 @@ public class MainWindow extends JFrame implements
 		toolBar.setFloatable(false);
 		contentPane.add(toolBar, BorderLayout.NORTH);
 
-		JButton selectToolBtn = new JButton();
-		selectToolBtn.setIcon(selectToolIcon);
-		toolBar.add(selectToolBtn);
+		selectionToolBtn = new JButton();
+		selectionToolBtn.addActionListener(this);
+		selectionToolBtn.setIcon(selectToolIcon);
+		toolBar.add(selectionToolBtn);
 
 		JButton moveToolBtn = new JButton();
 		moveToolBtn.setIcon(moveToolIcon);
@@ -462,6 +464,15 @@ public class MainWindow extends JFrame implements
 		else if (source == textureLayersBtn) {
 			TextureLayerDialog tld = new TextureLayerDialog();
 			tld.setVisible(true);
+		} 
+		
+		/*==============================================*
+		 * TOOL BAR
+		 *==============================================*/
+		
+		else if (source == selectionToolBtn) {
+			editingContext.assignState(EditingContext.EditingState.SELECT);
+			textureList.setSelectedIndices(new int[] {});
 		}
 	}
 }

@@ -5,11 +5,13 @@
  */
 package elara.editor.ui.customlists;
 
+import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import elara.assets.Texture;
+import elara.project.EditingContext;
 import elara.project.ProjectContext;
 
 /**
@@ -21,11 +23,15 @@ public class TextureJList extends JList<Texture> implements ListSelectionListene
 {
 	private static final long serialVersionUID = 1L;
 	
+	private EditingContext editingContext = EditingContext.editingContext();
+	private ProjectContext projectContext = ProjectContext.projectContext();
+	
 	private DefaultListModel<Texture> model = new DefaultListModel<Texture>();
 	
 	public TextureJList()
 	{
 		setCellRenderer(new TextureListRenderer());
+		addListSelectionListener(this);
 		setModel(model);
 	}
 
@@ -35,12 +41,15 @@ public class TextureJList extends JList<Texture> implements ListSelectionListene
 	@Override
 	public void valueChanged(ListSelectionEvent e)
 	{
-		/*
-		 * It's very likely here is where the editing state
-		 * will change to texture editing where the texture
-		 * will then be able to be painted on to the the workspace
-		 */
-		// TODO Handle texture selection
+		
+		// change the editing state and set the selected texture values
+		if (getSelectedIndex() != -1) {
+			editingContext.assignState(EditingContext.EditingState.TEXTURE_PAINT);
+			ArrayList<Texture> loadedTextures = projectContext.loadedTextures();
+			editingContext.setSelectedTexture(loadedTextures.get(getSelectedIndex()));
+		} else {
+			editingContext.assignState(EditingContext.EditingState.SELECT);
+		}
 	}
 
 	/**
