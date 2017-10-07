@@ -11,7 +11,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import elara.assets.Sound;
 import elara.editor.ui.MainWindow;
-import elara.editor.ui.SoundPreviewDialog;
+import elara.project.EditingContext;
+import elara.project.EditingContext.EditingState;
 import elara.project.ProjectContext;
 
 /**
@@ -19,11 +20,13 @@ import elara.project.ProjectContext;
  *
  * Description: JList of sounds to select from.
  */
-public class SoundJList extends JList<Sound> implements ListSelectionListener
+public class SoundJList extends JList<Sound> 
+	implements ListSelectionListener
 {
 	private static final long serialVersionUID = 1L;
 	
 	private ProjectContext projectContext = ProjectContext.projectContext();
+	private EditingContext editingContext = EditingContext.editingContext();
 	
 	private DefaultListModel<Sound> model = new DefaultListModel<Sound>();
 	
@@ -52,10 +55,8 @@ public class SoundJList extends JList<Sound> implements ListSelectionListener
 		// TODO Handle sound selection
 		
 		Sound source = model.getElementAt(getSelectedIndex());
+		editingContext.assignState(EditingState.ADD_SOUND);
 		
-		SoundPreviewDialog sp = new SoundPreviewDialog(source);
-		sp.setVisible(true);
-	
 		mainWindow.evaluateState();
 	}
 

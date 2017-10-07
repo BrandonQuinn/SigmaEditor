@@ -56,7 +56,12 @@ public class EditingContext
 		 * Allows the user to change the offset of the world,
 		 * so basically it allows the user to move around the world.
 		 */
-		MOVE_WORLD
+		MOVE_WORLD,
+		
+		/**
+		 * Adding sounds to the game world
+		 */
+		ADD_SOUND
 	}
 	
 	private EditingState previousState = null;

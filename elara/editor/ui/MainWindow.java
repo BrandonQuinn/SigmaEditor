@@ -36,6 +36,7 @@ import elara.editor.rendering.RenderUpdateThread;
 import elara.editor.ui.customlists.LayerJList;
 import elara.editor.ui.customlists.SoundJList;
 import elara.editor.ui.customlists.TextureJList;
+import elara.editor.ui.propertiespanels.SoundPropsPanel;
 import elara.editor.ui.propertiespanels.TexturePropsPanel;
 import elara.project.AssetLoader;
 import elara.project.EditingContext;
@@ -536,12 +537,22 @@ public class MainWindow extends JFrame implements
 		switch(editingContext.state()) {
 			case SELECT:
 			break;
+			
 			case TEXTURE_PAINT:
 				propertiesPanel.removeAll();
 				propertiesPanel.add(new TexturePropsPanel(), BorderLayout.CENTER);
 				propertiesPanel.updateUI();
 			break;
+			
 			case MOVE_WORLD:
+			break;
+			
+			case ADD_SOUND:
+				propertiesPanel.removeAll();
+				propertiesPanel.add(new SoundPropsPanel(), BorderLayout.CENTER);
+				propertiesPanel.updateUI();
+			break;
+		default:
 			break;
 		}
 	}
