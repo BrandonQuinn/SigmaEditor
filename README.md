@@ -9,4 +9,4 @@
 ## Screenshot of Current Progress (7/10/2017)
 
 ![Oops the image broke](https://i.imgur.com/ZKALwWL.jpg "Elara Editor")
-![Oops the image broke](https://imgur.com/a/zrPNa "Texture blending")
+![Oops the image broke](https://i.imgur.com/BfeGT6I.jpg "Texture blending")
