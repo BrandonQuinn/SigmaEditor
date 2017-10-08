@@ -25,7 +25,6 @@ import elara.editor.input.Keyboard;
 import elara.editor.input.Mouse;
 import elara.editor.input.MouseState;
 import elara.editor.util.ImageFilter;
-import elara.project.BrushFilter;
 import elara.project.EditingContext;
 import elara.project.EditingContext.EditingState;
 import elara.project.GameModel;
@@ -110,7 +109,9 @@ public class RenderPanel extends JComponent implements
 		g2d.setColor(Color.WHITE);
 		g2d.drawString("Tool: " + editingContext.state().toString() + " | "
 				+ "Selected Texture Layer: " + (editingContext.getSelectedGroundLayerIndex() + 1)
-				+ " | Offset x:" + editingContext.xOffset() + ", y: " + editingContext.yOffset(), 5, 15);
+				+ " | Offset x:" + editingContext.xOffset() + ", y: " + editingContext.yOffset()
+				+ " | Memory Usage: " + Runtime.getRuntime().totalMemory()/1000000 + "MB/" + Runtime.getRuntime().maxMemory()/1000000 + "MB", 
+				5, 15);
 	}
 
 	/**
@@ -195,16 +196,24 @@ public class RenderPanel extends JComponent implements
 				
 					case MULTIPLY:
 						// fuck me
-							BufferedImage src = buffIm.getSubimage(
-									Math.max(0, Math.min(buffIm.getWidth(), paintx)), 
-									Math.max(0, Math.min(buffIm.getHeight(), painty)), 
-									Math.max(1, Math.min(newImage.getWidth(), buffIm.getWidth() - ((paintx + newImage.getWidth()) - newImage.getWidth()))), 
-									Math.max(1, Math.min(newImage.getHeight(), buffIm.getHeight() - ((painty + newImage.getHeight()) - newImage.getHeight())))
-								);
-						newImage = ImageFilter.multiply(newImage, src);
+						BufferedImage srcMult = buffIm.getSubimage(
+								Math.max(0, Math.min(buffIm.getWidth(), paintx)), 
+								Math.max(0, Math.min(buffIm.getHeight(), painty)), 
+								Math.max(1, Math.min(newImage.getWidth(), buffIm.getWidth() - ((paintx + newImage.getWidth()) - newImage.getWidth()))), 
+								Math.max(1, Math.min(newImage.getHeight(), buffIm.getHeight() - ((painty + newImage.getHeight()) - newImage.getHeight())))
+							);
+						newImage = ImageFilter.multiply(newImage, srcMult);
 					break;
 					
 					case OVERLAY:
+						// fuck me
+						BufferedImage srcScreen = buffIm.getSubimage(
+								Math.max(0, Math.min(buffIm.getWidth(), paintx)), 
+								Math.max(0, Math.min(buffIm.getHeight(), painty)), 
+								Math.max(1, Math.min(newImage.getWidth(), buffIm.getWidth() - ((paintx + newImage.getWidth()) - newImage.getWidth()))), 
+								Math.max(1, Math.min(newImage.getHeight(), buffIm.getHeight() - ((painty + newImage.getHeight()) - newImage.getHeight())))
+							);
+						newImage = ImageFilter.overlay(newImage, srcScreen);
 					break;
 					
 					case SCREEN:
@@ -349,10 +358,6 @@ public class RenderPanel extends JComponent implements
 
 		case TEXTURE_PAINT:
 			BufferedImage selectedImage = editingContext.selectedTexture().image();
-
-			int hypotenuse = (int) Math.sqrt(Math.pow(selectedImage.getWidth(), 2) + Math.pow(selectedImage.getHeight(), 2));
-			int paintx = (Mouse.x - (selectedImage.getWidth() >> 1)) + editingContext.xOffset() * -1;
-			int painty = (Mouse.y - (selectedImage.getHeight() >> 1)) + editingContext.yOffset() * -1;
 			
 			BufferedImage newImage 
 				= new BufferedImage(selectedImage.getWidth(), selectedImage.getHeight(), 
@@ -360,35 +365,9 @@ public class RenderPanel extends JComponent implements
 			Graphics2D paintg2d = newImage.createGraphics();
 			paintg2d.drawImage(selectedImage, 0, 0, null);
 			
-			g2d.setColor(new Color(86, 247, 217));
+			g2d.setColor(new Color(255, 255, 255));
 			g2d.setStroke(new BasicStroke(2.0f));
-			g2d.drawOval(Mouse.x - (hypotenuse / 2), Mouse.y - (hypotenuse / 2), hypotenuse, hypotenuse);
-			
-			// create a new image which handles tiling
-			if (editingContext.tiledPaintingEnabled()) {
-				paintg2d.drawImage(editingContext.selectedTexture().image(), 
-					0 - (paintx % selectedImage.getWidth()), 
-					0 - (painty % selectedImage.getHeight()), null);
-				
-				paintg2d.drawImage(editingContext.selectedTexture().image(), 
-						(0 - (paintx % selectedImage.getWidth()) + selectedImage.getWidth()), 
-						0 - (painty % selectedImage.getHeight()), null);
-				
-				paintg2d.drawImage(editingContext.selectedTexture().image(), 
-						(0 - (paintx % selectedImage.getWidth()) + selectedImage.getWidth()), 
-						(0 - (painty % selectedImage.getHeight()) + selectedImage.getHeight()), null);
-					
-				paintg2d.drawImage(editingContext.selectedTexture().image(), 
-						0 - (paintx % selectedImage.getWidth()), 
-						(0 - (painty % selectedImage.getHeight()) + selectedImage.getHeight()), null);
-			}
-			
-			if (editingContext.selectedBrushFilter() == BrushFilter.RADIAL_FALLOFF) {
-				newImage = ImageFilter.radialAlphaFalloff(newImage);
-			}
-			
-			g2d.drawImage(newImage,
-					Mouse.x - (selectedImage.getWidth() / 2), Mouse.y - (selectedImage.getHeight() / 2), null);
+			g2d.drawOval(Mouse.x - (selectedImage.getWidth() / 2), Mouse.y - (selectedImage.getHeight() / 2), selectedImage.getWidth(), selectedImage.getHeight());
 		break;
 
 		case MOVE_WORLD:

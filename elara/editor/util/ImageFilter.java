@@ -65,13 +65,64 @@ public class ImageFilter
 		WritableRaster srcRaster = src.getRaster();
 		
 		int[] RGBA = new int[4];
+		int[] srcTmp = new int[4];
+		int[] destTmp = new int[4];
 		for (int x = 0; x < src.getWidth(); x++) {
 			for (int y = 0; y < src.getHeight(); y++) {
+				srcRaster.getPixel(x, y, srcTmp);
+				destRaster.getPixel(x, y, destTmp);
 				
-				RGBA[0] = clamp((int)(((srcRaster.getPixel(x, y, (int[]) null)[0] / 255.0f) * (destRaster.getPixel(x, y, (int[]) null)[0] / 255.0f)) * 255), 0, 255);
-				RGBA[1] = clamp((int)(((srcRaster.getPixel(x, y, (int[]) null)[1] / 255.0f) * (destRaster.getPixel(x, y, (int[]) null)[1] / 255.0f)) * 255), 0, 255);
-				RGBA[2] = clamp((int)(((srcRaster.getPixel(x, y, (int[]) null)[2] / 255.0f) * (destRaster.getPixel(x, y, (int[]) null)[2] / 255.0f)) * 255), 0, 255);
-				RGBA[3] = (destRaster.getPixel(x, y, (int[]) null)[3]);
+				RGBA[0] = clamp((int)(((srcTmp[0] / 255.0f) * (destTmp[0] / 255.0f)) * 255), 0, 255);
+				RGBA[1] = clamp((int)(((srcTmp[1] / 255.0f) * (destTmp[1] / 255.0f)) * 255), 0, 255);
+				RGBA[2] = clamp((int)(((srcTmp[2] / 255.0f) * (destTmp[2] / 255.0f)) * 255), 0, 255);
+				RGBA[3] = destTmp[3];
+				
+				destRaster.setPixel(x, y, RGBA);
+			}
+		}
+		
+		return dest;
+	}
+	
+	/**
+	 * Overlay filter
+	 * 
+	 * @param newImage
+	 * @param srcScreen
+	 * @return
+	 */
+	public static BufferedImage overlay(BufferedImage dest, BufferedImage src)
+	{
+		WritableRaster destRaster = dest.getRaster();
+		WritableRaster srcRaster = src.getRaster();
+		
+		int[] RGBA = new int[4];
+		int[] srcTmp = new int[4];
+		int[] destTmp = new int[4];
+		for (int x = 0; x < src.getWidth(); x++) {
+			for (int y = 0; y < src.getHeight(); y++) {
+				srcRaster.getPixel(x, y, srcTmp);
+				destRaster.getPixel(x, y, destTmp);
+				
+				if (destTmp[0] < (255.0f / 2.0f)) {
+					RGBA[0] = (int)(2 * (destTmp[0] / 255.0f) * (srcTmp[0] / 255.0f) * 255);
+				} else {
+					RGBA[0] = (int)((1 - 2 * (1 - (destTmp[0] / 255.0f)) * (1 - (srcTmp[0] / 255.0f))) * 255);
+				}
+				
+				if (destTmp[1] < (255.0f / 2.0f)) {
+					RGBA[1] = (int)(2 * (destTmp[1] / 255.0f) * (srcTmp[1] / 255.0f) * 255);
+				} else {
+					RGBA[1] = (int)((1 - 2 * (1 - (destTmp[1] / 255.0f)) * (1 - (srcTmp[1] / 255.0f))) * 255);
+				}
+				
+				if (destTmp[2] < (255.0f / 2.0f)) {
+					RGBA[2] = (int)(2 * (destTmp[2] / 255.0f) * (srcTmp[2] / 255.0f) * 255);
+				} else {
+					RGBA[2] = (int)((1 - 2 * (1 - (destTmp[2] / 255.0f)) * (1 - (srcTmp[2] / 255.0f))) * 255);
+				}
+				
+				RGBA[3] = destTmp[3];
 				
 				destRaster.setPixel(x, y, RGBA);
 			}
