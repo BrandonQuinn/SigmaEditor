@@ -22,6 +22,8 @@ import javax.swing.JSpinner;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import elara.project.BlendMode;
 import elara.project.BrushFilter;
 import elara.project.EditingContext;
@@ -32,7 +34,7 @@ import elara.project.EditingContext;
  * Description:
  */
 public class TexturePropsPanel extends JPanel 
-	implements ActionListener
+	implements ActionListener, ChangeListener
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -44,6 +46,7 @@ public class TexturePropsPanel extends JPanel
 	private JCheckBox tiledPlacementChkBox;
 	private JComboBox<String> blendModeBox;
 	private JComboBox<String> brushTypeBox;
+	private JSpinner opacitySpinner;
 	
 	/**
 	 * Create the panel.
@@ -137,14 +140,19 @@ public class TexturePropsPanel extends JPanel
 		gbc_lblOpacity.gridy = 3;
 		panel.add(lblOpacity, gbc_lblOpacity);
 		
-		JSpinner spinner_1 = new JSpinner();
-		spinner_1.setModel(new SpinnerNumberModel(100, 0, 100, 1));
-		GridBagConstraints gbc_spinner_1 = new GridBagConstraints();
-		gbc_spinner_1.fill = GridBagConstraints.HORIZONTAL;
-		gbc_spinner_1.insets = new Insets(0, 0, 5, 0);
-		gbc_spinner_1.gridx = 1;
-		gbc_spinner_1.gridy = 3;
-		panel.add(spinner_1, gbc_spinner_1);
+		opacitySpinner = new JSpinner();
+		opacitySpinner.addChangeListener(this);
+		opacitySpinner.setModel(new SpinnerNumberModel(100, 0, 100, 1));
+		
+		int value = (Integer) opacitySpinner.getValue();
+		editingContext.assignTextureBrushOpacity(value / 100.0f);
+		
+		GridBagConstraints gbc_opacitySpinner = new GridBagConstraints();
+		gbc_opacitySpinner.fill = GridBagConstraints.HORIZONTAL;
+		gbc_opacitySpinner.insets = new Insets(0, 0, 5, 0);
+		gbc_opacitySpinner.gridx = 1;
+		gbc_opacitySpinner.gridy = 3;
+		panel.add(opacitySpinner, gbc_opacitySpinner);
 		
 		JLabel lblBrushSize = new JLabel("Brush Size:");
 		GridBagConstraints gbc_lblBrushSize = new GridBagConstraints();
@@ -198,7 +206,20 @@ public class TexturePropsPanel extends JPanel
 			} else if (value.equals("NONE")) {
 				editingContext.setSelectedBrushFilter(BrushFilter.NONE);
 			}
-		}
+		} 
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
+	 */
+	@Override
+	public void stateChanged(ChangeEvent ce)
+	{
+		Object source = ce.getSource();
+		
+		if (source == opacitySpinner) {
+			int value = (Integer) opacitySpinner.getValue();
+			editingContext.assignTextureBrushOpacity(value / 100.0f);
+		}
+	}
 }

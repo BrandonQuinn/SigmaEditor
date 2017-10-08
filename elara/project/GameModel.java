@@ -183,4 +183,14 @@ public class GameModel
 	{
 		assetLayers.add(newLayer);
 	}
+
+	/**
+	 * @param selectedIndex
+	 */
+	public void deleteAssetLayer(int selectedIndex)
+	{
+		if (assetLayers.size() > 0 && selectedIndex > -1 
+				&& assetLayers.get(selectedIndex) != null)
+			assetLayers.remove(selectedIndex);
+	}
 }

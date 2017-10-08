@@ -5,6 +5,7 @@
  */
 package elara.editor.ui.customlists;
 
+import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -17,7 +18,8 @@ import elara.assets.Sound;
  *
  * Description:
  */
-public class SoundListRenderer extends JLabel implements ListCellRenderer<Sound>
+public class SoundListRenderer extends JLabel 
+	implements ListCellRenderer<Sound>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -41,8 +43,10 @@ public class SoundListRenderer extends JLabel implements ListCellRenderer<Sound>
 		
 		if (isSelected) {
 			setBackground(list.getSelectionBackground());
+			setForeground(Color.WHITE);
 		} else {
 			setBackground(list.getBackground());
+			setForeground(Color.BLACK);
 		}
 		
 		return this;

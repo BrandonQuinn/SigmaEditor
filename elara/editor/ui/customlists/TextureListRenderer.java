@@ -5,6 +5,7 @@
  */
 package elara.editor.ui.customlists;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
@@ -56,8 +57,10 @@ public class TextureListRenderer extends JLabel implements ListCellRenderer<Text
 		
 		if (isSelected) {
 			setBackground(list.getSelectionBackground());
+			setForeground(Color.WHITE);
 		} else {
 			setBackground(list.getBackground());
+			setForeground(Color.BLACK);
 		}
 				
 		return this;

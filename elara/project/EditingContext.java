@@ -91,6 +91,7 @@ public class EditingContext
 	private Texture selectedTexture;
 	private BrushFilter selectedBrushFilter = BrushFilter.RADIAL_FALLOFF;
 	private BlendMode selectedBlendMode = BlendMode.OVERLAP;
+	private float textureBrushOpacity = 1.0f;
 	private Sound selectedSound;
 	private Layer selectedAssetLayer;
 	
@@ -330,5 +331,23 @@ public class EditingContext
 	public void setSelectedBlendMode(BlendMode mode)
 	{
 		this.selectedBlendMode = mode;
+	}
+
+	/**
+	 * Set the opacity of the texture brush.
+	 * @param opacity
+	 */
+	public void assignTextureBrushOpacity(float opacity)
+	{
+		this.textureBrushOpacity = opacity;
+	}
+	
+	/**
+	 * Return the opacity textures should be painted at.
+	 * @return
+	 */
+	public float textureBrushOpacity()
+	{
+		return textureBrushOpacity;
 	}
 }

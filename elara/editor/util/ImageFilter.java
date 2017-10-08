@@ -135,4 +135,35 @@ public class ImageFilter
 	{
 		return Math.max(min, Math.min(max, value));
 	}
+
+	/**
+	 * Change the opacity of every pixel on the given image.
+	 * 
+	 * FIXME Opacity has weird effect at low factors like 0.02
+	 * 
+	 * @param newImage
+	 * @param textureBrushOpacity
+	 * @return
+	 */
+	public static BufferedImage setOpacity(BufferedImage src, float opacity)
+	{
+		WritableRaster raster = src.getRaster();
+		
+		int[] RGBA = new int[4];
+		int[] newRGBA = new int[4];
+		for (int x = 0; x < src.getWidth(); x++) {
+			for (int y = 0; y < src.getHeight(); y++) {
+				RGBA = raster.getPixel(x, y, RGBA);
+				
+				newRGBA[0] = RGBA[0];
+				newRGBA[1] = RGBA[1];
+				newRGBA[2] = RGBA[2];
+				newRGBA[3] = (int) (((RGBA[3] / 255.0f) * opacity) * 255.0f);
+				
+				raster.setPixel(x, y, newRGBA);
+			}
+		}
+		
+		return src;
+	}
 }

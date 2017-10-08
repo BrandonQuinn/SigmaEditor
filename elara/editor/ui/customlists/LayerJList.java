@@ -59,4 +59,13 @@ public class LayerJList extends JList<Layer>
 	{
 		layerModel.addElement(layer);
 	}
+	
+	/**
+	 * Removes a layer.
+	 * @param index
+	 */
+	public void removeLayer(int index) 
+	{
+		layerModel.remove(index);
+	}
 }

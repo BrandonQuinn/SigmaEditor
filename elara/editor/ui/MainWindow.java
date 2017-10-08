@@ -92,7 +92,7 @@ public class MainWindow extends JFrame implements
 	private ImageIcon moveToolIcon;
 	private ImageIcon rotateToolIcon;
 	private ImageIcon playIcon;
-	private ImageIcon stopIcon;
+	// private ImageIcon stopIcon;
 
 	/**
 	 * Menu Items
@@ -126,7 +126,7 @@ public class MainWindow extends JFrame implements
 		moveToolIcon = new ImageIcon("res\\icons\\moveTool.png");
 		rotateToolIcon = new ImageIcon("res\\icons\\rotateTool.png");
 		playIcon = new ImageIcon("res\\icons\\playBtn.png");
-		stopIcon = new ImageIcon("res\\icons\\stopBtn.png");
+		// stopIcon = new ImageIcon("res\\icons\\stopBtn.png");
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -521,6 +521,13 @@ public class MainWindow extends JFrame implements
 			gameModel.addAssetLayer(newLayer);
 			layerList.addLayer(newLayer);
 			editingContext.setSelectedAssetLayer(newLayer);
+		}
+		
+		else if (source == deleteLayerBtn) {
+			if (gameModel.assetLayers().size() > 0 && layerList.getSelectedIndex() != -1) {
+				gameModel.assetLayers().remove(layerList.getSelectedIndex());
+				layerList.removeLayer(layerList.getSelectedIndex());
+			}
 		}
 		
 		/*==============================================*

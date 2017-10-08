@@ -5,6 +5,7 @@
  */
 package elara.editor.ui.customlists;
 
+import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -22,6 +23,11 @@ public class LayerListRenderer extends JLabel
 
 	private static final long serialVersionUID = 1L;
 
+	public LayerListRenderer()
+	{
+		setOpaque(true);
+	}
+	
 	/* (non-Javadoc)
 	 * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
 	 */
@@ -36,8 +42,10 @@ public class LayerListRenderer extends JLabel
 		
 		if (isSelected) {
 			setBackground(list.getSelectionBackground());
+			setForeground(Color.WHITE);
 		} else {
 			setBackground(list.getBackground());
+			setForeground(Color.BLACK);
 		}
 		
 		return this;

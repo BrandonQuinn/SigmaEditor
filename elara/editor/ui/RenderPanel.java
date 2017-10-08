@@ -223,6 +223,7 @@ public class RenderPanel extends JComponent implements
 					break;
 				}
 
+				newImage = ImageFilter.setOpacity(newImage, editingContext.textureBrushOpacity());
 				big.drawImage(newImage, paintx, painty, null);
 			}
 			

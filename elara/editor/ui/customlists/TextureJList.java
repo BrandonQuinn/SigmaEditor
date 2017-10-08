@@ -37,6 +37,7 @@ public class TextureJList extends JList<Texture> implements ListSelectionListene
 		setCellRenderer(new TextureListRenderer());
 		addListSelectionListener(this);
 		setModel(model);
+		loadFromContext();
 	}
 
 	/* (non-Javadoc)
@@ -70,6 +71,7 @@ public class TextureJList extends JList<Texture> implements ListSelectionListene
 	/**
 	 * Uses the ProjectContext to get a list of loaded textures.
 	 * And adds then to the list.
+	 * 
 	 * @see ProjectContext
 	 */
 	public void loadFromContext()
