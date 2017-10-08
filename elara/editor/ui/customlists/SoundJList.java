@@ -56,6 +56,7 @@ public class SoundJList extends JList<Sound>
 		
 		Sound source = model.getElementAt(getSelectedIndex());
 		editingContext.assignState(EditingState.ADD_SOUND);
+		editingContext.setSelectedSound(source);
 		
 		mainWindow.evaluateState();
 	}

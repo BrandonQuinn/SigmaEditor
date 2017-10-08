@@ -21,6 +21,8 @@ import elara.editor.input.KeyState;
 import elara.editor.input.Keyboard;
 import elara.editor.input.Mouse;
 import elara.editor.input.MouseState;
+import elara.editor.util.ImageFilter;
+import elara.project.BrushFilter;
 import elara.project.EditingContext;
 import elara.project.EditingContext.EditingState;
 import elara.project.GameModel;
@@ -135,11 +137,11 @@ public class RenderPanel extends JComponent implements
 				BufferedImage newImage 
 					= new BufferedImage(paintTexture.getWidth(), paintTexture.getHeight(), 
 							BufferedImage.TYPE_INT_ARGB);
+				Graphics2D p2d = newImage.createGraphics();
+				p2d.drawImage(paintTexture, 0, 0, null);
 				
 				// create a new image which handles tiling
 				if (editingContext.tiledPaintingEnabled()) {
-					Graphics2D p2d = newImage.createGraphics();
-					
 					p2d.drawImage(editingContext.selectedTexture().image(), 
 							0 - (paintx % newImage.getWidth()), 
 							0 - (painty % newImage.getHeight()), null);
@@ -155,16 +157,13 @@ public class RenderPanel extends JComponent implements
 					p2d.drawImage(editingContext.selectedTexture().image(), 
 							0 - (paintx % newImage.getWidth()), 
 							(0 - (painty % newImage.getHeight()) + newImage.getHeight()), null);
-					
-					g2d.drawImage(newImage,
-							Mouse.x - (newImage.getWidth() / 2), Mouse.y - (newImage.getHeight() / 2), null);
-					
-					big.drawImage(newImage, paintx, painty, null);
-				} else {
-					big.drawImage(paintTexture, paintx, painty, null);
 				}
-		        
-		        
+				
+				if (editingContext.selectedBrushFilter() == BrushFilter.RADIAL_FALLOFF) {
+					newImage = ImageFilter.radialAlphaFalloff(newImage);
+				}
+
+				big.drawImage(newImage, paintx, painty, null);
 			}
 			
 		break;
@@ -198,6 +197,12 @@ public class RenderPanel extends JComponent implements
 				editingContext.assignState(editingContext.previousState());
 			}
 		break;
+		
+		case ADD_SOUND:
+			break;
+			
+		default:
+			break;
 		}
 
 		drawMouseCursor(g2d);
@@ -295,6 +300,8 @@ public class RenderPanel extends JComponent implements
 			BufferedImage newImage 
 				= new BufferedImage(selectedImage.getWidth(), selectedImage.getHeight(), 
 						BufferedImage.TYPE_INT_ARGB);
+			Graphics2D paintg2d = newImage.createGraphics();
+			paintg2d.drawImage(selectedImage, 0, 0, null);
 			
 			g2d.setColor(new Color(86, 247, 217));
 			g2d.setStroke(new BasicStroke(2.0f));
@@ -302,8 +309,6 @@ public class RenderPanel extends JComponent implements
 			
 			// create a new image which handles tiling
 			if (editingContext.tiledPaintingEnabled()) {
-				Graphics2D paintg2d = newImage.createGraphics();
-				
 				paintg2d.drawImage(editingContext.selectedTexture().image(), 
 					0 - (paintx % selectedImage.getWidth()), 
 					0 - (painty % selectedImage.getHeight()), null);
@@ -319,17 +324,22 @@ public class RenderPanel extends JComponent implements
 				paintg2d.drawImage(editingContext.selectedTexture().image(), 
 						0 - (paintx % selectedImage.getWidth()), 
 						(0 - (painty % selectedImage.getHeight()) + selectedImage.getHeight()), null);
-				
-				g2d.drawImage(newImage,
-						Mouse.x - (selectedImage.getWidth() / 2), Mouse.y - (selectedImage.getHeight() / 2), null);
-			} else {
-				g2d.drawImage(selectedImage,
-						Mouse.x - (selectedImage.getWidth() / 2), Mouse.y - (selectedImage.getHeight() / 2), null);
 			}
+			
+			if (editingContext.selectedBrushFilter() == BrushFilter.RADIAL_FALLOFF) {
+				newImage = ImageFilter.radialAlphaFalloff(newImage);
+			}
+			
+			g2d.drawImage(newImage,
+					Mouse.x - (selectedImage.getWidth() / 2), Mouse.y - (selectedImage.getHeight() / 2), null);
 		break;
 
 		case MOVE_WORLD:
 			g2d.drawImage(DefaultIcons.moveWorldIcon.getImage(), Mouse.x - 8, Mouse.y - 8, null);
+		break;
+		
+		case ADD_SOUND:
+			g2d.drawImage(DefaultIcons.soundIcon.getImage(), Mouse.x - 8, Mouse.y - 8, null);
 		break;
 
 		default:

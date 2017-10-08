@@ -8,25 +8,46 @@ package elara.editor.ui.propertiespanels;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import org.newdawn.slick.SlickException;
+import elara.editor.debug.LogType;
+import elara.editor.debug.StaticLogs;
+import elara.project.EditingContext;
+import elara.project.ProjectContext;
 
 /**
  * SoundPropsPanel
  *
  * Description:
  */
-public class SoundPropsPanel extends JPanel
+public class SoundPropsPanel extends JPanel 
+	implements ActionListener, ChangeListener
 {
 	private static final long serialVersionUID = 1L;
+	
+	private EditingContext editingContext = EditingContext.editingContext();
+	private ProjectContext projectContext = ProjectContext.projectContext();
+	
+	private org.newdawn.slick.Sound sound;
+	
+	/**
+	 * Controls
+	 */
+	private JButton playBtn;
 
 	/**
 	 * Create the panel.
@@ -50,7 +71,8 @@ public class SoundPropsPanel extends JPanel
 		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 		
-		JButton playBtn = new JButton("Play");
+		playBtn = new JButton("Play");
+		playBtn.addActionListener(this);
 		GridBagConstraints gbc_playBtn = new GridBagConstraints();
 		gbc_playBtn.gridwidth = 2;
 		gbc_playBtn.fill = GridBagConstraints.HORIZONTAL;
@@ -67,14 +89,15 @@ public class SoundPropsPanel extends JPanel
 		gbc_lblVolume.gridy = 2;
 		panel.add(lblVolume, gbc_lblVolume);
 		
-		JSpinner spinner = new JSpinner();
-		spinner.setModel(new SpinnerNumberModel(50, 0, 100, 1));
-		GridBagConstraints gbc_spinner = new GridBagConstraints();
-		gbc_spinner.fill = GridBagConstraints.HORIZONTAL;
-		gbc_spinner.insets = new Insets(0, 0, 5, 0);
-		gbc_spinner.gridx = 1;
-		gbc_spinner.gridy = 2;
-		panel.add(spinner, gbc_spinner);
+		JSpinner volumeSpinner = new JSpinner();
+		volumeSpinner.addChangeListener(this);
+		volumeSpinner.setModel(new SpinnerNumberModel(50, 0, 100, 1));
+		GridBagConstraints gbc_volumeSpinner = new GridBagConstraints();
+		gbc_volumeSpinner.fill = GridBagConstraints.HORIZONTAL;
+		gbc_volumeSpinner.insets = new Insets(0, 0, 5, 0);
+		gbc_volumeSpinner.gridx = 1;
+		gbc_volumeSpinner.gridy = 2;
+		panel.add(volumeSpinner, gbc_volumeSpinner);
 		
 		JLabel lblLoop = new JLabel("Loop:");
 		GridBagConstraints gbc_lblLoop = new GridBagConstraints();
@@ -84,12 +107,51 @@ public class SoundPropsPanel extends JPanel
 		gbc_lblLoop.gridy = 3;
 		panel.add(lblLoop, gbc_lblLoop);
 		
-		JCheckBox checkBox = new JCheckBox("");
-		GridBagConstraints gbc_checkBox = new GridBagConstraints();
-		gbc_checkBox.anchor = GridBagConstraints.WEST;
-		gbc_checkBox.gridx = 1;
-		gbc_checkBox.gridy = 3;
-		panel.add(checkBox, gbc_checkBox);
+		JCheckBox loopChkBox = new JCheckBox("");
+		GridBagConstraints gbc_loopChkBox = new GridBagConstraints();
+		gbc_loopChkBox.anchor = GridBagConstraints.WEST;
+		gbc_loopChkBox.gridx = 1;
+		gbc_loopChkBox.gridy = 3;
+		panel.add(loopChkBox, gbc_loopChkBox);
 
+	}
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
+	@Override
+	public void actionPerformed(ActionEvent ae)
+	{
+		Object source = ae.getSource();
+		
+		if (source == playBtn) {
+			if (sound != null && sound.playing()) {
+				sound.stop();
+				playBtn.setText("Play");
+			} else {
+				try {
+					sound = new org.newdawn.slick.Sound(projectContext.projectPath() + "/assets/sounds/" 
+							+ editingContext.selectedSound().filename());
+				} catch (SlickException e) {
+					StaticLogs.debug.log(LogType.ERROR, "Could not load sound on play: " + projectContext.projectPath() + "/assets/sounds/" 
+							+ editingContext.selectedSound().filename());
+					JOptionPane.showMessageDialog(null, projectContext.projectPath() + "/assets/sounds/" 
+							+ editingContext.selectedSound().filename(), "Failed to load sound", JOptionPane.ERROR_MESSAGE);
+				}
+				
+				sound.play();
+				playBtn.setText("Stop");
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
+	 */
+	@Override
+	public void stateChanged(ChangeEvent ce)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

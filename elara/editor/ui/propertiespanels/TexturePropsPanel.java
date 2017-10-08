@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
+import elara.project.BrushFilter;
 import elara.project.EditingContext;
 
 /**
@@ -37,6 +38,8 @@ public class TexturePropsPanel extends JPanel
 	 * Properties components
 	 */
 	private JCheckBox tiledPlacementChkBox;
+	private JComboBox<String> blendModeBox;
+	private JComboBox<String> brushTypeBox;
 	
 	/**
 	 * Create the panel.
@@ -72,14 +75,15 @@ public class TexturePropsPanel extends JPanel
 		gbc_lblNewLabel.gridy = 0;
 		panel.add(lblNewLabel, gbc_lblNewLabel);
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"OVERLAP", "BLEND", "MULTIPLY", "DIFFERENCE"}));
-		GridBagConstraints gbc_comboBox = new GridBagConstraints();
-		gbc_comboBox.insets = new Insets(0, 0, 5, 0);
-		gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboBox.gridx = 1;
-		gbc_comboBox.gridy = 0;
-		panel.add(comboBox, gbc_comboBox);
+		blendModeBox = new JComboBox<String>();
+		blendModeBox.addActionListener(this);
+		blendModeBox.setModel(new DefaultComboBoxModel<String>(new String[] {"OVERLAP", "BLEND", "MULTIPLY", "DIFFERENCE"}));
+		GridBagConstraints gbc_blendModeBox = new GridBagConstraints();
+		gbc_blendModeBox.insets = new Insets(0, 0, 5, 0);
+		gbc_blendModeBox.fill = GridBagConstraints.HORIZONTAL;
+		gbc_blendModeBox.gridx = 1;
+		gbc_blendModeBox.gridy = 0;
+		panel.add(blendModeBox, gbc_blendModeBox);
 		
 		JLabel lblNewLabel_1 = new JLabel("Brush Type:");
 		GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
@@ -89,14 +93,16 @@ public class TexturePropsPanel extends JPanel
 		gbc_lblNewLabel_1.gridy = 1;
 		panel.add(lblNewLabel_1, gbc_lblNewLabel_1);
 		
-		JComboBox comboBox_1 = new JComboBox();
-		comboBox_1.setModel(new DefaultComboBoxModel(new String[] {"RADIAL FALLOFF", "NONE"}));
-		GridBagConstraints gbc_comboBox_1 = new GridBagConstraints();
-		gbc_comboBox_1.insets = new Insets(0, 0, 5, 0);
-		gbc_comboBox_1.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboBox_1.gridx = 1;
-		gbc_comboBox_1.gridy = 1;
-		panel.add(comboBox_1, gbc_comboBox_1);
+		brushTypeBox = new JComboBox<String>();
+		brushTypeBox.addActionListener(this);
+		brushTypeBox.setModel(new DefaultComboBoxModel<String>(new String[] {"RADIAL_FALLOFF", "NONE"}));
+		GridBagConstraints gbc_brushTypeBox = new GridBagConstraints();
+		gbc_brushTypeBox.anchor = GridBagConstraints.SOUTH;
+		gbc_brushTypeBox.insets = new Insets(0, 0, 5, 0);
+		gbc_brushTypeBox.fill = GridBagConstraints.HORIZONTAL;
+		gbc_brushTypeBox.gridx = 1;
+		gbc_brushTypeBox.gridy = 1;
+		panel.add(brushTypeBox, gbc_brushTypeBox);
 		
 		JLabel lblTiledPlacement = new JLabel("Tiled Placement:");
 		GridBagConstraints gbc_lblTiledPlacement = new GridBagConstraints();
@@ -128,6 +134,18 @@ public class TexturePropsPanel extends JPanel
 				editingContext.enableTiledTexturePlacement();
 			} else {
 				editingContext.disableTiledTexturePlacement();
+			}
+		} else if (source == blendModeBox) {
+			String value = (String) blendModeBox.getSelectedItem();
+			
+			
+		} else if (source == brushTypeBox) {
+			String value = (String) brushTypeBox.getSelectedItem();
+			
+			if (value.equals("RADIAL_FALLOFF")) {
+				editingContext.setSelectedBrushFilter(BrushFilter.RADIAL_FALLOFF);
+			} else if (value.equals("NONE")) {
+				editingContext.setSelectedBrushFilter(BrushFilter.NONE);
 			}
 		}
 	}

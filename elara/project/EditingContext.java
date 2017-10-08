@@ -6,6 +6,7 @@
 
 package elara.project;
 
+import elara.assets.Sound;
 import elara.assets.Texture;
 
 /**
@@ -86,9 +87,11 @@ public class EditingContext
 	private int selectedGroundLayer = -1;
 	
 	/**
-	 * Current texture selected for painting.
+	 * Currently selected objects or items etc.
 	 */
 	private Texture selectedTexture;
+	private BrushFilter selectedBrushFilter = BrushFilter.RADIAL_FALLOFF;
+	private Sound selectedSound;
 	
 	/**
 	 * This changes weather or not a texture being painting 
@@ -241,5 +244,37 @@ public class EditingContext
 	public void disableTiledTexturePlacement()
 	{
 		tiledPaintingEnabled = false;
+	}
+
+	/**
+	 * Returns the currently selected sound
+	 * @return
+	 */
+	public Sound selectedSound()
+	{
+		return selectedSound;
+	}
+	
+	public void setSelectedSound(Sound sound)
+	{
+		this.selectedSound = sound;
+	}
+
+	/**
+	 * Gets the currently selected brush filter for texture painting.
+	 * @return
+	 */
+	public BrushFilter selectedBrushFilter()
+	{
+		return selectedBrushFilter;
+	}
+	
+	/**
+	 * Sets the currently selected brush filter.
+	 * @param filter
+	 */
+	public void setSelectedBrushFilter(BrushFilter filter)
+	{
+		this.selectedBrushFilter = filter;
 	}
 }
