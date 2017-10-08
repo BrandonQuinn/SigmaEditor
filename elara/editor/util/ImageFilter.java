@@ -43,12 +43,45 @@ public class ImageFilter
 				RGBA[0] = sourceRGBA[0];
 				RGBA[1] = sourceRGBA[1];
 				RGBA[2] = sourceRGBA[2];
-				RGBA[3] = Math.max(0, Math.min(255, newAlpha));
+				RGBA[3] = clamp(newAlpha, 0, 255);
 				
 				sourceRaster.setPixel(x, y, RGBA);
 			}
 		}
 		
 		return image;
+	}
+
+	/**
+	 * Multiplies each pixel channel together.
+	 * 
+	 * @param newImage
+	 * @param src
+	 * @return
+	 */
+	public static BufferedImage multiply(BufferedImage dest, BufferedImage src)
+	{
+		WritableRaster destRaster = dest.getRaster();
+		WritableRaster srcRaster = src.getRaster();
+		
+		int[] RGBA = new int[4];
+		for (int x = 0; x < src.getWidth(); x++) {
+			for (int y = 0; y < src.getHeight(); y++) {
+				
+				RGBA[0] = clamp((int)(((srcRaster.getPixel(x, y, (int[]) null)[0] / 255.0f) * (destRaster.getPixel(x, y, (int[]) null)[0] / 255.0f)) * 255), 0, 255);
+				RGBA[1] = clamp((int)(((srcRaster.getPixel(x, y, (int[]) null)[1] / 255.0f) * (destRaster.getPixel(x, y, (int[]) null)[1] / 255.0f)) * 255), 0, 255);
+				RGBA[2] = clamp((int)(((srcRaster.getPixel(x, y, (int[]) null)[2] / 255.0f) * (destRaster.getPixel(x, y, (int[]) null)[2] / 255.0f)) * 255), 0, 255);
+				RGBA[3] = (destRaster.getPixel(x, y, (int[]) null)[3]);
+				
+				destRaster.setPixel(x, y, RGBA);
+			}
+		}
+		
+		return dest;
+	}
+	
+	private static int clamp(int value, int min, int max)
+	{
+		return Math.max(min, Math.min(max, value));
 	}
 }

@@ -220,11 +220,6 @@ public class MainWindow extends JFrame implements
 		leftSplitPane.setRightComponent(leftSideSouthPanel);
 		leftSideSouthPanel.setLayout(new BorderLayout(0, 0));
 
-		JLabel lblProperties = new JLabel("Properties");
-		lblProperties.setHorizontalAlignment(SwingConstants.CENTER);
-		lblProperties.setFont(new Font("Tahoma", Font.BOLD, 11));
-		leftSideSouthPanel.add(lblProperties, BorderLayout.NORTH);
-
 		propertiesPanel = new JPanel();
 		leftSideSouthPanel.add(propertiesPanel, BorderLayout.CENTER);
 		propertiesPanel.setLayout(new BorderLayout());

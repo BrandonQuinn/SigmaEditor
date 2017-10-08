@@ -175,8 +175,43 @@ public class RenderPanel extends JComponent implements
 							(0 - (painty % newImage.getHeight()) + newImage.getHeight()), null);
 				}
 				
-				if (editingContext.selectedBrushFilter() == BrushFilter.RADIAL_FALLOFF) {
-					newImage = ImageFilter.radialAlphaFalloff(newImage);
+				switch (editingContext.selectedBrushFilter()) {
+					case RADIAL_FALLOFF:
+						newImage = ImageFilter.radialAlphaFalloff(newImage);
+					break;
+					
+					case NONE:
+						// Do nothing
+					break;
+					
+					default:
+					break;
+				}
+				
+				switch (editingContext.selectedBlendMode()) {
+					case OVERLAP:
+						// Do nothing
+					break;
+				
+					case MULTIPLY:
+						// fuck me
+							BufferedImage src = buffIm.getSubimage(
+									Math.max(0, Math.min(buffIm.getWidth(), paintx)), 
+									Math.max(0, Math.min(buffIm.getHeight(), painty)), 
+									Math.max(1, Math.min(newImage.getWidth(), buffIm.getWidth() - ((paintx + newImage.getWidth()) - newImage.getWidth()))), 
+									Math.max(1, Math.min(newImage.getHeight(), buffIm.getHeight() - ((painty + newImage.getHeight()) - newImage.getHeight())))
+								);
+						newImage = ImageFilter.multiply(newImage, src);
+					break;
+					
+					case OVERLAY:
+					break;
+					
+					case SCREEN:
+					break;
+					
+					default:
+					break;
 				}
 
 				big.drawImage(newImage, paintx, painty, null);

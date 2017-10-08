@@ -90,6 +90,7 @@ public class EditingContext
 	 */
 	private Texture selectedTexture;
 	private BrushFilter selectedBrushFilter = BrushFilter.RADIAL_FALLOFF;
+	private BlendMode selectedBlendMode = BlendMode.OVERLAP;
 	private Sound selectedSound;
 	private Layer selectedAssetLayer;
 	
@@ -315,5 +316,19 @@ public class EditingContext
 	public Layer selectedAssetLayer()
 	{
 		return selectedAssetLayer;
+	}
+
+	/**
+	 * Return selected blend mode.
+	 * @return
+	 */
+	public BlendMode selectedBlendMode()
+	{
+		return selectedBlendMode;
+	}
+	
+	public void setSelectedBlendMode(BlendMode mode)
+	{
+		this.selectedBlendMode = mode;
 	}
 }
