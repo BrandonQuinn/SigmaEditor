@@ -16,7 +16,6 @@ import elara.assets.Texture;
  * in terms of tools currently selected and what
  * the user is interacting with or changing.
  * 
- * TODO Work on EditingContext
  */
 public class EditingContext
 {
@@ -49,7 +48,6 @@ public class EditingContext
 		 * Uses the currently selected ground texture layer
 		 * and the current selected texture to paint the currently
 		 * selected texture on to the layer using any chosen blend mode.
-		 * TODO Add texture blend modes
 		 */
 		TEXTURE_PAINT,
 		

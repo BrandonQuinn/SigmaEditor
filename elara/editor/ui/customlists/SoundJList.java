@@ -52,7 +52,6 @@ public class SoundJList extends JList<Sound>
 		 * will change to texture editing where the texture
 		 * will then be able to be painted on to the the workspace
 		 */
-		// TODO Handle sound selection
 		
 		Sound source = model.getElementAt(getSelectedIndex());
 		editingContext.assignState(EditingState.ADD_SOUND);

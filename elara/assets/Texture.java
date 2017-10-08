@@ -11,8 +11,6 @@ import java.io.File;
 	File: Texture.java
 	
 	Description: Represents a simple texture.
-	
-	TODO Texture modifcation methods like fall-off and scale
  *============================================================*/
 
 public class Texture

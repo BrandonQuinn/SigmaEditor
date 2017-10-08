@@ -20,7 +20,6 @@ import elara.assets.Texture;
  * All the data here represents a project on disk that can then be
  * send to the game engine and executed.
  * 
- * TODO ProjectContext
  */
 public class ProjectContext
 {
