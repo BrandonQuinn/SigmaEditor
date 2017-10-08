@@ -5,13 +5,15 @@
  */
 package elara.assets;
 
+import org.joml.Vector2f;
+
 /**
  * Sound
  *
  * Description: Represents a sound, yeppie,
  * sure does.
  */
-public class Sound
+public class Sound extends Entity
 {
 	private String name;
 	private String filename;
@@ -24,6 +26,16 @@ public class Sound
 	{
 		this.name = name;
 		this.filename = filename;
+	}
+
+	/**
+	 * Copy
+	 * @param selectedSound
+	 */
+	public Sound(Sound copySrc)
+	{
+		this.name = copySrc.name;
+		this.filename = copySrc.filename;
 	}
 
 	public void assignName(String name)
@@ -43,5 +55,14 @@ public class Sound
 	public String filename()
 	{
 		return filename;
+	}
+
+	/**
+	 * Sets the position of the sound.
+	 * @param vector2f
+	 */
+	public void setPosition(Vector2f pos)
+	{
+		this.position = pos;
 	}
 }

@@ -57,4 +57,17 @@ public class Mouse
 	{
 		Mouse.rightButton = state;
 	}
+
+	/**
+	 * @return
+	 */
+	public static boolean isLeftButtonClicked()
+	{
+		if (leftButton == MouseState.CLICKED) {
+			leftButton = MouseState.NOT_PRESSED;
+			return true;
+		}
+		
+		return false;
+	}
 }

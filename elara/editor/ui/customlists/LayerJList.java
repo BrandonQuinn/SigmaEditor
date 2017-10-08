@@ -5,10 +5,13 @@
  */
 package elara.editor.ui.customlists;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import elara.assets.Layer;
+import elara.project.EditingContext;
+import elara.project.GameModel;
 
 /**
  * LayerJList
@@ -18,25 +21,42 @@ import elara.assets.Layer;
  * appear in the game.
  * 
  */
-public class LayerJList extends JList<Layer> implements ListSelectionListener
+public class LayerJList extends JList<Layer> 
+	implements ListSelectionListener
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * 
-	 */
+	private EditingContext editingContext = EditingContext.editingContext();
+	private GameModel gameModel = GameModel.gameModel();
+	
+	private DefaultListModel<Layer> layerModel = new DefaultListModel<Layer>();
+	
 	public LayerJList()
 	{
-		
+		setCellRenderer(new LayerListRenderer());
+		addListSelectionListener(this);
+		setModel(layerModel);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
 	 */
 	@Override
 	public void valueChanged(ListSelectionEvent e)
 	{
-		// TODO layer list change
+		int selectedIndex = getSelectedIndex();
+		
+		if (selectedIndex > -1) {
+			editingContext.setSelectedAssetLayer(gameModel.assetLayers().get(selectedIndex));
+			editingContext.assignState(EditingContext.EditingState.ADD_SOUND);
+		}
 	}
-	
+	/**
+	 * Adds a layer to the list.
+	 * @param layer
+	 */
+	public void addLayer(Layer layer)
+	{
+		layerModel.addElement(layer);
+	}
 }

@@ -7,6 +7,7 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -16,7 +17,9 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import org.joml.Vector2f;
 import elara.assets.DefaultIcons;
+import elara.assets.Sound;
 import elara.editor.input.KeyState;
 import elara.editor.input.Keyboard;
 import elara.editor.input.Mouse;
@@ -76,13 +79,26 @@ public class RenderPanel extends JComponent implements
 	public void paint(Graphics g)
 	{
 		Graphics2D g2d = (Graphics2D) g;
+		
+		g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
+				RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+		
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+		g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
+				RenderingHints.VALUE_RENDER_SPEED);
+		
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+		
 		drawDefaultBackground(g2d);
 		g2d.setColor(Color.white);
 
 		gameModel.draw(editingContext.xOffset(), editingContext.yOffset(), g2d);
-
 		handleInput();
 		handleEditingState(g2d);
+
 		drawDebugInfo(g2d);
 	}
 
@@ -199,6 +215,12 @@ public class RenderPanel extends JComponent implements
 		break;
 		
 		case ADD_SOUND:
+				if (Mouse.isLeftButtonClicked() && gameModel.assetLayers().size() != 0) {
+					Sound s = new Sound(editingContext.selectedSound());
+					s.setPosition(new Vector2f(Mouse.x - editingContext.xOffset(), 
+							Mouse.y - editingContext.yOffset() - DefaultIcons.soundIcon.getIconHeight()));
+					editingContext.selectedAssetLayer().addSound(s);
+				}
 			break;
 			
 		default:
@@ -335,11 +357,15 @@ public class RenderPanel extends JComponent implements
 		break;
 
 		case MOVE_WORLD:
-			g2d.drawImage(DefaultIcons.moveWorldIcon.getImage(), Mouse.x - 8, Mouse.y - 8, null);
+			g2d.drawImage(DefaultIcons.moveWorldIcon.getImage(), 
+					Mouse.x - DefaultIcons.moveWorldIcon.getIconWidth() / 2, 
+					Mouse.y - DefaultIcons.moveWorldIcon.getIconHeight() / 2, null);
 		break;
 		
 		case ADD_SOUND:
-			g2d.drawImage(DefaultIcons.soundIcon.getImage(), Mouse.x - 8, Mouse.y - 8, null);
+			g2d.drawImage(DefaultIcons.soundIcon.getImage(),
+				Mouse.x  - DefaultIcons.soundIcon.getIconWidth() / 2, 
+				Mouse.y - DefaultIcons.soundIcon.getIconHeight() / 2, null);
 		break;
 
 		default:

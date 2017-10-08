@@ -6,7 +6,6 @@
 package elara.editor.ui.customlists;
 
 import java.awt.Component;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
@@ -17,7 +16,8 @@ import elara.assets.Layer;
  *
  * Description:
  */
-public class LayerListRenderer extends JLabel implements ListCellRenderer<Layer>
+public class LayerListRenderer extends JLabel 
+	implements ListCellRenderer<Layer>
 {
 
 	private static final long serialVersionUID = 1L;
@@ -32,10 +32,15 @@ public class LayerListRenderer extends JLabel implements ListCellRenderer<Layer>
 			boolean isSelected,
 			boolean cellHasFocus)
 	{
-		add(new JCheckBox());
 		setText(layer.name());
 		
-		return null;
+		if (isSelected) {
+			setBackground(list.getSelectionBackground());
+		} else {
+			setBackground(list.getBackground());
+		}
+		
+		return this;
 	}
 	
 }

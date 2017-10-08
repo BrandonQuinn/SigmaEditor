@@ -6,6 +6,7 @@
 
 package elara.project;
 
+import elara.assets.Layer;
 import elara.assets.Sound;
 import elara.assets.Texture;
 
@@ -90,6 +91,7 @@ public class EditingContext
 	private Texture selectedTexture;
 	private BrushFilter selectedBrushFilter = BrushFilter.RADIAL_FALLOFF;
 	private Sound selectedSound;
+	private Layer selectedAssetLayer;
 	
 	/**
 	 * This changes weather or not a texture being painting 
@@ -98,6 +100,10 @@ public class EditingContext
 	 */
 	private boolean tiledPaintingEnabled = true;
 	
+	/**
+	 * Rendering options.
+	 */
+	private boolean gizmoRenderingEnabled = true;
 	
 	// can not instantiate, do not want to
 	private EditingContext()
@@ -274,5 +280,40 @@ public class EditingContext
 	public void setSelectedBrushFilter(BrushFilter filter)
 	{
 		this.selectedBrushFilter = filter;
+	}
+
+	/**
+	 * Do we want to render gizmos?
+	 */
+	public void setGizmoRenderingEnabled(boolean b)
+	{
+		 gizmoRenderingEnabled = b;
+	}
+	
+	/**
+	 * Do we want to render gizmos?
+	 * @return
+	 */
+	public boolean gizmoRenderingEnabled()
+	{
+		return gizmoRenderingEnabled;
+	}
+
+	/**
+	 * Set the currently selected asset layer.
+	 * @param selectedIndex
+	 */
+	public void setSelectedAssetLayer(Layer selectedLayer)
+	{
+		selectedAssetLayer = selectedLayer;
+	}
+	
+	/**
+	 * Returns the selected asset layer.
+	 * @return
+	 */
+	public Layer selectedAssetLayer()
+	{
+		return selectedAssetLayer;
 	}
 }

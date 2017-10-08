@@ -26,6 +26,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import elara.assets.DefaultIcons;
+import elara.assets.Layer;
 import elara.assets.Sound;
 import elara.assets.Texture;
 import elara.editor.Constants;
@@ -518,6 +519,14 @@ public class MainWindow extends JFrame implements
 			TextureLayerDialog tld = new TextureLayerDialog();
 			tld.setVisible(true);
 		} 
+		
+		else if (source == newLayerBtn) {
+			String name = JOptionPane.showInputDialog(this, "Enter layer name.");
+			Layer newLayer = new Layer(name);
+			gameModel.addAssetLayer(newLayer);
+			layerList.addLayer(newLayer);
+			editingContext.setSelectedAssetLayer(newLayer);
+		}
 		
 		/*==============================================*
 		 * TOOL BAR

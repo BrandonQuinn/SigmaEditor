@@ -9,6 +9,7 @@ package elara.project;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import elara.assets.Layer;
 import elara.editor.debug.SigmaException;
 
 /**
@@ -48,6 +49,12 @@ public class GameModel
 	 * in to one image.
 	 */
 	private ArrayList<BufferedImage> groundImageLayers = new ArrayList<BufferedImage>();
+	
+	/**
+	 * Asset layers, this is where objects, sounds, particle effects,
+	 * what ever it is are stored.
+	 */
+	private ArrayList<Layer> assetLayers = new ArrayList<Layer>();
 
 	private GameModel()
 	{
@@ -132,6 +139,11 @@ public class GameModel
 		for (BufferedImage buffImage : groundImageLayers) {
 			g2d.drawImage(buffImage, xOffset, yOffset, null);
 		}
+		
+		// draw asset layers
+		for (Layer layer : assetLayers) {
+			layer.draw(xOffset, yOffset, g2d);
+		}
 	}
 
 	/**
@@ -152,5 +164,23 @@ public class GameModel
 	public int worldHeightPixels()
 	{
 		return GRID_SIZE * worldHeight;
+	}
+	
+	/**
+	 * Returns the list of asset layers.
+	 * @return
+	 */
+	public ArrayList<Layer> assetLayers()
+	{
+		return assetLayers;
+	}
+
+	/**
+	 * Add a new layer.
+	 * @param newLayer
+	 */
+	public void addAssetLayer(Layer newLayer)
+	{
+		assetLayers.add(newLayer);
 	}
 }
