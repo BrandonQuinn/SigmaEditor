@@ -62,7 +62,7 @@ public class TextureLayerDialog extends JDialog
 	public TextureLayerDialog()
 	{
 		setTitle("Texture Layers");
-		setBounds(100, 100, 333, 360);
+		setBounds(100, 100, 262, 360);
 		getContentPane().setLayout(new BorderLayout());
 		setLocationRelativeTo(null);
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));

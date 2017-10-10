@@ -48,7 +48,6 @@ public class LayerJList extends JList<Layer>
 		
 		if (selectedIndex > -1) {
 			editingContext.setSelectedAssetLayer(gameModel.assetLayers().get(selectedIndex));
-			editingContext.assignState(EditingContext.EditingState.ADD_SOUND);
 		}
 	}
 	/**

@@ -4,6 +4,7 @@ package elara.editor.ui;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -24,10 +25,13 @@ import elara.editor.input.KeyState;
 import elara.editor.input.Keyboard;
 import elara.editor.input.Mouse;
 import elara.editor.input.MouseState;
+import elara.editor.rendering.RenderStats;
 import elara.editor.util.ImageFilter;
 import elara.project.EditingContext;
 import elara.project.EditingContext.EditingState;
 import elara.project.GameModel;
+import elara.threading.ImageWriteEvent;
+import elara.threading.ImageWriteThread;
 
 /**
  * Component which actually holds the level being rendered and everything
@@ -48,13 +52,18 @@ public class RenderPanel extends JComponent implements
 	private EditingContext editingContext = EditingContext.editingContext();
 	private GameModel gameModel = GameModel.gameModel();
 
+	private MainWindow mainWindow;
+	
+	private ImageWriteThread imageWriteThread = new ImageWriteThread("Image Processing Thread");
+
 	/*
 	 * Mouse cursor.
 	 */
 	private ImageIcon cursorImage;
 
-	public RenderPanel()
+	public RenderPanel(MainWindow mainWindow)
 	{
+		this.mainWindow = mainWindow;
 		addMouseListener(this);
 		addKeyListener(this);
 		addMouseMotionListener(this);
@@ -72,6 +81,8 @@ public class RenderPanel extends JComponent implements
 				"blank cursor");
 
 		setCursor(blankCursor);
+		
+		imageWriteThread.start();
 	}
 
 	@Override
@@ -79,6 +90,24 @@ public class RenderPanel extends JComponent implements
 	{
 		Graphics2D g2d = (Graphics2D) g;
 		
+		long time = System.currentTimeMillis();
+		
+		drawDefaultBackground(g2d);
+		setup(g2d);
+		gameModel.draw(editingContext.xOffset(), editingContext.yOffset(), g2d);
+		handleInput();
+		handleEditingState(g2d);
+		drawDebugInfo(g2d);
+		
+		RenderStats.frameTime = System.currentTimeMillis() - time;
+	}
+	
+	/**
+	 * Prepare the renderer
+	 * @param g2d
+	 */
+	private void setup(Graphics2D g2d) 
+	{
 		g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
 				RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
 		
@@ -91,14 +120,8 @@ public class RenderPanel extends JComponent implements
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		
-		drawDefaultBackground(g2d);
 		g2d.setColor(Color.white);
-
-		gameModel.draw(editingContext.xOffset(), editingContext.yOffset(), g2d);
-		handleInput();
-		handleEditingState(g2d);
-
-		drawDebugInfo(g2d);
+		g2d.setFont(new Font("Tahoma", Font.BOLD, 12));
 	}
 
 	/**
@@ -110,8 +133,10 @@ public class RenderPanel extends JComponent implements
 		g2d.drawString("Tool: " + editingContext.state().toString() + " | "
 				+ "Selected Texture Layer: " + (editingContext.getSelectedGroundLayerIndex() + 1)
 				+ " | Offset x:" + editingContext.xOffset() + ", y: " + editingContext.yOffset()
-				+ " | Memory Usage: " + Runtime.getRuntime().totalMemory()/1000000 + "MB/" + Runtime.getRuntime().maxMemory()/1000000 + "MB", 
-				5, 15);
+				+ " | Memory Usage: " + Runtime.getRuntime().totalMemory()/1000000 + "MB/" + Runtime.getRuntime().maxMemory()/1000000 + "MB", 5, 15);
+		
+		g2d.drawString("Frame Frequency: " + RenderStats.frameFrequency + "ms"
+				+ " | Frame Time: " + RenderStats.frameTime + "ms", 5, 30);
 	}
 
 	/**
@@ -131,14 +156,15 @@ public class RenderPanel extends JComponent implements
 			break;
 			
 			case TEXTURE_PAINT:
-				// TODO opacity keys interface update, clamp values
 				// comma and period keys control opacity
 				if (Keyboard.PERIOD == KeyState.PRESSED) {
 					editingContext.assignTextureBrushOpacity(editingContext.textureBrushOpacity() + 0.01f);
+					mainWindow.evaluateState();
 				}
 				
 				if (Keyboard.COMMA == KeyState.PRESSED) {
 					editingContext.assignTextureBrushOpacity(editingContext.textureBrushOpacity() - 0.01f);
+					mainWindow.evaluateState();
 				}
 			break;
 			
@@ -156,7 +182,7 @@ public class RenderPanel extends JComponent implements
 
 	private Integer moveStartX = null;
 	private Integer moveStartY = null;
-
+	
 	/**
 	 * Basically switch throw all the editing states and make the
 	 * edits
@@ -173,15 +199,18 @@ public class RenderPanel extends JComponent implements
 		case TEXTURE_PAINT:
 			if (Mouse.isLeftButtonDown() && editingContext.getSelectedGroundLayerIndex() != -1) {
 				BufferedImage paintTexture = editingContext.selectedTexture().image();
-				BufferedImage buffIm = gameModel.groundTextureLayers().get(editingContext.getSelectedGroundLayerIndex());
-				Graphics2D big = (Graphics2D) buffIm.getGraphics();
+				BufferedImage buffIm = gameModel.groundTextureLayers()
+						.get(editingContext.getSelectedGroundLayerIndex());
+				
+				// Graphics2D big = buffIm.createGraphics(); /* no threading */
 				
 				int paintx = (Mouse.x - (paintTexture.getWidth() >> 1)) + editingContext.xOffset() * -1;
 				int painty = (Mouse.y - (paintTexture.getHeight() >> 1)) + editingContext.yOffset() * -1;
 				
-				BufferedImage newImage 
-					= new BufferedImage(paintTexture.getWidth(), paintTexture.getHeight(), 
-							BufferedImage.TYPE_INT_ARGB);
+				BufferedImage newImage = new BufferedImage(
+						paintTexture.getWidth(), 
+						paintTexture.getHeight(), 
+						BufferedImage.TYPE_INT_ARGB);
 				Graphics2D p2d = newImage.createGraphics();
 				p2d.drawImage(paintTexture, 0, 0, null);
 				
@@ -204,6 +233,7 @@ public class RenderPanel extends JComponent implements
 							(0 - (painty % newImage.getHeight()) + newImage.getHeight()), null);
 				}
 				
+				// BRUSH TYPE
 				switch (editingContext.selectedBrushFilter()) {
 					case RADIAL_FALLOFF:
 						newImage = ImageFilter.radialAlphaFalloff(newImage);
@@ -217,6 +247,7 @@ public class RenderPanel extends JComponent implements
 					break;
 				}
 				
+				// BLEND MODE
 				switch (editingContext.selectedBlendMode()) {
 					case OVERLAP:
 						// Do nothing
@@ -225,8 +256,8 @@ public class RenderPanel extends JComponent implements
 					case MULTIPLY:
 						// fuck me
 						BufferedImage srcMult = buffIm.getSubimage(
-								Math.max(0, Math.min(buffIm.getWidth(), paintx)), 
-								Math.max(0, Math.min(buffIm.getHeight(), painty)), 
+								Math.max(0, Math.min(buffIm.getWidth() - 1, paintx)), 
+								Math.max(0, Math.min(buffIm.getHeight() - 1, painty)), 
 								Math.max(1, Math.min(newImage.getWidth(), buffIm.getWidth() - ((paintx + newImage.getWidth()) - newImage.getWidth()))), 
 								Math.max(1, Math.min(newImage.getHeight(), buffIm.getHeight() - ((painty + newImage.getHeight()) - newImage.getHeight())))
 							);
@@ -234,10 +265,9 @@ public class RenderPanel extends JComponent implements
 					break;
 					
 					case OVERLAY:
-						// fuck me
 						BufferedImage srcScreen = buffIm.getSubimage(
-								Math.max(0, Math.min(buffIm.getWidth(), paintx)), 
-								Math.max(0, Math.min(buffIm.getHeight(), painty)), 
+								Math.max(0, Math.min(buffIm.getWidth() - 1, paintx)), 
+								Math.max(0, Math.min(buffIm.getHeight() - 1, painty)), 
 								Math.max(1, Math.min(newImage.getWidth(), buffIm.getWidth() - ((paintx + newImage.getWidth()) - newImage.getWidth()))), 
 								Math.max(1, Math.min(newImage.getHeight(), buffIm.getHeight() - ((painty + newImage.getHeight()) - newImage.getHeight())))
 							);
@@ -252,7 +282,10 @@ public class RenderPanel extends JComponent implements
 				}
 
 				newImage = ImageFilter.setOpacity(newImage, editingContext.textureBrushOpacity());
-				big.drawImage(newImage, paintx, painty, null);
+				// big.drawImage(newImage, paintx, painty, null); /* not threaded option */
+				
+				ImageWriteEvent iwe = new ImageWriteEvent(buffIm, paintx, painty, newImage);
+				imageWriteThread.addWriteEvent(iwe);
 			}
 			
 		break;

@@ -26,15 +26,17 @@ public class RenderUpdateThread implements Runnable
 	@Override
 	public void run()
 	{
+		long time;
 		// repaint thread after WAIT_TIME passed
 		while (updating) {
+			time = System.currentTimeMillis();
 			try {
 				Thread.sleep(WAIT_TIME);
 			} catch (InterruptedException e) {
-
 				e.printStackTrace();
 			}
 			renderPanel.repaint();
+			RenderStats.frameFrequency = System.currentTimeMillis() - time;
 		}
 	}
 

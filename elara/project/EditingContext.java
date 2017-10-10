@@ -93,7 +93,14 @@ public class EditingContext
 	private BrushFilter selectedBrushFilter = BrushFilter.RADIAL_FALLOFF;
 	private BlendMode selectedBlendMode = BlendMode.OVERLAP;
 	private float textureBrushOpacity = 1.0f;
+	
+	
+	/*===========================*
+	 * ADD_SOUND state fields        *
+	 *===========================*/
+	
 	private Sound selectedSound;
+	
 	private Layer selectedAssetLayer;
 	
 	/**
@@ -329,6 +336,10 @@ public class EditingContext
 		return selectedBlendMode;
 	}
 	
+	/**
+	 * Change the current blend mode for texture painting.
+	 * @param mode
+	 */
 	public void setSelectedBlendMode(BlendMode mode)
 	{
 		this.selectedBlendMode = mode;

@@ -64,20 +64,18 @@ public class ImageFilter
 		WritableRaster destRaster = dest.getRaster();
 		WritableRaster srcRaster = src.getRaster();
 		
-		int[] RGBA = new int[4];
 		int[] srcTmp = new int[4];
 		int[] destTmp = new int[4];
 		for (int x = 0; x < src.getWidth(); x++) {
 			for (int y = 0; y < src.getHeight(); y++) {
 				srcRaster.getPixel(x, y, srcTmp);
 				destRaster.getPixel(x, y, destTmp);
-				
-				RGBA[0] = MathUtil.clamp((int)(((srcTmp[0] / 255.0f) * (destTmp[0] / 255.0f)) * 255), 0, 255);
-				RGBA[1] = MathUtil.clamp((int)(((srcTmp[1] / 255.0f) * (destTmp[1] / 255.0f)) * 255), 0, 255);
-				RGBA[2] = MathUtil.clamp((int)(((srcTmp[2] / 255.0f) * (destTmp[2] / 255.0f)) * 255), 0, 255);
-				RGBA[3] = destTmp[3];
-				
-				destRaster.setPixel(x, y, RGBA);
+				destRaster.setPixel(x, y, new int[] {
+						MathUtil.clamp((int)(((srcTmp[0] / 255.0f) * (destTmp[0] / 255.0f)) * 255), 0, 255),
+						MathUtil.clamp((int)(((srcTmp[1] / 255.0f) * (destTmp[1] / 255.0f)) * 255), 0, 255),
+						MathUtil.clamp((int)(((srcTmp[2] / 255.0f) * (destTmp[2] / 255.0f)) * 255), 0, 255),
+						destTmp[3]
+				});
 			}
 		}
 		
@@ -145,17 +143,15 @@ public class ImageFilter
 		WritableRaster raster = src.getRaster();
 		
 		int[] RGBA = new int[4];
-		int[] newRGBA = new int[4];
 		for (int x = 0; x < src.getWidth(); x++) {
 			for (int y = 0; y < src.getHeight(); y++) {
 				RGBA = raster.getPixel(x, y, RGBA);
-				
-				newRGBA[0] = RGBA[0];
-				newRGBA[1] = RGBA[1];
-				newRGBA[2] = RGBA[2];
-				newRGBA[3] = (int) (((RGBA[3] / 255.0f) * opacity) * 255.0f);
-				
-				raster.setPixel(x, y, newRGBA);
+				raster.setPixel(x, y, new int[] {
+						RGBA[0],
+						RGBA[1],
+						RGBA[2],
+						(int) (((RGBA[3] / 255.0) * opacity) * 255.0)
+				});
 			}
 		}
 		

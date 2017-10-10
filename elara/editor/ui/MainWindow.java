@@ -2,7 +2,6 @@
 package elara.editor.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,7 +20,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import elara.assets.DefaultIcons;
@@ -68,6 +66,7 @@ public class MainWindow extends JFrame implements
 	private JLabel statusLabel;
 	private JScrollPane leftScrollPane;
 	private JPanel propertiesPanel;
+	private TexturePropsPanel texturePropertiesPanel;
 	
 	/**
 	 * Buttons
@@ -108,7 +107,10 @@ public class MainWindow extends JFrame implements
 		setSize((int) (toolkit.getScreenSize().width / 1.3f),
 				(int) (toolkit.getScreenSize().height / 1.3f));
 		setLocationRelativeTo(null);
+		setIconImage(DefaultIcons.windowIcon.getImage());
 
+		texturePropertiesPanel = new TexturePropsPanel();
+		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
@@ -220,7 +222,7 @@ public class MainWindow extends JFrame implements
 		rightSplitPane.setResizeWeight(0.5);
 		rightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 
-		renderPanel = new RenderPanel();
+		renderPanel = new RenderPanel(this);
 
 		/*
 		 * Create the thread which will be used to continuously re-render the editor
@@ -256,11 +258,6 @@ public class MainWindow extends JFrame implements
 		layerToolBar.add(textureLayersBtn);
 		layerPanel.add(layerToolBar, BorderLayout.SOUTH);
 		layerPanel.add(layerList, BorderLayout.CENTER);
-
-		JLabel lblLayers = new JLabel("Object Layers");
-		lblLayers.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblLayers.setHorizontalAlignment(SwingConstants.CENTER);
-		layerPanel.add(lblLayers, BorderLayout.NORTH);
 
 		JPanel statusPanel = new JPanel();
 		statusPanel.setLayout(new BorderLayout());
@@ -497,11 +494,17 @@ public class MainWindow extends JFrame implements
 		} 
 		
 		else if (source == newLayerBtn) {
-			String name = JOptionPane.showInputDialog(this, "Enter layer name.");
-			Layer newLayer = new Layer(name);
-			gameModel.addAssetLayer(newLayer);
-			layerList.addLayer(newLayer);
-			editingContext.setSelectedAssetLayer(newLayer);
+			if (projectContext.isProjectLoaded()) {
+				String name = JOptionPane.showInputDialog(this, "Enter layer name.");
+				Layer newLayer = new Layer(name);
+				gameModel.addAssetLayer(newLayer);
+				layerList.addLayer(newLayer);
+				editingContext.setSelectedAssetLayer(newLayer);
+			} else {
+				JOptionPane.showMessageDialog(this, "No project loaded", "No project", 
+						JOptionPane.INFORMATION_MESSAGE);
+			}
+			
 		}
 		
 		else if (source == deleteLayerBtn) {
@@ -532,7 +535,7 @@ public class MainWindow extends JFrame implements
 			
 			case TEXTURE_PAINT:
 				propertiesPanel.removeAll();
-				propertiesPanel.add(new TexturePropsPanel(), BorderLayout.CENTER);
+				propertiesPanel.add(texturePropertiesPanel, BorderLayout.CENTER);
 				propertiesPanel.updateUI();
 			break;
 			
@@ -544,8 +547,11 @@ public class MainWindow extends JFrame implements
 				propertiesPanel.add(new SoundPropsPanel(), BorderLayout.CENTER);
 				propertiesPanel.updateUI();
 			break;
+			
 		default:
 			break;
 		}
+		
+		texturePropertiesPanel.assignOpacity((int)(editingContext.textureBrushOpacity() * 100.0f));
 	}
 }

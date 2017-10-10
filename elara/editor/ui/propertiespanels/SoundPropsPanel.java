@@ -23,6 +23,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import elara.editor.debug.LogType;
 import elara.editor.debug.StaticLogs;
@@ -42,12 +43,15 @@ public class SoundPropsPanel extends JPanel
 	private EditingContext editingContext = EditingContext.editingContext();
 	private ProjectContext projectContext = ProjectContext.projectContext();
 	
-	private org.newdawn.slick.Sound sound;
+	private Music music;
+	
 	
 	/**
 	 * Controls
 	 */
 	private JButton playBtn;
+	private JSpinner volumeSpinner;
+	private JCheckBox loopChkBox;
 
 	/**
 	 * Create the panel.
@@ -89,7 +93,7 @@ public class SoundPropsPanel extends JPanel
 		gbc_lblVolume.gridy = 2;
 		panel.add(lblVolume, gbc_lblVolume);
 		
-		JSpinner volumeSpinner = new JSpinner();
+		volumeSpinner = new JSpinner();
 		volumeSpinner.addChangeListener(this);
 		volumeSpinner.setModel(new SpinnerNumberModel(50, 0, 100, 1));
 		GridBagConstraints gbc_volumeSpinner = new GridBagConstraints();
@@ -99,7 +103,7 @@ public class SoundPropsPanel extends JPanel
 		gbc_volumeSpinner.gridy = 2;
 		panel.add(volumeSpinner, gbc_volumeSpinner);
 		
-		JLabel lblLoop = new JLabel("Loop:");
+		JLabel lblLoop = new JLabel("Looped in-game:");
 		GridBagConstraints gbc_lblLoop = new GridBagConstraints();
 		gbc_lblLoop.anchor = GridBagConstraints.WEST;
 		gbc_lblLoop.insets = new Insets(0, 0, 0, 5);
@@ -107,13 +111,13 @@ public class SoundPropsPanel extends JPanel
 		gbc_lblLoop.gridy = 3;
 		panel.add(lblLoop, gbc_lblLoop);
 		
-		JCheckBox loopChkBox = new JCheckBox("");
+		loopChkBox = new JCheckBox("");
+		loopChkBox.addActionListener(this);
 		GridBagConstraints gbc_loopChkBox = new GridBagConstraints();
 		gbc_loopChkBox.anchor = GridBagConstraints.WEST;
 		gbc_loopChkBox.gridx = 1;
 		gbc_loopChkBox.gridy = 3;
 		panel.add(loopChkBox, gbc_loopChkBox);
-
 	}
 
 	/* (non-Javadoc)
@@ -125,12 +129,9 @@ public class SoundPropsPanel extends JPanel
 		Object source = ae.getSource();
 		
 		if (source == playBtn) {
-			if (sound != null && sound.playing()) {
-				sound.stop();
-				playBtn.setText("Play");
-			} else {
+			if (music == null) {
 				try {
-					sound = new org.newdawn.slick.Sound(projectContext.projectPath() + "/assets/sounds/" 
+					music = new Music(projectContext.projectPath() + "/assets/sounds/" 
 							+ editingContext.selectedSound().filename());
 				} catch (SlickException e) {
 					StaticLogs.debug.log(LogType.ERROR, "Could not load sound on play: " + projectContext.projectPath() + "/assets/sounds/" 
@@ -138,11 +139,17 @@ public class SoundPropsPanel extends JPanel
 					JOptionPane.showMessageDialog(null, projectContext.projectPath() + "/assets/sounds/" 
 							+ editingContext.selectedSound().filename(), "Failed to load sound", JOptionPane.ERROR_MESSAGE);
 				}
-				
-				sound.play();
+			}
+			
+			if (music.playing()) {
+				music.stop();
+				playBtn.setText("Play");
+			} else {
+				music.play();
 				playBtn.setText("Stop");
 			}
 		}
+		
 	}
 
 	/* (non-Javadoc)
@@ -151,7 +158,12 @@ public class SoundPropsPanel extends JPanel
 	@Override
 	public void stateChanged(ChangeEvent ce)
 	{
-		// TODO Auto-generated method stub
+		Object source = ce.getSource();
 		
+		if (source == volumeSpinner) {
+			if (music != null) {
+				music.setVolume((int)volumeSpinner.getValue() / 100.0f);
+			}
+		}
 	}
 }

@@ -59,7 +59,9 @@ public class DefaultIcons
 	public static ImageIcon rotateToolIcon;
 	public static ImageIcon playIcon;
 	
-	// check if icons exist otherwise set them to the blank
+	public static ImageIcon windowIcon;
+
+	// check if icons exist otherwise set them to the blank icon
 	static {
 		soundIcon = new ImageIcon("res/icons/sound.png");
 		newLayerIcon = new ImageIcon("res/icons/newLayer.png");
@@ -67,10 +69,12 @@ public class DefaultIcons
 		textureLayersIcon = new ImageIcon("res/icons/textureLayers.png");
 		moveWorldIcon = new ImageIcon("res/icons/moveWorldTool.png");
 		
-		selectToolIcon = new ImageIcon("res/icons/selectToolIcon.png");
-		moveToolIcon = new ImageIcon("res/icons/moveToolIcon.png");
-		rotateToolIcon = new ImageIcon("res/icons/rotateToolIcon.png");
-		playIcon = new ImageIcon("res/icons/playIcon.png");
+		selectToolIcon = new ImageIcon("res/icons/selectTool.png");
+		moveToolIcon = new ImageIcon("res/icons/moveTool.png");
+		rotateToolIcon = new ImageIcon("res/icons/rotateTool.png");
+		playIcon = new ImageIcon("res/icons/playBtn.png");
+		
+		windowIcon = new ImageIcon("res/icons/icon.png");
 		
 		File testFile = new File("res/icons/sound.png");
 		if (!testFile.exists()) {
@@ -97,24 +101,29 @@ public class DefaultIcons
 			moveWorldIcon.setImage(BLANK_ICON_16);
 		}
 		
-		testFile = new File("res/icons/selectToolIcon.png");
+		testFile = new File("res/icons/selectTool.png");
 		if (!testFile.exists()) {
 			selectToolIcon.setImage(BLANK_ICON_32);
 		}
 		
-		testFile = new File("res/icons/moveToolIcon.png");
+		testFile = new File("res/icons/moveTool.png");
 		if (!testFile.exists()) {
 			moveToolIcon.setImage(BLANK_ICON_32);
 		}
 		
-		testFile = new File("res/icons/rotateToolIcon.png");
+		testFile = new File("res/icons/rotateTool.png");
 		if (!testFile.exists()) {
 			rotateToolIcon.setImage(BLANK_ICON_32);
 		}
 		
-		testFile = new File("res/icons/playIcon.png");
+		testFile = new File("res/icons/playBtn.png");
 		if (!testFile.exists()) {
 			playIcon.setImage(BLANK_ICON_32);
+		}
+		
+		testFile = new File("res/icons/icon.png");
+		if (!testFile.exists()) {
+			windowIcon.setImage(BLANK_ICON_32);
 		}
 	}
 }

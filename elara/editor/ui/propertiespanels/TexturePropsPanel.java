@@ -222,4 +222,13 @@ public class TexturePropsPanel extends JPanel
 			editingContext.assignTextureBrushOpacity(value / 100.0f);
 		}
 	}
+
+	/**
+	 * Set the opacity of the spinner.
+	 * @param i
+	 */
+	public void assignOpacity(int opacity)
+	{
+		opacitySpinner.setValue(opacity);
+	}
 }
