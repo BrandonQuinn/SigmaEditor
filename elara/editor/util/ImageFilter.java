@@ -43,7 +43,7 @@ public class ImageFilter
 				RGBA[0] = sourceRGBA[0];
 				RGBA[1] = sourceRGBA[1];
 				RGBA[2] = sourceRGBA[2];
-				RGBA[3] = clamp(newAlpha, 0, 255);
+				RGBA[3] = MathUtil.clamp(newAlpha, 0, 255);
 				
 				sourceRaster.setPixel(x, y, RGBA);
 			}
@@ -72,9 +72,9 @@ public class ImageFilter
 				srcRaster.getPixel(x, y, srcTmp);
 				destRaster.getPixel(x, y, destTmp);
 				
-				RGBA[0] = clamp((int)(((srcTmp[0] / 255.0f) * (destTmp[0] / 255.0f)) * 255), 0, 255);
-				RGBA[1] = clamp((int)(((srcTmp[1] / 255.0f) * (destTmp[1] / 255.0f)) * 255), 0, 255);
-				RGBA[2] = clamp((int)(((srcTmp[2] / 255.0f) * (destTmp[2] / 255.0f)) * 255), 0, 255);
+				RGBA[0] = MathUtil.clamp((int)(((srcTmp[0] / 255.0f) * (destTmp[0] / 255.0f)) * 255), 0, 255);
+				RGBA[1] = MathUtil.clamp((int)(((srcTmp[1] / 255.0f) * (destTmp[1] / 255.0f)) * 255), 0, 255);
+				RGBA[2] = MathUtil.clamp((int)(((srcTmp[2] / 255.0f) * (destTmp[2] / 255.0f)) * 255), 0, 255);
 				RGBA[3] = destTmp[3];
 				
 				destRaster.setPixel(x, y, RGBA);
@@ -129,11 +129,6 @@ public class ImageFilter
 		}
 		
 		return dest;
-	}
-	
-	private static int clamp(int value, int min, int max)
-	{
-		return Math.max(min, Math.min(max, value));
 	}
 
 	/**

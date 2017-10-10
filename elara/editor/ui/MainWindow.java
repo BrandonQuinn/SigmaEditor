@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -86,15 +85,6 @@ public class MainWindow extends JFrame implements
 	private LayerJList layerList;
 
 	/**
-	 * Icons
-	 */
-	private ImageIcon selectToolIcon;
-	private ImageIcon moveToolIcon;
-	private ImageIcon rotateToolIcon;
-	private ImageIcon playIcon;
-	// private ImageIcon stopIcon;
-
-	/**
 	 * Menu Items
 	 */
 	private JMenuItem newProjectItem;
@@ -118,15 +108,6 @@ public class MainWindow extends JFrame implements
 		setSize((int) (toolkit.getScreenSize().width / 1.3f),
 				(int) (toolkit.getScreenSize().height / 1.3f));
 		setLocationRelativeTo(null);
-
-		/*
-		 * Initialise Icons
-		 */
-		selectToolIcon = new ImageIcon("res\\icons\\selectTool.png");
-		moveToolIcon = new ImageIcon("res\\icons\\moveTool.png");
-		rotateToolIcon = new ImageIcon("res\\icons\\rotateTool.png");
-		playIcon = new ImageIcon("res\\icons\\playBtn.png");
-		// stopIcon = new ImageIcon("res\\icons\\stopBtn.png");
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -167,19 +148,19 @@ public class MainWindow extends JFrame implements
 
 		selectionToolBtn = new JButton();
 		selectionToolBtn.addActionListener(this);
-		selectionToolBtn.setIcon(selectToolIcon);
+		selectionToolBtn.setIcon(DefaultIcons.selectToolIcon);
 		toolBar.add(selectionToolBtn);
 
 		JButton moveToolBtn = new JButton();
-		moveToolBtn.setIcon(moveToolIcon);
+		moveToolBtn.setIcon(DefaultIcons.moveToolIcon);
 		toolBar.add(moveToolBtn);
 
 		JButton rotateToolBtn = new JButton();
-		rotateToolBtn.setIcon(rotateToolIcon);
+		rotateToolBtn.setIcon(DefaultIcons.rotateToolIcon);
 		toolBar.add(rotateToolBtn);
 
 		JButton playBtn = new JButton();
-		playBtn.setIcon(playIcon);
+		playBtn.setIcon(DefaultIcons.playIcon);
 		toolBar.add(playBtn);
 
 		JSplitPane splitPane = new JSplitPane();

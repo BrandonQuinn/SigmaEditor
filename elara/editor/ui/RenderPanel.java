@@ -124,6 +124,34 @@ public class RenderPanel extends JComponent implements
 				&& editingContext.state() != EditingState.MOVE_WORLD) {
 			editingContext.assignState(EditingState.MOVE_WORLD);
 		}
+		
+		// state controlled input, no privatisation here!
+		switch (editingContext.state()) {
+			case SELECT:
+			break;
+			
+			case TEXTURE_PAINT:
+				// TODO opacity keys interface update, clamp values
+				// comma and period keys control opacity
+				if (Keyboard.PERIOD == KeyState.PRESSED) {
+					editingContext.assignTextureBrushOpacity(editingContext.textureBrushOpacity() + 0.01f);
+				}
+				
+				if (Keyboard.COMMA == KeyState.PRESSED) {
+					editingContext.assignTextureBrushOpacity(editingContext.textureBrushOpacity() - 0.01f);
+				}
+			break;
+			
+			case MOVE_WORLD:
+			break;
+			
+			case ADD_SOUND:
+			break;
+			
+			default:
+			break;
+			
+		}
 	}
 
 	private Integer moveStartX = null;
@@ -448,9 +476,15 @@ public class RenderPanel extends JComponent implements
 		int keyCode = e.getKeyCode();
 
 		switch (keyCode) {
-		case KeyEvent.VK_SPACE:
-			Keyboard.SPACE_BAR = KeyState.PRESSED;
-		break;
+			case KeyEvent.VK_SPACE:
+				Keyboard.SPACE_BAR = KeyState.PRESSED;
+			break;
+			case KeyEvent.VK_PERIOD:
+				Keyboard.PERIOD = KeyState.PRESSED;
+			break;
+			case KeyEvent.VK_COMMA:
+				Keyboard.COMMA = KeyState.PRESSED;
+			break;
 		}
 	}
 
@@ -460,9 +494,15 @@ public class RenderPanel extends JComponent implements
 		int keyCode = e.getKeyCode();
 
 		switch (keyCode) {
-		case KeyEvent.VK_SPACE:
-			Keyboard.SPACE_BAR = KeyState.RELEASED;
-		break;
+			case KeyEvent.VK_SPACE:
+				Keyboard.SPACE_BAR = KeyState.RELEASED;
+			break;
+			case KeyEvent.VK_PERIOD:
+				Keyboard.PERIOD = KeyState.RELEASED;
+			break;
+			case KeyEvent.VK_COMMA:
+				Keyboard.COMMA = KeyState.RELEASED;
+			break;
 		}
 	}
 
@@ -472,9 +512,15 @@ public class RenderPanel extends JComponent implements
 		int keyCode = e.getKeyCode();
 
 		switch (keyCode) {
-		case KeyEvent.VK_SPACE:
-			Keyboard.SPACE_BAR = KeyState.TYPED;
-		break;
+			case KeyEvent.VK_SPACE:
+				Keyboard.SPACE_BAR = KeyState.TYPED;
+			break;
+			case KeyEvent.VK_PERIOD:
+				Keyboard.PERIOD = KeyState.TYPED;
+			break;
+			case KeyEvent.VK_COMMA:
+				Keyboard.COMMA = KeyState.TYPED;
+			break;
 		}
 	}
 

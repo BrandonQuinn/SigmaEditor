@@ -5,6 +5,14 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import elara.editor.debug.StackTraceUtil;
 
+/*
+ * The big TODO LIST
+ * 
+ * TODO Threaded texture painting, blending, OpenCL?
+ * TODO Texture modifiers like blur, dodge, burn
+ * TODO Keyboard shortcuts
+ * 
+ */
 
 /**
  * A level editor for the "Project Sigma" game.

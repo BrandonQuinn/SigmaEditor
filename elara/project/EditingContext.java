@@ -9,6 +9,7 @@ package elara.project;
 import elara.assets.Layer;
 import elara.assets.Sound;
 import elara.assets.Texture;
+import elara.editor.util.MathUtil;
 
 /**
  * World
@@ -339,7 +340,7 @@ public class EditingContext
 	 */
 	public void assignTextureBrushOpacity(float opacity)
 	{
-		this.textureBrushOpacity = opacity;
+		 this.textureBrushOpacity = MathUtil.clamp(opacity, 0.0f, 1.0f);
 	}
 	
 	/**
