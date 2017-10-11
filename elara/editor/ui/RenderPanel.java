@@ -357,6 +357,8 @@ public class RenderPanel extends JComponent implements
 	 * Draws a selection rectangle in the render area when the mouse is
 	 * pressed down and held.
 	 * 
+	 * FIXME Selection only works in 1 direction
+	 * 
 	 * @param g2d
 	 */
 	private void drawSelectionRectangle(Graphics2D g2d)
