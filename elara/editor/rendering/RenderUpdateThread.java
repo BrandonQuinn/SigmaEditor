@@ -14,7 +14,7 @@ import elara.editor.ui.RenderPanel;
 
 public class RenderUpdateThread implements Runnable
 {
-	private static final long WAIT_TIME = 16; // milliseconds
+	private static final long WAIT_TIME = 33; // milliseconds
 	private static boolean updating = true;
 	private RenderPanel renderPanel;
 

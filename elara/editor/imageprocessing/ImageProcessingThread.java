@@ -3,26 +3,27 @@
  * Date Created: 10 Oct. 2017
  * File : ImageWriteThread.java
  */
-package elara.threading;
+package elara.editor.imageprocessing;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import elara.editor.debug.LogType;
 import elara.editor.debug.StaticLogs;
 
 /**
- * ImageWriteThread
+ * ImageProcessingThread
  *
- * Description: Allows us to send write operations to this
- * thread so that they'll essentially the source image will be painted on
- * to the destination image  in the background as fast as possible as to not 
- * halt the execution of the original thread.
+ * Description: Allows us to run any kind of image
+ * processing algorithm on either a single image or
+ * from a source to a destination image in the background
+ * as to not halt execution due to the expensive nature
+ * of image processing algrothims.
  */
-public class ImageWriteThread extends Thread
+public class ImageProcessingThread extends Thread
 {
-	private LinkedBlockingQueue<ImageWriteEvent> writeQueue 
-		= new LinkedBlockingQueue<ImageWriteEvent>();
+	private volatile LinkedBlockingQueue<ImageProcessingEvent> processingQueue 
+		= new LinkedBlockingQueue<ImageProcessingEvent>();
 	
-	public ImageWriteThread(String name)
+	public ImageProcessingThread(String name)
 	{
 		super(name);
 	}
@@ -35,8 +36,8 @@ public class ImageWriteThread extends Thread
 	{
 		while(true) {
 			try {
-				ImageWriteEvent iwe = writeQueue.take();
-				iwe.doWrite();
+				ImageProcessingEvent iwe = processingQueue.take();
+				iwe.processImages();
 			} catch (InterruptedException e) {
 				StaticLogs.debug.log(LogType.CRITICAL, "ImageWriteThread: " + getName() + " was interrupted.");
 				break;
@@ -49,10 +50,10 @@ public class ImageWriteThread extends Thread
 	 * @param iwe
 	 * @return
 	 */
-	public synchronized void addWriteEvent(ImageWriteEvent iwe)
+	public synchronized void addProcessingEvent(ImageProcessingEvent iwe)
 	{
 		try {
-			writeQueue.put(iwe);
+			processingQueue.put(iwe);
 		} catch (InterruptedException e) {
 			// TODO writeQueue.put runs out of memory
 			e.printStackTrace();

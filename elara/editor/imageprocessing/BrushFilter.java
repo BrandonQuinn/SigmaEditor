@@ -3,7 +3,7 @@
  * Date Created: 8 Oct. 2017
  * File : BrushFilter.java
  */
-package elara.project;
+package elara.editor.imageprocessing;
 
 /**
  * BrushFilter

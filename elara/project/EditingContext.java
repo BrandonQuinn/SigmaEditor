@@ -9,6 +9,8 @@ package elara.project;
 import elara.assets.Layer;
 import elara.assets.Sound;
 import elara.assets.Texture;
+import elara.editor.imageprocessing.BlendMode;
+import elara.editor.imageprocessing.BrushFilter;
 import elara.editor.util.MathUtil;
 
 /**
@@ -90,8 +92,20 @@ public class EditingContext
 	 * Currently selected objects or items etc.
 	 */
 	private Texture selectedTexture;
+	
+	/**
+	 * The brush filter to apply while painting.
+	 */
 	private BrushFilter selectedBrushFilter = BrushFilter.RADIAL_FALLOFF;
+	
+	/**
+	 * Blending mode for texture painting.
+	 */
 	private BlendMode selectedBlendMode = BlendMode.OVERLAP;
+	
+	/**
+	 * Opacity of the texture being placed over the destination.
+	 */
 	private float textureBrushOpacity = 1.0f;
 	
 	

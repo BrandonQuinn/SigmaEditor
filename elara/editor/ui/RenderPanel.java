@@ -21,17 +21,15 @@ import javax.swing.JComponent;
 import org.joml.Vector2f;
 import elara.assets.DefaultIcons;
 import elara.assets.Sound;
+import elara.editor.imageprocessing.ImageProcessor;
 import elara.editor.input.KeyState;
 import elara.editor.input.Keyboard;
 import elara.editor.input.Mouse;
 import elara.editor.input.MouseState;
 import elara.editor.rendering.RenderStats;
-import elara.editor.util.ImageFilter;
 import elara.project.EditingContext;
 import elara.project.EditingContext.EditingState;
 import elara.project.GameModel;
-import elara.threading.ImageWriteEvent;
-import elara.threading.ImageWriteThread;
 
 /**
  * Component which actually holds the level being rendered and everything
@@ -53,8 +51,6 @@ public class RenderPanel extends JComponent implements
 	private GameModel gameModel = GameModel.gameModel();
 
 	private MainWindow mainWindow;
-	
-	private ImageWriteThread imageWriteThread = new ImageWriteThread("Image Processing Thread");
 
 	/*
 	 * Mouse cursor.
@@ -81,8 +77,6 @@ public class RenderPanel extends JComponent implements
 				"blank cursor");
 
 		setCursor(blankCursor);
-		
-		imageWriteThread.start();
 	}
 
 	@Override
@@ -135,8 +129,7 @@ public class RenderPanel extends JComponent implements
 				+ " | Offset x:" + editingContext.xOffset() + ", y: " + editingContext.yOffset()
 				+ " | Memory Usage: " + Runtime.getRuntime().totalMemory()/1000000 + "MB/" + Runtime.getRuntime().maxMemory()/1000000 + "MB", 5, 15);
 		
-		g2d.drawString("Frame Frequency: " + RenderStats.frameFrequency + "ms"
-				+ " | Frame Time: " + RenderStats.frameTime + "ms", 5, 30);
+		g2d.drawString("Frame Time: " + RenderStats.frameTime + "ms", 5, 30);
 	}
 
 	/**
@@ -202,41 +195,42 @@ public class RenderPanel extends JComponent implements
 				BufferedImage buffIm = gameModel.groundTextureLayers()
 						.get(editingContext.getSelectedGroundLayerIndex());
 				
-				// Graphics2D big = buffIm.createGraphics(); /* no threading */
-				
+				BufferedImage newImage = new BufferedImage(
+						paintTexture.getWidth(), paintTexture.getHeight(), 
+						BufferedImage.TYPE_INT_ARGB);
+				Graphics2D ng = newImage.createGraphics();
+				ng.drawImage(paintTexture, 0, 0, null);
+
 				int paintx = (Mouse.x - (paintTexture.getWidth() >> 1)) + editingContext.xOffset() * -1;
 				int painty = (Mouse.y - (paintTexture.getHeight() >> 1)) + editingContext.yOffset() * -1;
 				
-				BufferedImage newImage = new BufferedImage(
-						paintTexture.getWidth(), 
-						paintTexture.getHeight(), 
-						BufferedImage.TYPE_INT_ARGB);
-				Graphics2D p2d = newImage.createGraphics();
-				p2d.drawImage(paintTexture, 0, 0, null);
-				
 				// create a new image which handles tiling
 				if (editingContext.tiledPaintingEnabled()) {
-					p2d.drawImage(editingContext.selectedTexture().image(), 
+					ng.drawImage(paintTexture, 
 							0 - (paintx % newImage.getWidth()), 
-							0 - (painty % newImage.getHeight()), null);
-						
-					p2d.drawImage(editingContext.selectedTexture().image(), 
+							0 - (painty % newImage.getHeight()),
+							null);
+					
+					ng.drawImage(paintTexture, 
 							(0 - (paintx % newImage.getWidth()) + newImage.getWidth()), 
-							0 - (painty % newImage.getHeight()), null);
-						
-					p2d.drawImage(editingContext.selectedTexture().image(), 
+							0 - (painty % newImage.getHeight()),
+							null);
+					
+					ng.drawImage(paintTexture, 
 							(0 - (paintx % newImage.getWidth()) + newImage.getWidth()), 
-							(0 - (painty % newImage.getHeight()) + newImage.getHeight()), null);
-						
-					p2d.drawImage(editingContext.selectedTexture().image(), 
+							(0 - (painty % newImage.getHeight()) + newImage.getHeight()),
+							null);
+					
+					ng.drawImage(paintTexture, 
 							0 - (paintx % newImage.getWidth()), 
-							(0 - (painty % newImage.getHeight()) + newImage.getHeight()), null);
+							(0 - (painty % newImage.getHeight()) + newImage.getHeight()),
+							null);
 				}
 				
 				// BRUSH TYPE
 				switch (editingContext.selectedBrushFilter()) {
 					case RADIAL_FALLOFF:
-						newImage = ImageFilter.radialAlphaFalloff(newImage);
+						newImage = ImageProcessor.radialAlphaFalloff(newImage);
 					break;
 					
 					case NONE:
@@ -254,24 +248,15 @@ public class RenderPanel extends JComponent implements
 					break;
 				
 					case MULTIPLY:
-						// fuck me
-						BufferedImage srcMult = buffIm.getSubimage(
-								Math.max(0, Math.min(buffIm.getWidth() - 1, paintx)), 
-								Math.max(0, Math.min(buffIm.getHeight() - 1, painty)), 
-								Math.max(1, Math.min(newImage.getWidth(), buffIm.getWidth() - ((paintx + newImage.getWidth()) - newImage.getWidth()))), 
-								Math.max(1, Math.min(newImage.getHeight(), buffIm.getHeight() - ((painty + newImage.getHeight()) - newImage.getHeight())))
-							);
-						newImage = ImageFilter.multiply(newImage, srcMult);
+						newImage = ImageProcessor.multiply(newImage, 0, 0, 
+								buffIm, paintx, painty, 
+								newImage.getWidth(), newImage.getHeight());
 					break;
 					
 					case OVERLAY:
-						BufferedImage srcScreen = buffIm.getSubimage(
-								Math.max(0, Math.min(buffIm.getWidth() - 1, paintx)), 
-								Math.max(0, Math.min(buffIm.getHeight() - 1, painty)), 
-								Math.max(1, Math.min(newImage.getWidth(), buffIm.getWidth() - ((paintx + newImage.getWidth()) - newImage.getWidth()))), 
-								Math.max(1, Math.min(newImage.getHeight(), buffIm.getHeight() - ((painty + newImage.getHeight()) - newImage.getHeight())))
-							);
-						newImage = ImageFilter.overlay(newImage, srcScreen);
+						newImage = ImageProcessor.overlay(newImage, 0, 0, 
+								buffIm, paintx, painty, 
+								newImage.getWidth(), newImage.getHeight());
 					break;
 					
 					case SCREEN:
@@ -281,13 +266,9 @@ public class RenderPanel extends JComponent implements
 					break;
 				}
 
-				newImage = ImageFilter.setOpacity(newImage, editingContext.textureBrushOpacity());
-				// big.drawImage(newImage, paintx, painty, null); /* not threaded option */
-				
-				ImageWriteEvent iwe = new ImageWriteEvent(buffIm, paintx, painty, newImage);
-				imageWriteThread.addWriteEvent(iwe);
+				newImage = ImageProcessor.setOpacity(newImage, editingContext.textureBrushOpacity());
+				buffIm.createGraphics().drawImage(newImage, paintx, painty, null);
 			}
-			
 		break;
 
 		case MOVE_WORLD:
@@ -420,16 +401,10 @@ public class RenderPanel extends JComponent implements
 
 		case TEXTURE_PAINT:
 			BufferedImage selectedImage = editingContext.selectedTexture().image();
-			
-			BufferedImage newImage 
-				= new BufferedImage(selectedImage.getWidth(), selectedImage.getHeight(), 
-						BufferedImage.TYPE_INT_ARGB);
-			Graphics2D paintg2d = newImage.createGraphics();
-			paintg2d.drawImage(selectedImage, 0, 0, null);
-			
 			g2d.setColor(new Color(255, 255, 255));
 			g2d.setStroke(new BasicStroke(2.0f));
-			g2d.drawOval(Mouse.x - (selectedImage.getWidth() / 2), Mouse.y - (selectedImage.getHeight() / 2), selectedImage.getWidth(), selectedImage.getHeight());
+			g2d.drawOval(Mouse.x - (selectedImage.getWidth() >> 1), Mouse.y - (selectedImage.getHeight() >> 1), 
+					selectedImage.getWidth(), selectedImage.getHeight());
 		break;
 
 		case MOVE_WORLD:

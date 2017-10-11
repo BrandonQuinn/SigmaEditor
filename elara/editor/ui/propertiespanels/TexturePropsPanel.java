@@ -24,8 +24,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import elara.project.BlendMode;
-import elara.project.BrushFilter;
+import elara.editor.imageprocessing.BlendMode;
+import elara.editor.imageprocessing.BrushFilter;
 import elara.project.EditingContext;
 
 /**

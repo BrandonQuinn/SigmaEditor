@@ -129,21 +129,28 @@ public class GameModel
 		groundImageLayers.remove(index);
 	}
 
+	
+	int c = 0;
 	/**
 	 * Draws the model on to the given Graphics2D object.
 	 * @param g2d
 	 */
 	public void draw(int xOffset, int yOffset, Graphics2D g2d)
 	{
-		// draw ground textures
-		for (BufferedImage buffImage : groundImageLayers) {
-			g2d.drawImage(buffImage, xOffset, yOffset, null);
-		}
+		
+			// draw ground textures
+			for (BufferedImage buffImage : groundImageLayers) {
+				g2d.drawImage(buffImage, xOffset, yOffset, null);
+			}
+			
+		
 		
 		// draw asset layers
 		for (Layer layer : assetLayers) {
 			layer.draw(xOffset, yOffset, g2d);
 		}
+		
+		c++;
 	}
 
 	/**
