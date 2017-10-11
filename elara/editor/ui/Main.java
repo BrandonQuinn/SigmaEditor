@@ -38,7 +38,7 @@ public class Main
 		}
 
 		initialise();
-
+		
 		MainWindow mainWindow = new MainWindow();
 		mainWindow.setVisible(true); // GO!
 	}

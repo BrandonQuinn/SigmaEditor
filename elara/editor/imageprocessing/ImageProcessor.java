@@ -55,41 +55,29 @@ public class ImageProcessor
 	}
 
 	/**
-	 * Multiplies each pixel channel together.
+	 * Multiplies their pixel values.
 	 * 
 	 * @param dest
-	 * @param toY x position to starting writing on the destination
-	 * @param toX y position to starting writing on the destination
-	 * @param src image to blend from
-	 * @param fromX x position to start copying from the src
-	 * @param fromY y position to start copying from the src
-	 * @param width width of pixels to blend
-	 * @param height height of pixels to blend
-	 * @return destination
+	 * @param src
+	 * @return
 	 */
-	public static BufferedImage multiply(BufferedImage dest, int toX, int toY, 
-			BufferedImage src, int fromX, int fromY, 
-			int width, int height)
+	public static BufferedImage multiply(BufferedImage dest, BufferedImage src)
 	{
 		WritableRaster destRaster = dest.getRaster();
 		WritableRaster srcRaster = src.getRaster();
-		
+
 		int[] srcTmp = new int[4];
-		int[] destTmp = new int[4];
-		for (int destX = toX, srcX = fromX, i = 0; i < width; destX++, srcX++, i++) {
-			for (int destY = toY, srcY = fromY, t = 0; t < height; destY++, srcY++, t++) {
-				try {
-					srcRaster.getPixel(srcX, srcY, srcTmp);
-					destRaster.getPixel(destX, destY, destTmp);
-					destRaster.setPixel(destX, destY, new int[] {
-							MathUtil.clamp((int)(((srcTmp[0] / 255.0f) * (destTmp[0] / 255.0f)) * 255), 0, 255),
-							MathUtil.clamp((int)(((srcTmp[1] / 255.0f) * (destTmp[1] / 255.0f)) * 255), 0, 255),
-							MathUtil.clamp((int)(((srcTmp[2] / 255.0f) * (destTmp[2] / 255.0f)) * 255), 0, 255),
-							destTmp[3]
-					});
-				} catch (ArrayIndexOutOfBoundsException e) {
-					continue; // just don't write on that pixel and continue
-				}
+		int[] destTmp = new int[4]; 
+		for (int x = 0; x < src.getWidth(); x++) {
+			for (int y = 0; y < src.getHeight(); y++) {
+				srcRaster.getPixel(x, y, srcTmp);
+				destRaster.getPixel(x, y, destTmp);
+				destRaster.setPixel(x, y, new int[] {
+					MathUtil.clamp((int)(((srcTmp[0] / 255.0f) * (destTmp[0] / 255.0f)) * 255), 0, 255),
+					MathUtil.clamp((int)(((srcTmp[1] / 255.0f) * (destTmp[1] / 255.0f)) * 255), 0, 255),
+					MathUtil.clamp((int)(((srcTmp[2] / 255.0f) * (destTmp[2] / 255.0f)) * 255), 0, 255),
+					destTmp[3]
+				});
 			}
 		}
 		

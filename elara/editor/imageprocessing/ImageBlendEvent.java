@@ -74,9 +74,7 @@ public class ImageBlendEvent implements ImageProcessingEvent
 			break;
 		
 			case MULTIPLY:
-				ImageProcessor.multiply(dest, toX, toY,
-						src, fromX, fromY,
-						width, height);
+				// ImageProcessor.multiply(dest, src);
 			break;
 
 			case OVERLAY:

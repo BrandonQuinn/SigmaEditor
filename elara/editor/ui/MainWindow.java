@@ -90,6 +90,7 @@ public class MainWindow extends JFrame implements
 	private JMenuItem openProjectItem;
 	private JMenuItem loadTextureItem;
 	private JMenuItem loadSoundItem;
+	private JMenuItem aboutItem;
 	
 	/**
 	 * Get the default toolkit to resize the application.
@@ -137,6 +138,10 @@ public class MainWindow extends JFrame implements
 		mnAssets.add(loadSoundItem);
 
 		JMenu mnHelp = new JMenu("Help");
+		
+		aboutItem = new JMenuItem("About");
+		aboutItem.addActionListener(this);
+		mnHelp.add(aboutItem);
 		menuBar.add(mnHelp);
 
 		contentPane = new JPanel();
@@ -521,6 +526,15 @@ public class MainWindow extends JFrame implements
 		else if (source == selectionToolBtn) {
 			editingContext.assignState(EditingContext.EditingState.SELECT);
 			textureList.setSelectedIndices(new int[] {});
+		} 
+		
+		/*==============================================*
+		 * HELP MENU
+		 *==============================================*/
+		
+		else if (source == aboutItem) {
+			AboutDialog ab = new AboutDialog();
+			ab.setVisible(true);
 		}
 	}
 	

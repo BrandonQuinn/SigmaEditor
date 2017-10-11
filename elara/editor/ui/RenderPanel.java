@@ -248,9 +248,10 @@ public class RenderPanel extends JComponent implements
 					break;
 				
 					case MULTIPLY:
-						newImage = ImageProcessor.multiply(newImage, 0, 0, 
-								buffIm, paintx, painty, 
-								newImage.getWidth(), newImage.getHeight());
+						
+						// FIXME out of bounds, blend mode
+						newImage = ImageProcessor.multiply(newImage, 
+								buffIm.getSubimage(paintx, painty, newImage.getWidth(), newImage.getHeight()));
 					break;
 					
 					case OVERLAY:
