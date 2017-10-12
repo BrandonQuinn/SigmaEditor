@@ -59,6 +59,12 @@ public class RenderPanel extends JComponent implements
 	 * Mouse cursor.
 	 */
 	private ImageIcon cursorImage;
+	
+	/*
+	 * Selection rectangle
+	 */
+	private SelectionRectangle selectionRectangle 
+		= new SelectionRectangle();
 
 	public RenderPanel(MainWindow mainWindow)
 	{
@@ -192,7 +198,7 @@ public class RenderPanel extends JComponent implements
 	{
 		switch (editingContext.state()) {
 		case SELECT:
-			drawSelectionRectangle(g2d);
+			selectionRectangle.draw(g2d);
 		break;
 
 		case TEXTURE_PAINT:
@@ -211,8 +217,6 @@ public class RenderPanel extends JComponent implements
 				
 				int paintx = (Mouse.x - (paintTexture.getWidth() >> 1)) + editingContext.xOffset() * -1;
 				int painty = (Mouse.y - (paintTexture.getHeight() >> 1)) + editingContext.yOffset() * -1;
-				
-				
 				
 				// create a new image which handles tiling
 				if (editingContext.tiledPaintingEnabled()) {
@@ -359,48 +363,6 @@ public class RenderPanel extends JComponent implements
 						gameModel.worldWidthPixels() + editingContext.xOffset(), 
 						y + editingContext.yOffset());
 			}
-		}
-	}
-
-	private int startX = 0, startY = 0;
-	private boolean startSet = false;
-
-	/**
-	 * Draws a selection rectangle in the render area when the mouse is
-	 * pressed down and held.
-	 * 
-	 * FIXME Selection only works in 1 direction
-	 * 
-	 * @param g2d
-	 */
-	private void drawSelectionRectangle(Graphics2D g2d)
-	{
-		// get the starting position
-		if (Mouse.isLeftButtonDown() && !startSet) {
-			startX = Mouse.x;
-			startY = Mouse.y;
-			startSet = true;
-		}
-
-		// ready to draw rectangle
-		if (Mouse.isLeftButtonDown() && startSet) {
-			// draw border
-			g2d.setStroke(new BasicStroke(1.0f));
-			g2d.setColor(new Color(93, 138, 153, 180));
-			g2d.drawRect(startX, startY, Mouse.x - startX, Mouse.y - startY);
-
-			g2d.setStroke(new BasicStroke(0.0f));
-			g2d.setColor(new Color(137, 227, 255, 100));
-			// draw center
-			g2d.fillRect(startX + 1, startY + 1, Mouse.x - startX - 1, Mouse.y - startY - 1);
-
-			g2d.setColor(Color.WHITE);
-		}
-
-		if (!Mouse.isLeftButtonDown()) {
-			startSet = false;
-			startX = 0;
-			startY = 0;
 		}
 	}
 
