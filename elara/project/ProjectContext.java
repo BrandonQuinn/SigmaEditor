@@ -145,4 +145,12 @@ public class ProjectContext
 	{
 		sounds.add(newSound);
 	}
+
+	/**
+	 * Creates a new instance.
+	 */
+	public void reset()
+	{
+		instance = new ProjectContext();
+	}
 }

@@ -15,11 +15,11 @@ import java.awt.image.BufferedImage;
 public class ImageFilterEvent implements ImageProcessingEvent
 {
 	private BufferedImage dest;
-	private int toX;
-	private int toY;
+	// private int toX;
+	// private int toY;
 	
-	private int width;
-	private int height;
+	// private int width;
+	// private int height;
 
 	private BrushFilter filter;
 	
@@ -29,10 +29,10 @@ public class ImageFilterEvent implements ImageProcessingEvent
 			BrushFilter filter) 
 	{
 		this.dest = destination;
-		this.toX = x;
-		this.toY = y;
-		this.width = width;
-		this.height = height;
+		// this.toX = x;
+		// this.toY = y;
+		// this.width = width;
+		// this.height = height;
 		
 		this.filter = filter;
 	}

@@ -18,7 +18,6 @@ import elara.editor.util.MathUtil;
  */
 public class ImageProcessor
 {
-	
 	/**
 	 * Modifies the image to have a alpha gradient fall off,
 	 * where the distance from the center to the edge is the
@@ -38,7 +37,7 @@ public class ImageProcessor
 		int newAlpha = 0;
 		for (int x = 0; x < sourceRaster.getWidth(); x++) {
 			for (int y = 0; y < sourceRaster.getHeight(); y++) {
-				newAlpha = (int) Math.sqrt(Math.pow(x - xCenter, 2) + Math.pow(y - yCenter, 2));
+				newAlpha = (int) Math.sqrt(((x - xCenter) * (x - xCenter)) + ((y - yCenter) * (y - yCenter)));
 				newAlpha = 255 - ((int)((newAlpha / (float)maxDist) * 255));
 				
 				sourceRGBA = sourceRaster.getPixel(x, y, sourceRGBA);

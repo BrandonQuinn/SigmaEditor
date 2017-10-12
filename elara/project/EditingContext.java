@@ -376,4 +376,12 @@ public class EditingContext
 	{
 		return textureBrushOpacity;
 	}
+
+	/**
+	 * Creates a fresh new instance.
+	 */
+	public void reset()
+	{
+		context = new EditingContext();
+	}
 }

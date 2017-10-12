@@ -28,6 +28,7 @@ import elara.editor.debug.LogType;
 import elara.editor.debug.SigmaException;
 import elara.editor.debug.StaticLogs;
 import elara.editor.imageprocessing.ImageProcessor;
+import elara.editor.util.JSON;
 import elara.editor.util.JSONFormatter;
 
 /**
@@ -153,6 +154,22 @@ public class ProjectManager
 		
 		writer.write(JSONFormatter.makePretty(newObject.toJSONString()));
 		writer.close();
+		
+		// add the project to the recents list
+		try {
+			JSONObject editorConf = JSON.read("conf/editor.config");
+			JSONArray recentsList = (JSONArray) editorConf.get("recentProjects");
+			JSONObject newRecent = new JSONObject();
+			newRecent.put("name", projectName);
+			newRecent.put("path", projectLocation + "/" + projectName);
+			recentsList.add(newRecent);
+			JSON.write(editorConf, "conf/editor.config");
+		} catch (ParseException | IOException e) {
+			StaticLogs.debug.log(LogType.ERROR,
+					"createNewProject: Failed to open editor configuration");
+			throw new SigmaException("createNewProject: Failed to open editor configuration");
+
+		}
 		
 		StaticLogs.debug.log(LogType.INFO,
 				"New project created '" + projectName + "' in "
@@ -309,9 +326,8 @@ public class ProjectManager
 				textureLayersList.add(listItem);
 			}
 			
-			Files.write(new File(projectContext.projectPath() 
-					+ "/" + ProjectStructure.CONFIG_FILE).toPath(), 
-					JSONFormatter.makePretty(jsonObject.toJSONString()).getBytes());
+			JSON.write(jsonObject, projectContext.projectPath() 
+					+ "/" + ProjectStructure.CONFIG_FILE);
 		} else {
 			throw new SigmaException("No project loaded.");
 		}
@@ -396,6 +412,18 @@ public class ProjectManager
 	{
 		return recentProjects;
 	}
+	
+	/**
+	 * Adds a recent project to the list.
+	 */
+	public void addRecentProject(String name, String path)
+	{
+		RecentProject rp = new RecentProject();
+		rp.projectName = name;
+		rp.projectPath = path;
+		recentProjects.add(rp);
+	}
+
 
 	public static ProjectManager manager()
 	{

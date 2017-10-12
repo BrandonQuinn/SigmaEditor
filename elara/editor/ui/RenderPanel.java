@@ -144,7 +144,7 @@ public class RenderPanel extends JComponent implements
 	private void handleInput()
 	{
 		// handle space bar pressed and change state only when we are just enterting this state
-		if (Keyboard.SPACE_BAR == KeyState.PRESSED 
+		if ((Keyboard.SPACE_BAR == KeyState.PRESSED)
 				&& editingContext.state() != EditingState.MOVE_WORLD) {
 			editingContext.assignState(EditingState.MOVE_WORLD);
 		}
@@ -208,9 +208,11 @@ public class RenderPanel extends JComponent implements
 						BufferedImage.TYPE_INT_ARGB);
 				Graphics2D ng = newImage.createGraphics();
 				ng.drawImage(paintTexture, 0, 0, null);
-
+				
 				int paintx = (Mouse.x - (paintTexture.getWidth() >> 1)) + editingContext.xOffset() * -1;
 				int painty = (Mouse.y - (paintTexture.getHeight() >> 1)) + editingContext.yOffset() * -1;
+				
+				
 				
 				// create a new image which handles tiling
 				if (editingContext.tiledPaintingEnabled()) {
@@ -234,7 +236,7 @@ public class RenderPanel extends JComponent implements
 							(0 - (painty % newImage.getHeight()) + newImage.getHeight()),
 							null);
 				}
-				
+
 				// BRUSH TYPE
 				switch (editingContext.selectedBrushFilter()) {
 					case RADIAL_FALLOFF:
@@ -347,11 +349,15 @@ public class RenderPanel extends JComponent implements
 		for (int x = 0; x < gameModel.worldWidthPixels() + 1; x += GameModel.GRID_SIZE) {
 			for (int y = 0; y < gameModel.worldHeightPixels() + 1; y += GameModel.GRID_SIZE) {
 
-				g2d.drawLine(x + editingContext.xOffset(), 0 + editingContext.yOffset(),
-						x + editingContext.xOffset(), gameModel.worldHeightPixels() + editingContext.yOffset());
+				g2d.drawLine(x + editingContext.xOffset(), 
+						0 + editingContext.yOffset(),
+						x + editingContext.xOffset(), 
+						gameModel.worldHeightPixels() + editingContext.yOffset());
 
-				g2d.drawLine(0 + editingContext.xOffset(), y + editingContext.yOffset(), 
-						gameModel.worldWidthPixels() + editingContext.xOffset(), y + editingContext.yOffset());
+				g2d.drawLine(0 + editingContext.xOffset(), 
+						y + editingContext.yOffset(), 
+						gameModel.worldWidthPixels() + editingContext.xOffset(), 
+						y + editingContext.yOffset());
 			}
 		}
 	}
@@ -379,12 +385,12 @@ public class RenderPanel extends JComponent implements
 		// ready to draw rectangle
 		if (Mouse.isLeftButtonDown() && startSet) {
 			// draw border
-			g2d.setStroke(new BasicStroke(2.0f));
-			g2d.setColor(new Color(42, 216, 30, 180));
+			g2d.setStroke(new BasicStroke(1.0f));
+			g2d.setColor(new Color(93, 138, 153, 180));
 			g2d.drawRect(startX, startY, Mouse.x - startX, Mouse.y - startY);
 
 			g2d.setStroke(new BasicStroke(0.0f));
-			g2d.setColor(new Color(87, 206, 78, 100));
+			g2d.setColor(new Color(137, 227, 255, 100));
 			// draw center
 			g2d.fillRect(startX + 1, startY + 1, Mouse.x - startX - 1, Mouse.y - startY - 1);
 
@@ -527,7 +533,7 @@ public class RenderPanel extends JComponent implements
 	public void keyTyped(KeyEvent e)
 	{
 		int keyCode = e.getKeyCode();
-
+		
 		switch (keyCode) {
 			case KeyEvent.VK_SPACE:
 				Keyboard.SPACE_BAR = KeyState.TYPED;
@@ -561,6 +567,5 @@ public class RenderPanel extends JComponent implements
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e)
 	{
-		
 	}
 }

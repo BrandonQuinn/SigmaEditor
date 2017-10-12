@@ -60,6 +60,23 @@ public class GameModel
 	{
 	}
 	
+	/**
+	 * Draws the model on to the given Graphics2D object.
+	 * @param g2d
+	 */
+	public void draw(int xOffset, int yOffset, Graphics2D g2d)
+	{
+		// draw ground textures
+		for (BufferedImage buffImage : groundImageLayers) {
+			g2d.drawImage(buffImage, xOffset, yOffset, null);
+		}
+			
+		// draw asset layers
+		for (Layer layer : assetLayers) {
+			layer.draw(xOffset, yOffset, g2d);
+		}
+	}
+	
 	/*================================================*
 	 * Getters and Setters                            *
 	 *================================================*/
@@ -128,25 +145,6 @@ public class GameModel
 	{	
 		groundImageLayers.remove(index);
 	}
-	
-	/**
-	 * Draws the model on to the given Graphics2D object.
-	 * @param g2d
-	 */
-	public void draw(int xOffset, int yOffset, Graphics2D g2d)
-	{
-		// draw ground textures
-		for (BufferedImage buffImage : groundImageLayers) {
-			g2d.drawImage(buffImage, xOffset, yOffset, null);
-		}
-			
-		
-		
-		// draw asset layers
-		for (Layer layer : assetLayers) {
-			layer.draw(xOffset, yOffset, g2d);
-		}
-	}
 
 	/**
 	 * Returns the world width size in pixels
@@ -194,5 +192,13 @@ public class GameModel
 		if (assetLayers.size() > 0 && selectedIndex > -1 
 				&& assetLayers.get(selectedIndex) != null)
 			assetLayers.remove(selectedIndex);
+	}
+
+	/**
+	 * Creates a fresh new instance.
+	 */
+	public void reset()
+	{
+		model = new GameModel();
 	}
 }

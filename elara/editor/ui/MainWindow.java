@@ -194,7 +194,7 @@ public class MainWindow extends JFrame implements
 		comboBox.addActionListener(this);
 
 		// init combo box
-		comboBox.addItem("Texture");
+		comboBox.addItem("Texture Painting");
 		comboBox.addItem("Sound");
 		
 		leftSideNorthPanel.add(comboBox,BorderLayout.NORTH);
@@ -381,7 +381,7 @@ public class MainWindow extends JFrame implements
 				statusLabel.setText(ProjectContext.projectContext().projectName() + " | " + GameModel
 						.gameModel().worldWidth() + "x" + GameModel.gameModel().worldHeight());
 			}
-
+			
 			waitingDialog.setVisible(false);
 		} 
 		
@@ -392,18 +392,22 @@ public class MainWindow extends JFrame implements
 		else if (source == saveProjectItem) {
 			WaitingDialog waitingDialog = new WaitingDialog("Saving project...");
 			waitingDialog.setVisible(true);
+			
 			try {
 				projectManager.saveProject();
 			} catch (SigmaException | IOException | ParseException | NullPointerException ex) {
 				waitingDialog.setVisible(false);
+				
 				StaticLogs.debug.log(LogType.CRITICAL,
 						"Failed to save project: " + ex.getMessage());
+				
 				JOptionPane.showMessageDialog(null,
 						"Failed to save project: " + ex.getMessage()
 								+ "\nCheck the logs.",
 						"Save failed",
 						JOptionPane.ERROR_MESSAGE);
 			}
+			
 			waitingDialog.setVisible(false);
 		}
 		
@@ -509,7 +513,7 @@ public class MainWindow extends JFrame implements
 			String selectedItem = (String) comboBox.getSelectedItem();
 			
 			if (leftScrollPane != null) {
-				if (selectedItem.equals("Texture")) {
+				if (selectedItem.equals("Texture Painting")) {
 					leftScrollPane.setViewportView(textureList);
 				} else if (selectedItem.equals("Sound")) {
 					leftScrollPane.setViewportView(soundList);
@@ -537,7 +541,6 @@ public class MainWindow extends JFrame implements
 				JOptionPane.showMessageDialog(this, "No project loaded", "No project", 
 						JOptionPane.INFORMATION_MESSAGE);
 			}
-			
 		}
 		
 		else if (source == deleteLayerBtn) {
@@ -545,7 +548,7 @@ public class MainWindow extends JFrame implements
 				gameModel.assetLayers().remove(layerList.getSelectedIndex());
 				layerList.removeLayer(layerList.getSelectedIndex());
 			}
-		}
+		} 
 		
 		/*==============================================*
 		 * TOOL BAR
@@ -567,7 +570,12 @@ public class MainWindow extends JFrame implements
 	}
 	
 	/**
-	 * Changes the interface to reflect the current state it's in
+	 * Changes the interface to reflect the current state it's in.
+	 * If you plan on calling this method, do not do it too frequently,
+	 * like for example, in the render loop or in a certain state of the
+	 * render loop, only do it under specifically, uncommon circumstances like
+	 * a key was pressed. It will block all interaction with the interface if
+	 * called too frequently.
 	 */
 	public void evaluateState()
 	{

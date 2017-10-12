@@ -14,7 +14,6 @@ import elara.editor.ui.RenderPanel;
 
 public class RenderUpdateThread implements Runnable
 {
-	private static final long WAIT_TIME = 33; // milliseconds
 	private static boolean updating = true;
 	private RenderPanel renderPanel;
 
@@ -26,17 +25,8 @@ public class RenderUpdateThread implements Runnable
 	@Override
 	public void run()
 	{
-		long time;
-		// repaint thread after WAIT_TIME passed
 		while (updating) {
-			time = System.currentTimeMillis();
-			try {
-				Thread.sleep(WAIT_TIME);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 			renderPanel.repaint();
-			RenderStats.frameFrequency = System.currentTimeMillis() - time;
 		}
 	}
 
