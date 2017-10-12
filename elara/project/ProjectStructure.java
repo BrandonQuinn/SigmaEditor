@@ -27,6 +27,7 @@ public class ProjectStructure
 				"\t\"creationDate\": \"\",\n" +
 				"\t\"textureList\": [],\n" +
 				"\t\"soundList\": []" +
+				"\t\"textureLayers\": []," +
 			"}";
 	
 	/**

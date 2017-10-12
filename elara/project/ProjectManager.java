@@ -6,6 +6,7 @@
 
 package elara.project;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,6 +17,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import javax.imageio.ImageIO;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -25,6 +27,7 @@ import elara.assets.Texture;
 import elara.editor.debug.LogType;
 import elara.editor.debug.SigmaException;
 import elara.editor.debug.StaticLogs;
+import elara.editor.imageprocessing.ImageProcessor;
 import elara.editor.util.JSONFormatter;
 
 /**
@@ -36,6 +39,10 @@ import elara.editor.util.JSONFormatter;
 public class ProjectManager
 {
 	private static ProjectManager instance = new ProjectManager();
+	
+	private ProjectContext projectContext = ProjectContext.projectContext();
+	private EditingContext editingContext = EditingContext.editingContext();
+	private GameModel gameModel = GameModel.gameModel();
 
 	/**
 	 * Just a simple class to store information to identify
@@ -74,9 +81,8 @@ public class ProjectManager
 			int worldWidth,
 			int worldHeight) throws SigmaException
 	{
-		ProjectContext projContext = ProjectContext.projectContext();
-		projContext.assignProjectName(projectName);
-		projContext.assignProjectDirectory(projectLocation);
+		projectContext.assignProjectName(projectName);
+		projectContext.assignProjectDirectory(projectLocation);
 		
 		// create the directory structure
 		File tempDir;
@@ -161,49 +167,15 @@ public class ProjectManager
 	 * @param editingContext
 	 * @param projectContext
 	 * @throws SigmaException
+	 * @throws ParseException 
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public void open(String projectLocation) throws SigmaException
+	public void open(String projectLocation) throws SigmaException, FileNotFoundException, IOException, ParseException
 	{
-		EditingContext editingContext = EditingContext.editingContext();
-		ProjectContext projectContext = ProjectContext.projectContext();
-		GameModel model = GameModel.gameModel();
-		
 		StaticLogs.debug.log(LogType.INFO, "Opening project at: " + projectLocation);
 
-		try {
-			loadConfiguration(projectLocation, editingContext, projectContext, model);
-		} catch (IOException | ParseException e) {
-			StaticLogs.debug.log(LogType.CRITICAL, "Failed to load project configuration");
-			throw new SigmaException("Failed to load project configuration. " + e.getMessage());
-		}
-
-		projectContext.setProjectLoaded(true);
-		
-		// TODO Use config to setup contexts
-
-		StaticLogs.debug.log(LogType.INFO, "Project opened '" + projectLocation + "'");
-	}
-
-	/**
-	 * Loads the project configuration from the project configuration file.
-	 * 
-	 * @param projectLocation
-	 * @param editingContext
-	 * @param projectContext
-	 * @throws SigmaException
-	 * @throws ParseException
-	 * @throws IOException
-	 * @throws FileNotFoundException
-	 */
-	private void loadConfiguration(String projectLocation,
-			EditingContext editingContext,
-			ProjectContext projectContext,
-			GameModel model)
-			throws SigmaException,
-			FileNotFoundException,
-			IOException,
-			ParseException
-	{
+		// create the parser and read the file
 		JSONParser parser = new JSONParser();
 		Object obj = parser.parse(new FileReader(projectLocation + "/"
 				+ ProjectStructure.CONFIG_FILE));
@@ -215,9 +187,8 @@ public class ProjectManager
 
 		projectContext.assignProjectName(projectName);
 		projectContext.assignProjectDirectory(projectLocation);
-		
-		model.assignWorldWidth(worldWidth);
-		model.assignWorldHeight(worldHeight);
+		gameModel.assignWorldWidth(worldWidth);
+		gameModel.assignWorldHeight(worldHeight);
 		
 		// load textures
 		JSONArray textureArray = (JSONArray) jsonObject.get("textureList");
@@ -260,6 +231,92 @@ public class ProjectManager
 						+ soundName + ", " + soundFilename);
 			}
 		}
+		
+		// load background textures
+		JSONArray bgTextureList = (JSONArray) jsonObject.get("textureLayers");
+		
+		for (int i = 0; i < bgTextureList.size(); i++) {
+			JSONObject bgTex = (JSONObject) bgTextureList.get(i);
+			int texIndex = ((Long) bgTex.get("index")).intValue();
+			
+			File bgTexFile = new File(projectLocation + "/assets/images/textures/ground_texture_layer_" 
+					+ texIndex + ".png");
+
+			// check if the file exists and then add it
+			if (bgTexFile.exists()) {
+				BufferedImage image = ImageIO.read(bgTexFile);
+
+				/* 
+				 	Ok so... there's a reason for literally copying the image we just read...
+					for some reason the image loaded by ImageIO.read() take forever to draw on
+					for example, when texture painting, it takes nearly twice as long.
+					So for that reason I copy it to a new image. It probably has something
+					to do with the format.
+				*/
+				BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(),
+						BufferedImage.TYPE_INT_ARGB);
+				newImage.setAccelerationPriority(1.0f);
+				ImageProcessor.overlap(newImage, 0, 0, image, 0, 0, image.getWidth(), image.getHeight());
+				gameModel.groundTextureLayers().add(texIndex, newImage);
+			}
+		}
+		
+		projectContext.setProjectLoaded(true);
+		StaticLogs.debug.log(LogType.INFO, "Project opened '" + projectLocation + "'");
+	}
+	
+	/**
+	 * Saves the project to disk.
+	 * 
+	 * @throws SigmaException
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws ParseException
+	 * @throws NullPointerException
+	 */
+	@SuppressWarnings("unchecked")
+	public void saveProject() throws SigmaException, 
+		FileNotFoundException, 
+		IOException, 
+		ParseException,
+		NullPointerException
+	{
+		if (projectContext.isProjectLoaded()) {
+			ArrayList<BufferedImage> textureLayers = gameModel.groundTextureLayers();
+			
+			// read the configuration json file
+			JSONParser parser = new JSONParser();
+			Object obj = parser.parse(new FileReader(projectContext.projectPath() 
+					+ "/" + ProjectStructure.CONFIG_FILE));
+			JSONObject jsonObject = (JSONObject) obj;
+			
+			// add ground textures to json
+			JSONArray textureLayersList = (JSONArray) jsonObject.get("textureLayers");
+			
+			// delete and replace
+			textureLayersList.clear();
+			
+			for (int i = 0; i < textureLayers.size(); i++) {
+				JSONObject listItem = new JSONObject();
+				listItem.put("index", i);
+				
+				// write out to disk
+				File outputImage = new File(projectContext.projectPath() + "/assets/images/textures/" 
+						+ "ground_texture_layer_" + i + ".png");
+				outputImage.createNewFile();
+				ImageIO.write(textureLayers.get(i), "png", outputImage);
+				
+				textureLayersList.add(listItem);
+			}
+			
+			Files.write(new File(projectContext.projectPath() 
+					+ "/" + ProjectStructure.CONFIG_FILE).toPath(), 
+					JSONFormatter.makePretty(jsonObject.toJSONString()).getBytes());
+		} else {
+			throw new SigmaException("No project loaded.");
+		}
+		
+		
 	}
 	
 	/**
@@ -273,22 +330,20 @@ public class ProjectManager
 	 */
 	@SuppressWarnings("unchecked")
 	public void addTexture(String name, File textureFile) throws SigmaException
-	{
-		ProjectContext projContext = ProjectContext.projectContext();
-		
+	{	
 		// check if the texture already exists
-		for (Texture texture : projContext.loadedTextures()) {
+		for (Texture texture : projectContext.loadedTextures()) {
 			if (texture.name() == name) {
 				StaticLogs.debug.log(LogType.WARNING, "Texture with name: " + name + " already exists");
 				throw new SigmaException("Texture with name: " + name + " already exists");
 			}
 		}
 		
-		String projectLoc = projContext.projectPath();
+		String projectLoc = projectContext.projectPath();
 		File configFile = new File(projectLoc + "/"+ ProjectStructure.CONFIG_FILE);
 
 		// copy the texture to the assets directory
-		File newFile = new File(projContext.projectPath() + "/assets/images/textures/" 
+		File newFile = new File(projectContext.projectPath() + "/assets/images/textures/" 
 				+ textureFile.getName());
 		
 		try {
@@ -330,7 +385,7 @@ public class ProjectManager
 			+ "' to project context");
 		}
 		
-		projContext.addTexture(newTex);
+		projectContext.addTexture(newTex);
 	}
 	
 	/**
@@ -355,21 +410,19 @@ public class ProjectManager
 	@SuppressWarnings("unchecked")
 	public void addSound(String name, File sourceSoundFile) throws SigmaException
 	{
-		ProjectContext projContext = ProjectContext.projectContext();
-		
 		// check if the sound already exists
-		for (Sound sound : projContext.sounds()) {
+		for (Sound sound : projectContext.sounds()) {
 			if (sound.name() == name) {
 				StaticLogs.debug.log(LogType.WARNING, "Sound with name: " + name + " already exists");
 				throw new SigmaException("Sound with name: " + name + " already exists");
 			}
 		}
 		
-		String projectLoc = projContext.projectPath();
+		String projectLoc = projectContext.projectPath();
 		File configFile = new File(projectLoc + "/"+ ProjectStructure.CONFIG_FILE);
 
 		// copy the sound to the assets directory
-		File newFile = new File(projContext.projectPath() + "/assets/sounds/" 
+		File newFile = new File(projectContext.projectPath() + "/assets/sounds/" 
 				+ sourceSoundFile.getName());
 		
 		try {
@@ -402,6 +455,6 @@ public class ProjectManager
 		
 		// add our new sound to the project context
 		Sound newSound = new Sound(name, sourceSoundFile.getName());
-		projContext.addSound(newSound);
+		projectContext.addSound(newSound);
 	}
 }

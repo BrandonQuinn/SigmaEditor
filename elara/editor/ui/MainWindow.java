@@ -22,6 +22,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.json.simple.parser.ParseException;
 import elara.assets.DefaultIcons;
 import elara.assets.Layer;
 import elara.assets.Sound;
@@ -88,6 +89,7 @@ public class MainWindow extends JFrame implements
 	 */
 	private JMenuItem newProjectItem;
 	private JMenuItem openProjectItem;
+	private JMenuItem saveProjectItem;
 	private JMenuItem loadTextureItem;
 	private JMenuItem loadSoundItem;
 	private JMenuItem aboutItem;
@@ -125,6 +127,10 @@ public class MainWindow extends JFrame implements
 		openProjectItem = new JMenuItem("Open Project...");
 		openProjectItem.addActionListener(this);
 		mnFile.add(openProjectItem);
+		
+		saveProjectItem = new JMenuItem("Save");
+		saveProjectItem.addActionListener(this);
+		mnFile.add(saveProjectItem);
 
 		JMenu mnAssets = new JMenu("Assets");
 		menuBar.add(mnAssets);
@@ -328,7 +334,7 @@ public class MainWindow extends JFrame implements
 			
 				statusLabel.setText(npd.projectName() + " | " + npd.worldWidth() + "x" 
 						+ npd.worldHeight());
-			} catch (SigmaException e1) {
+			} catch (SigmaException | IOException | ParseException e1) {
 				waitingDialog.setVisible(false);
 				
 				JOptionPane.showMessageDialog(null,
@@ -360,13 +366,13 @@ public class MainWindow extends JFrame implements
 					projectManager.open(projectDirectory.getAbsolutePath());
 					textureList.loadFromContext();
 					soundList.loadFromContext();
-				} catch (SigmaException e1) {
+				} catch (SigmaException | IOException | ParseException e1) {
 					waitingDialog.setVisible(false);
 					
 					StaticLogs.debug.log(LogType.CRITICAL,
-							"Failed to open project: " + e1.message());
+							"Failed to open project: " + e1.getMessage());
 					JOptionPane.showMessageDialog(null,
-							"Failed to load project: " + e1.message()
+							"Failed to load project: " + e1.getMessage()
 									+ "\nCheck the logs.",
 							"Failure to Load",
 							JOptionPane.ERROR_MESSAGE);
@@ -378,6 +384,28 @@ public class MainWindow extends JFrame implements
 
 			waitingDialog.setVisible(false);
 		} 
+		
+		/*==============================================*
+		 * SAVE PROJECT
+		 *==============================================*/
+		
+		else if (source == saveProjectItem) {
+			WaitingDialog waitingDialog = new WaitingDialog("Saving project...");
+			waitingDialog.setVisible(true);
+			try {
+				projectManager.saveProject();
+			} catch (SigmaException | IOException | ParseException | NullPointerException ex) {
+				waitingDialog.setVisible(false);
+				StaticLogs.debug.log(LogType.CRITICAL,
+						"Failed to save project: " + ex.getMessage());
+				JOptionPane.showMessageDialog(null,
+						"Failed to save project: " + ex.getMessage()
+								+ "\nCheck the logs.",
+						"Save failed",
+						JOptionPane.ERROR_MESSAGE);
+			}
+			waitingDialog.setVisible(false);
+		}
 		
 		/*==============================================*
 		 * LOAD TEXTURE

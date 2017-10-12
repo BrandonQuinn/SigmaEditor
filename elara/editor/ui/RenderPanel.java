@@ -15,6 +15,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -43,7 +45,8 @@ import elara.project.GameModel;
 public class RenderPanel extends JComponent implements
 		KeyListener,
 		MouseListener,
-		MouseMotionListener
+		MouseMotionListener,
+		MouseWheelListener
 {
 	private static final long serialVersionUID = 1L;
 
@@ -63,6 +66,7 @@ public class RenderPanel extends JComponent implements
 		addMouseListener(this);
 		addKeyListener(this);
 		addMouseMotionListener(this);
+		addMouseWheelListener(this);
 
 		// load mouse cursor
 		cursorImage = new ImageIcon("res\\icons\\cursor.png");
@@ -90,9 +94,11 @@ public class RenderPanel extends JComponent implements
 		setup(g2d);
 		gameModel.draw(editingContext.xOffset(), editingContext.yOffset(), g2d);
 		handleInput();
+		drawMouseCursor(g2d);
 		handleEditingState(g2d);
-		drawDebugInfo(g2d);
 		
+		drawDebugInfo(g2d);
+
 		RenderStats.frameTime = System.currentTimeMillis() - time;
 	}
 	
@@ -195,6 +201,8 @@ public class RenderPanel extends JComponent implements
 				BufferedImage buffIm = gameModel.groundTextureLayers()
 						.get(editingContext.getSelectedGroundLayerIndex());
 				
+				Graphics2D buffG = buffIm.createGraphics();
+				
 				BufferedImage newImage = new BufferedImage(
 						paintTexture.getWidth(), paintTexture.getHeight(), 
 						BufferedImage.TYPE_INT_ARGB);
@@ -266,9 +274,9 @@ public class RenderPanel extends JComponent implements
 					default:
 					break;
 				}
-
+				
 				newImage = ImageProcessor.setOpacity(newImage, editingContext.textureBrushOpacity());
-				buffIm.createGraphics().drawImage(newImage, paintx, painty, null);
+				buffG.drawImage(newImage, paintx, painty, null);
 			}
 		break;
 
@@ -314,8 +322,6 @@ public class RenderPanel extends JComponent implements
 		default:
 			break;
 		}
-
-		drawMouseCursor(g2d);
 	}
 
 	/**
@@ -329,7 +335,7 @@ public class RenderPanel extends JComponent implements
 	{
 		g2d.setColor(Color.BLACK);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
-
+		
 		g2d.setColor(new Color(10, 10, 10));
 		g2d.fillRect(editingContext.xOffset(),
 				editingContext.yOffset(),
@@ -398,32 +404,32 @@ public class RenderPanel extends JComponent implements
 	public void drawMouseCursor(Graphics2D g2d)
 	{
 		switch (editingContext.state()) {
-		case SELECT:
-			g2d.drawImage(cursorImage.getImage(), Mouse.x - 8, Mouse.y - 8, null);
-		break;
-
-		case TEXTURE_PAINT:
-			BufferedImage selectedImage = editingContext.selectedTexture().image();
-			g2d.setColor(new Color(255, 255, 255));
-			g2d.setStroke(new BasicStroke(2.0f));
-			g2d.drawOval(Mouse.x - (selectedImage.getWidth() >> 1), Mouse.y - (selectedImage.getHeight() >> 1), 
-					selectedImage.getWidth(), selectedImage.getHeight());
-		break;
-
-		case MOVE_WORLD:
-			g2d.drawImage(DefaultIcons.moveWorldIcon.getImage(), 
-					Mouse.x - DefaultIcons.moveWorldIcon.getIconWidth() / 2, 
-					Mouse.y - DefaultIcons.moveWorldIcon.getIconHeight() / 2, null);
-		break;
-		
-		case ADD_SOUND:
-			g2d.drawImage(DefaultIcons.soundIcon.getImage(),
-				Mouse.x  - DefaultIcons.soundIcon.getIconWidth() / 2, 
-				Mouse.y - DefaultIcons.soundIcon.getIconHeight() / 2, null);
-		break;
-
-		default:
-			g2d.drawImage(cursorImage.getImage(), Mouse.x - 8, Mouse.y - 8, null);
+			case SELECT:
+				g2d.drawImage(cursorImage.getImage(), Mouse.x - 8, Mouse.y - 8, null);
+			break;
+	
+			case TEXTURE_PAINT:
+				BufferedImage selectedImage = editingContext.selectedTexture().image();
+				g2d.setColor(new Color(255, 255, 255));
+				g2d.setStroke(new BasicStroke(2.0f));
+				g2d.drawOval(Mouse.x - (selectedImage.getWidth() >> 1), Mouse.y - (selectedImage.getHeight() >> 1), 
+						selectedImage.getWidth(), selectedImage.getHeight());
+			break;
+	
+			case MOVE_WORLD:
+				g2d.drawImage(DefaultIcons.moveWorldIcon.getImage(), 
+						Mouse.x - DefaultIcons.moveWorldIcon.getIconWidth() / 2, 
+						Mouse.y - DefaultIcons.moveWorldIcon.getIconHeight() / 2, null);
+			break;
+			
+			case ADD_SOUND:
+				g2d.drawImage(DefaultIcons.soundIcon.getImage(),
+					Mouse.x  - DefaultIcons.soundIcon.getIconWidth() / 2, 
+					Mouse.y - DefaultIcons.soundIcon.getIconHeight() / 2, null);
+			break;
+	
+			default:
+				g2d.drawImage(cursorImage.getImage(), Mouse.x - 8, Mouse.y - 8, null);
 		}
 	}
 
@@ -547,5 +553,14 @@ public class RenderPanel extends JComponent implements
 	{
 		Mouse.x = e.getX();
 		Mouse.y = e.getY();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseWheelListener#mouseWheelMoved(java.awt.event.MouseWheelEvent)
+	 */
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e)
+	{
+		
 	}
 }
