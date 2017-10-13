@@ -21,6 +21,11 @@ public class Layer implements Drawable
 	private String name = "Untitled";
 	
 	/**
+	 * A list of every entity that appears in this layer.
+	 */
+	private ArrayList<Entity> entities = new ArrayList<Entity>();
+	
+	/**
 	 * List of sounds on this layer.
 	 */
 	private ArrayList<Sound> sounds = new ArrayList<Sound>();
@@ -46,13 +51,8 @@ public class Layer implements Drawable
 	public void draw(int xOffset, int yOffset, Graphics2D g2d)
 	{
 		// render sound gizmo
-		for (Sound sound: sounds) {
-			sound.draw(xOffset, yOffset, g2d);
-		}
-		
-		// render spawn point gizmo
-		for (SpawnPoint spawnPoint: spawnPoints) {
-			spawnPoint.draw(xOffset, yOffset, g2d);
+		for (Entity entity: entities) {
+			entity.draw(xOffset, yOffset, g2d);
 		}
 	}
 	
@@ -80,8 +80,10 @@ public class Layer implements Drawable
 	 */
 	public void addSound(Sound s)
 	{
-		if (s != null)
+		if (s != null) {
 			sounds.add(s);
+			entities.add(s);
+		}
 	}
 	
 	/**
@@ -99,8 +101,10 @@ public class Layer implements Drawable
 	 */
 	public void addSpawnPoint(SpawnPoint sp)
 	{
-		if (sp != null)
+		if (sp != null) {
 			spawnPoints.add(sp);
+			entities.add(sp);
+		}
 	}
 	
 	/**
@@ -110,5 +114,15 @@ public class Layer implements Drawable
 	public ArrayList<SpawnPoint> spawnPoints()
 	{
 		return spawnPoints;
+	}
+
+	/**
+	 * Returns a list of ALL entities!
+	 * 
+	 * @return
+	 */
+	public ArrayList<Entity> entities()
+	{
+		return entities;
 	}
 }

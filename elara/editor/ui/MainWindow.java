@@ -213,7 +213,7 @@ public class MainWindow extends JFrame implements
 		
 		soundList = new SoundJList(this);
 		layerList = new LayerJList();
-		spawnPointList = new SpawnPointJList(this);
+		spawnPointList = new SpawnPointJList();
 		
 		JPanel leftSideSouthPanel = new JPanel();
 		leftSideSouthPanel.setBorder(new EmptyBorder(2, 2, 2, 2));

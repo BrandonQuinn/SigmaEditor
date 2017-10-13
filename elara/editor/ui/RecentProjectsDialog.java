@@ -47,6 +47,7 @@ public class RecentProjectsDialog extends JDialog
 		setModal(true);
 		setBounds(100, 100, 323, 332);
 		setLocationRelativeTo(null);
+		setIconImage(DefaultIcons.windowIcon.getImage());
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);

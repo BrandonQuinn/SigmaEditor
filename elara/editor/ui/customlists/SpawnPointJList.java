@@ -10,7 +10,6 @@ import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import elara.assets.SpawnPoint;
-import elara.editor.ui.MainWindow;
 import elara.project.EditingContext;
 import elara.project.EditingContext.EditingState;
 
@@ -27,12 +26,9 @@ public class SpawnPointJList extends JList<SpawnPoint>
 	private EditingContext editingContext = EditingContext.editingContext();
 	
 	private DefaultListModel<SpawnPoint> model = new DefaultListModel<SpawnPoint>();
-
-	private MainWindow mainWindow;
 	
-	public SpawnPointJList(MainWindow mainWindow)
+	public SpawnPointJList()
 	{
-		this.mainWindow = mainWindow;
 		setCellRenderer(new SpawnPointListRenderer());
 		addListSelectionListener(this);
 		setModel(model);

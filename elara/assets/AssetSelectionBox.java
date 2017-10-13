@@ -5,7 +5,6 @@
  */
 package elara.assets;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -22,8 +21,8 @@ import org.newdawn.slick.geom.Circle;
 public class AssetSelectionBox
 	implements Drawable
 {
-	private static final Color BOX_COLOR = new Color(255, 0, 0);
-	private static final int BORDER = 5;
+	private static final Color BOX_COLOR = new Color(8, 255, 0);
+	private static final int BORDER = 0;
 	
 	// surrounding rectangle
 	private Rectangle rect = new Rectangle(0, 0, 10, 10);
@@ -39,7 +38,6 @@ public class AssetSelectionBox
 	{
 		Color tmp = g2d.getColor();
 		g2d.setColor(BOX_COLOR);
-		g2d.setStroke(new BasicStroke(1.5f));
 
 		moveCircle.setCenterX((int)rect.getCenterX());
 		moveCircle.setCenterY((int)rect.getCenterY());
@@ -52,7 +50,6 @@ public class AssetSelectionBox
 		g2d.drawRect(rect.x, rect.y, 
 					rect.width, rect.height);
 		
-		g2d.setStroke(new BasicStroke(1.0f));
 		g2d.setColor(tmp);
 	}
 	
@@ -68,5 +65,14 @@ public class AssetSelectionBox
 	public void assignSize(int width, int height)
 	{
 		rect.setSize(width + BORDER * 2, height + BORDER * 2);
+	}
+	
+	/**
+	 * Returns the rectangle that represents the selection box.
+	 * @return
+	 */
+	public Rectangle rectangle()
+	{
+		return rect;
 	}
 }

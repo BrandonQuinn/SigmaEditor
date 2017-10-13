@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import org.joml.Vector2f;
+import elara.assets.AssetSelector;
 import elara.assets.DefaultIcons;
 import elara.assets.Sound;
 import elara.assets.SpawnPoint;
@@ -203,7 +204,14 @@ public class RenderPanel extends JComponent implements
 	{
 		switch (editingContext.state()) {
 			case SELECT:
+				
+				if (Mouse.isLeftButtonDown()) {
+					AssetSelector.makeSelection(Mouse.x, Mouse.y);
+				}
+				
 				selectionRectangle.draw(g2d);
+				AssetSelector.makeSelection(selectionRectangle.rectangle());
+				
 			break;
 	
 			case TEXTURE_PAINT:
@@ -426,7 +434,6 @@ public class RenderPanel extends JComponent implements
 				ImageIcon chosenIcon = DefaultIcons.spawnIcon;
 				
 				if (sp != null) {
-					
 					switch (sp.team()) {
 						case 1:
 							chosenIcon = DefaultIcons.spawnIcon1;

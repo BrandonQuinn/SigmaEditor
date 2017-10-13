@@ -56,7 +56,9 @@ public class Sound extends Entity
 			selectionBox.assignPosition(new Vector2f(xpos, ypos));
 			selectionBox.assignSize(DefaultIcons.soundIcon.getIconWidth(), 
 					DefaultIcons.soundIcon.getIconHeight());
-			selectionBox.draw(xOffset, yOffset, g2d);
+			if (isSelected) {
+				selectionBox.draw(xOffset, yOffset, g2d);
+			}
 		}
 	}
 

@@ -7,6 +7,8 @@ package elara.editor.ui;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import elara.assets.AssetSelector;
 import elara.editor.input.Mouse;
 
 /**
@@ -41,6 +43,7 @@ public class SelectionRectangle
 			startX = Mouse.x;
 			startY = Mouse.y;
 			startSet = true;
+			AssetSelector.deselectAll();
 		}
 
 		// ready to draw rectangle
@@ -84,5 +87,14 @@ public class SelectionRectangle
 			startX = 0;
 			startY = 0;
 		}
+	}
+
+	/**
+	 * Gets a rectangle that is the selection rectangle.
+	 * @return
+	 */
+	public Rectangle rectangle()
+	{
+		return new Rectangle(topLeftX, topLeftY, width, height);
 	}
 }

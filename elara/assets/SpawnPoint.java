@@ -59,12 +59,14 @@ public class SpawnPoint extends Entity
 			}
 			
 			g2d.drawImage(chosenIcon.getImage(), xpos, ypos, null);
-			
+		
 			// setup and draw selection box
 			selectionBox.assignPosition(new Vector2f(xpos, ypos));
 			selectionBox.assignSize(chosenIcon.getIconWidth(), 
 					chosenIcon.getIconHeight());
-			selectionBox.draw(xOffset, yOffset, g2d);
+			if (isSelected) {
+				selectionBox.draw(xOffset, yOffset, g2d);
+			}
 		}
 	}
 	

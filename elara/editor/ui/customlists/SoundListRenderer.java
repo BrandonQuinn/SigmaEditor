@@ -7,9 +7,11 @@ package elara.editor.ui.customlists;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+import javax.swing.border.EmptyBorder;
 import elara.assets.DefaultIcons;
 import elara.assets.Sound;
 
@@ -48,6 +50,9 @@ public class SoundListRenderer extends JLabel
 			setBackground(list.getBackground());
 			setForeground(Color.BLACK);
 		}
+		
+		setPreferredSize(new Dimension(220, DefaultIcons.soundIcon.getIconHeight() + 2));
+		setBorder(new EmptyBorder(1, 1, 1, 1));
 		
 		return this;
 	}
