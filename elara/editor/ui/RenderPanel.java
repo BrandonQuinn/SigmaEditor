@@ -206,11 +206,11 @@ public class RenderPanel extends JComponent implements
 			case SELECT:
 				
 				if (Mouse.isLeftButtonDown()) {
-					AssetSelector.makeSelection(Mouse.x, Mouse.y);
+					AssetSelector.checkSelections(Mouse.x, Mouse.y);
 				}
 				
 				selectionRectangle.draw(g2d);
-				AssetSelector.makeSelection(selectionRectangle.rectangle());
+				AssetSelector.checkSelections(selectionRectangle.rectangle());
 				
 			break;
 	

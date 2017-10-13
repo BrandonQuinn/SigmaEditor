@@ -7,6 +7,7 @@ package elara.assets;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import elara.project.EditingContext;
 
 /**
@@ -21,12 +22,14 @@ public class AssetSelector
 	private static Layer selectedLayer;
 	private static Point point;
 	
+	private static ArrayList<Entity> selectedEntities = new ArrayList<Entity>();
+	
 	/**
 	 * Find all entities in the game world that are inside the given 
 	 * rectangle.
 	 * @param rectangle
 	 */
-	public static void makeSelection(Rectangle rectangle)
+	public static void checkSelections(Rectangle rectangle)
 	{
 		selectedLayer = editingContext.selectedAssetLayer();
 		
@@ -36,6 +39,7 @@ public class AssetSelector
 				
 				if (rectangle.intersects(rect)) {
 					entity.isSelected = true;
+					selectedEntities.add(entity);
 				}
 			}
 		}
@@ -46,7 +50,7 @@ public class AssetSelector
 	 * @param x
 	 * @param y
 	 */
-	public static void makeSelection(int x, int y)
+	public static void checkSelections(int x, int y)
 	{
 		selectedLayer = editingContext.selectedAssetLayer();
 		point = new Point(x, y);
@@ -56,6 +60,7 @@ public class AssetSelector
 				Rectangle rect = entity.selectionBox.rectangle();
 				if (rect.contains(point)) {
 					entity.isSelected = true;
+					selectedEntities.add(entity);
 					break; 	// this is important, makes sure we don't continue to select ALL 
 							// entites under the mouse, just the top one. This makes sure
 							// that if there are many entities stacked on top of each other
@@ -75,7 +80,17 @@ public class AssetSelector
 		if (selectedLayer != null) {
 			for (Entity entity : selectedLayer.entities()) {
 				entity.isSelected = false;
+				selectedEntities.clear();
 			}
 		}
+	}
+	
+	/**
+	 * Returns a list of all selected entities.
+	 * @return
+	 */
+	public static ArrayList<Entity> selectedEntities()
+	{
+		return selectedEntities;
 	}
 }
