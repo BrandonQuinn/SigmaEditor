@@ -1,3 +1,9 @@
+### About
+- Despite it's ugly interface, I assure you, it's still not worth using
+- There's plenty of obtuse, tiny bugs that don't break anything, just make it less usable, stop being obtuse
+- Other than those points, on the plus side, it's completely free and new features are hard to add because the code makes no sense
+- If that doesn't make you love it, it's also written in Java, notoriously not-as-slow-as-it-used-to-be, and I still use Swing which is deprecated. I also use Java2D which I'm pretty sure is older than me
+
 ### Dependencies
 - JSON.Simple https://github.com/fangyidong/json-simple
 	- Provides simple tools for reading and writing JSON files

@@ -12,9 +12,12 @@ import org.joml.Vector2f;
  *
  * Description: Represents an entity in the game world.
  */
-public class Entity
+public abstract class Entity 
+	implements Drawable
 {
 	protected Vector2f position = new Vector2f(0.0f, 0.0f);
+	protected AssetSelectionBox selectionBox = new AssetSelectionBox();
+	protected boolean isSelected = false;
 	
 	public Vector2f position()
 	{

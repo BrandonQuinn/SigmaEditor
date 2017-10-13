@@ -290,21 +290,32 @@ public class RenderPanel extends JComponent implements
 			if (moveStartX == null) {
 				moveStartX = Mouse.x;
 			}
+			
 			if (moveStartY == null) {
 				moveStartY = Mouse.y;
 			}
 
-			// TODO prevent moving world too far
-
-			// detect a change and add it
-			if (Mouse.x - moveStartX != 0) {
+			// detect a change and add it, what a might fine mess, but it works
+			if (Mouse.x - moveStartX != 0 
+					&& editingContext.xOffset() <= (getWidth() >> 1) &&
+					editingContext.xOffset() >= -1 * gameModel.worldWidthPixels() + (getWidth() >> 1)) {
 				editingContext.addToXOffset(Mouse.x - moveStartX);
 				moveStartX = Mouse.x;
+			} else if (editingContext.xOffset() >= (getWidth() >> 1)) {
+				editingContext.addToXOffset(-editingContext.xOffset() + (getWidth() >> 1));
+			} else if (editingContext.xOffset() <= -1 * gameModel.worldWidthPixels() + (getWidth() >> 1)) {
+				editingContext.addToXOffset(-editingContext.xOffset() + -1 * gameModel.worldWidthPixels() + (getWidth() >> 1));
 			}
-
-			if (Mouse.y - moveStartY != 0) {
+			
+			if (Mouse.y - moveStartY != 0 
+					&& editingContext.xOffset() <= (getHeight()) &&
+					editingContext.yOffset() >= -1 * gameModel.worldHeightPixels() + (getHeight() >> 1)) {
 				editingContext.addToYOffset(Mouse.y - moveStartY);
 				moveStartY = Mouse.y;
+			} else if (editingContext.yOffset() >= (getHeight() >> 1)) {
+				editingContext.addToYOffset(-editingContext.yOffset() + (getHeight() >> 1));
+			} else if (editingContext.yOffset() <= -1 * gameModel.worldHeightPixels() + (getHeight() >> 1)) {
+				editingContext.addToYOffset(-editingContext.yOffset() + -1 * gameModel.worldHeightPixels() + (getHeight() >> 1));
 			}
 
 			if (Keyboard.SPACE_BAR == KeyState.RELEASED) {
@@ -320,7 +331,7 @@ public class RenderPanel extends JComponent implements
 				if (Mouse.isLeftButtonClicked() && gameModel.assetLayers().size() != 0) {
 					Sound s = new Sound(editingContext.selectedSound());
 					s.setPosition(new Vector2f(Mouse.x - editingContext.xOffset(), 
-							Mouse.y - editingContext.yOffset() - DefaultIcons.soundIcon.getIconHeight()));
+							Mouse.y - editingContext.yOffset()));
 					editingContext.selectedAssetLayer().addSound(s);
 				}
 			break;

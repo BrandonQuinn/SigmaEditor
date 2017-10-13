@@ -218,7 +218,6 @@ public class ProjectManager
 			JSONObject textureInfo = (JSONObject) textureArray.get(i);
 			String textureName = (String) textureInfo.get("name");
 			String textureFilename = (String) textureInfo.get("filename");
-			
 			File textureFile = new File(projectLocation + "/assets/images/textures/" + textureFilename);
 
 			// check if the file exists and then add it
@@ -321,10 +320,12 @@ public class ProjectManager
 				soundJSONList = (JSONArray) currentJSONLayer.get("sounds");
 				for (int s = 0; s < soundJSONList.size(); s++) {
 					tmpJSONSound = (JSONObject) soundJSONList.get(s);
+					
 					String soundName = (String) tmpJSONSound.get("name");
 					String soundFilename = (String) tmpJSONSound.get("filename");
 					float xpos = ((Double) tmpJSONSound.get("xpos")).floatValue();
 					float ypos = ((Double) tmpJSONSound.get("ypos")).floatValue();
+					
 					tmpSound = new Sound(soundName, soundFilename);
 					tmpSound.setPosition(new Vector2f(xpos, ypos));
 					tmpLayer.addSound(tmpSound);
@@ -334,9 +335,11 @@ public class ProjectManager
 				spJSONList = (JSONArray) currentJSONLayer.get("spawnPoints");
 				for (int s = 0; s < spJSONList.size(); s++) {
 					tmpJSONsp = (JSONObject) spJSONList.get(s);
+					
 					int spTeam = ((Long) tmpJSONsp.get("team")).intValue();
 					float xpos = ((Double) tmpJSONsp.get("xpos")).floatValue();
 					float ypos = ((Double) tmpJSONsp.get("ypos")).floatValue();
+					
 					tmpSP = new SpawnPoint();
 					tmpSP.assignTeam(spTeam);
 					tmpSP.setPosition(new Vector2f(xpos, ypos));
@@ -521,32 +524,6 @@ public class ProjectManager
 		
 		projectContext.addTexture(newTex);
 	}
-	
-	/**
-	 * Returns a list of recent projects.
-	 * @return
-	 */
-	public ArrayList<RecentProject> recentProjects()
-	{
-		return recentProjects;
-	}
-	
-	/**
-	 * Adds a recent project to the list.
-	 */
-	public void addRecentProject(String name, String path)
-	{
-		RecentProject rp = new RecentProject();
-		rp.projectName = name;
-		rp.projectPath = path;
-		recentProjects.add(rp);
-	}
-
-
-	public static ProjectManager manager()
-	{
-		return instance;
-	}
 
 	/**
 	 * @param sourceSoundFile
@@ -603,5 +580,31 @@ public class ProjectManager
 		// add our new sound to the project context
 		Sound newSound = new Sound(name, sourceSoundFile.getName());
 		projectContext.addSound(newSound);
+	}
+	
+	/**
+	 * Returns a list of recent projects.
+	 * @return
+	 */
+	public ArrayList<RecentProject> recentProjects()
+	{
+		return recentProjects;
+	}
+	
+	/**
+	 * Adds a recent project to the list.
+	 */
+	public void addRecentProject(String name, String path)
+	{
+		RecentProject rp = new RecentProject();
+		rp.projectName = name;
+		rp.projectPath = path;
+		recentProjects.add(rp);
+	}
+
+
+	public static ProjectManager manager()
+	{
+		return instance;
 	}
 }

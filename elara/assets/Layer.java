@@ -7,17 +7,14 @@ package elara.assets;
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
-import elara.project.EditingContext;
 
 /**
  * Layer
  *
  * Description: Layer of assets
  */
-public class Layer
+public class Layer implements Drawable
 {
-	private EditingContext editingContext = EditingContext.editingContext();
-	
 	/**
 	 * Name of layer.
 	 */
@@ -45,16 +42,12 @@ public class Layer
 	 * @param yOffset
 	 * @param g2d
 	 */
+	@Override
 	public void draw(int xOffset, int yOffset, Graphics2D g2d)
 	{
 		// render sound gizmo
 		for (Sound sound : sounds) {
-			if (editingContext.gizmoRenderingEnabled()) {
-				g2d.drawImage(DefaultIcons.soundIcon.getImage(), 
-						((int) sound.position().x - DefaultIcons.soundIcon.getIconWidth() / 2) + xOffset, 
-						((int) sound.position().y -  - DefaultIcons.soundIcon.getIconHeight() / 2)+ yOffset, 
-						null);
-			}
+			sound.draw(xOffset, yOffset, g2d);
 		}
 	}
 	

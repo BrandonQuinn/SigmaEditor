@@ -110,7 +110,7 @@ public class EditingContext
 	
 	
 	/*===========================*
-	 * ADD_SOUND state fields        *
+	 * ADD_SOUND state fields    *
 	 *===========================*/
 	
 	private Sound selectedSound;
