@@ -30,11 +30,13 @@ public class AssetSelector
 	{
 		selectedLayer = editingContext.selectedAssetLayer();
 		
-		for (Entity entity : selectedLayer.entities()) {
-			Rectangle rect = entity.selectionBox.rectangle();
-			
-			if (rectangle.intersects(rect)) {
-				entity.isSelected = true;
+		if (selectedLayer != null) {
+			for (Entity entity : selectedLayer.entities()) {
+				Rectangle rect = entity.selectionBox.rectangle();
+				
+				if (rectangle.intersects(rect)) {
+					entity.isSelected = true;
+				}
 			}
 		}
 	}
@@ -48,24 +50,32 @@ public class AssetSelector
 	{
 		selectedLayer = editingContext.selectedAssetLayer();
 		point = new Point(x, y);
-
-		for (Entity entity : selectedLayer.entities()) {
-			Rectangle rect = entity.selectionBox.rectangle();
-			if (rect.contains(point)) {
-				entity.isSelected = true;
+		
+		if (selectedLayer != null) {
+			for (Entity entity : selectedLayer.entities()) {
+				Rectangle rect = entity.selectionBox.rectangle();
+				if (rect.contains(point)) {
+					entity.isSelected = true;
+					break; 	// this is important, makes sure we don't continue to select ALL 
+							// entites under the mouse, just the top one. This makes sure
+							// that if there are many entities stacked on top of each other
+							// we are able to drag them off one by one
+				}
 			}
 		}
 	}
 
 	/**
-	 * Desletects everything.
+	 * Deselects everything.
 	 */
 	public static void deselectAll()
 	{
 		selectedLayer = editingContext.selectedAssetLayer();
 		
-		for (Entity entity : selectedLayer.entities()) {
-			entity.isSelected = false;
+		if (selectedLayer != null) {
+			for (Entity entity : selectedLayer.entities()) {
+				entity.isSelected = false;
+			}
 		}
 	}
 }
