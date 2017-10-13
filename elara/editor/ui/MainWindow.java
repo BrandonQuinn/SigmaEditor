@@ -34,6 +34,7 @@ import elara.editor.debug.StaticLogs;
 import elara.editor.rendering.RenderUpdateThread;
 import elara.editor.ui.customlists.LayerJList;
 import elara.editor.ui.customlists.SoundJList;
+import elara.editor.ui.customlists.SpawnPointJList;
 import elara.editor.ui.customlists.TextureJList;
 import elara.editor.ui.propertiespanels.SoundPropsPanel;
 import elara.editor.ui.propertiespanels.TexturePropsPanel;
@@ -84,6 +85,7 @@ public class MainWindow extends JFrame implements
 	private TextureJList textureList;
 	private SoundJList soundList;
 	private LayerJList layerList;
+	private SpawnPointJList spawnPointList;
 
 	/**
 	 * Menu Items
@@ -196,8 +198,9 @@ public class MainWindow extends JFrame implements
 
 		// init combo box
 		comboBox.addItem("Texture Painting");
+		comboBox.addItem("Spawn Points");
+		comboBox.addItem("Sounds");
 		comboBox.addItem("Decals");
-		comboBox.addItem("Sound");
 		
 		leftSideNorthPanel.add(comboBox,BorderLayout.NORTH);
 
@@ -210,6 +213,7 @@ public class MainWindow extends JFrame implements
 		
 		soundList = new SoundJList(this);
 		layerList = new LayerJList();
+		spawnPointList = new SpawnPointJList(this);
 		
 		JPanel leftSideSouthPanel = new JPanel();
 		leftSideSouthPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
@@ -516,7 +520,9 @@ public class MainWindow extends JFrame implements
 			if (leftScrollPane != null) {
 				if (selectedItem.equals("Texture Painting")) {
 					leftScrollPane.setViewportView(textureList);
-				} else if (selectedItem.equals("Sound")) {
+				} else if (selectedItem.equals("Spawn Points")) {
+					leftScrollPane.setViewportView(spawnPointList);
+				} else if (selectedItem.equals("Sounds")) {
 					leftScrollPane.setViewportView(soundList);
 				}
 			}

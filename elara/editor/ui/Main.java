@@ -37,6 +37,8 @@ public class Main
 	
 	public static void main(String args[])
 	{
+		System.setProperty("-Dsun.java2d.opengl", "true");
+		
 		// load the system look and feel
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -53,7 +55,7 @@ public class Main
 		RecentProjectsDialog rpg = new RecentProjectsDialog();
 		rpg.setVisible(true);
 		
-		MainWindow mainWindow = new MainWindow();
+		MainWindow mainWindow = new MainWindow();		
 		mainWindow.setVisible(true); // GO!
 	}
 

@@ -23,6 +23,7 @@ import javax.swing.JComponent;
 import org.joml.Vector2f;
 import elara.assets.DefaultIcons;
 import elara.assets.Sound;
+import elara.assets.SpawnPoint;
 import elara.editor.imageprocessing.ImageProcessor;
 import elara.editor.input.KeyState;
 import elara.editor.input.Keyboard;
@@ -155,6 +156,10 @@ public class RenderPanel extends JComponent implements
 			editingContext.assignState(EditingState.MOVE_WORLD);
 		}
 		
+		if (Keyboard.S == KeyState.PRESSED) {
+			editingContext.assignState(EditingState.SELECT);
+		}
+		
 		// state controlled input, no privatisation here!
 		switch (editingContext.state()) {
 			case SELECT:
@@ -197,146 +202,155 @@ public class RenderPanel extends JComponent implements
 	private void handleEditingState(Graphics2D g2d)
 	{
 		switch (editingContext.state()) {
-		case SELECT:
-			selectionRectangle.draw(g2d);
-		break;
-
-		case TEXTURE_PAINT:
-			if (Mouse.isLeftButtonDown() && editingContext.getSelectedGroundLayerIndex() != -1) {
-				BufferedImage paintTexture = editingContext.selectedTexture().image();
-				BufferedImage buffIm = gameModel.groundTextureLayers()
-						.get(editingContext.getSelectedGroundLayerIndex());
-				
-				Graphics2D buffG = buffIm.createGraphics();
-				
-				BufferedImage newImage = new BufferedImage(
-						paintTexture.getWidth(), paintTexture.getHeight(), 
-						BufferedImage.TYPE_INT_ARGB);
-				Graphics2D ng = newImage.createGraphics();
-				ng.drawImage(paintTexture, 0, 0, null);
-				
-				int paintx = (Mouse.x - (paintTexture.getWidth() >> 1)) + editingContext.xOffset() * -1;
-				int painty = (Mouse.y - (paintTexture.getHeight() >> 1)) + editingContext.yOffset() * -1;
-				
-				// create a new image which handles tiling
-				if (editingContext.tiledPaintingEnabled()) {
-					ng.drawImage(paintTexture, 
-							0 - (paintx % newImage.getWidth()), 
-							0 - (painty % newImage.getHeight()),
-							null);
+			case SELECT:
+				selectionRectangle.draw(g2d);
+			break;
+	
+			case TEXTURE_PAINT:
+				if (Mouse.isLeftButtonDown() && editingContext.getSelectedGroundLayerIndex() != -1) {
+					BufferedImage paintTexture = editingContext.selectedTexture().image();
+					BufferedImage buffIm = gameModel.groundTextureLayers()
+							.get(editingContext.getSelectedGroundLayerIndex());
 					
-					ng.drawImage(paintTexture, 
-							(0 - (paintx % newImage.getWidth()) + newImage.getWidth()), 
-							0 - (painty % newImage.getHeight()),
-							null);
+					Graphics2D buffG = buffIm.createGraphics();
 					
-					ng.drawImage(paintTexture, 
-							(0 - (paintx % newImage.getWidth()) + newImage.getWidth()), 
-							(0 - (painty % newImage.getHeight()) + newImage.getHeight()),
-							null);
+					BufferedImage newImage = new BufferedImage(
+							paintTexture.getWidth(), paintTexture.getHeight(), 
+							BufferedImage.TYPE_INT_ARGB);
+					Graphics2D ng = newImage.createGraphics();
+					ng.drawImage(paintTexture, 0, 0, null);
 					
-					ng.drawImage(paintTexture, 
-							0 - (paintx % newImage.getWidth()), 
-							(0 - (painty % newImage.getHeight()) + newImage.getHeight()),
-							null);
-				}
-
-				// BRUSH TYPE
-				switch (editingContext.selectedBrushFilter()) {
-					case RADIAL_FALLOFF:
-						newImage = ImageProcessor.radialAlphaFalloff(newImage);
-					break;
+					int paintx = (Mouse.x - (paintTexture.getWidth() >> 1)) + editingContext.xOffset() * -1;
+					int painty = (Mouse.y - (paintTexture.getHeight() >> 1)) + editingContext.yOffset() * -1;
 					
-					case NONE:
-						// Do nothing
-					break;
-					
-					default:
-					break;
-				}
-				
-				// BLEND MODE
-				switch (editingContext.selectedBlendMode()) {
-					case OVERLAP:
-						// Do nothing
-					break;
-				
-					case MULTIPLY:
+					// create a new image which handles tiling
+					if (editingContext.tiledPaintingEnabled()) {
+						ng.drawImage(paintTexture, 
+								0 - (paintx % newImage.getWidth()), 
+								0 - (painty % newImage.getHeight()),
+								null);
 						
-						// FIXME out of bounds, blend mode
-						newImage = ImageProcessor.multiply(newImage, 
-								buffIm.getSubimage(paintx, painty, newImage.getWidth(), newImage.getHeight()));
-					break;
+						ng.drawImage(paintTexture, 
+								(0 - (paintx % newImage.getWidth()) + newImage.getWidth()), 
+								0 - (painty % newImage.getHeight()),
+								null);
+						
+						ng.drawImage(paintTexture, 
+								(0 - (paintx % newImage.getWidth()) + newImage.getWidth()), 
+								(0 - (painty % newImage.getHeight()) + newImage.getHeight()),
+								null);
+						
+						ng.drawImage(paintTexture, 
+								0 - (paintx % newImage.getWidth()), 
+								(0 - (painty % newImage.getHeight()) + newImage.getHeight()),
+								null);
+					}
+	
+					// BRUSH TYPE
+					switch (editingContext.selectedBrushFilter()) {
+						case RADIAL_FALLOFF:
+							newImage = ImageProcessor.radialAlphaFalloff(newImage);
+						break;
+						
+						case NONE:
+							// Do nothing
+						break;
+						
+						default:
+						break;
+					}
 					
-					case OVERLAY:
-						newImage = ImageProcessor.overlay(newImage, 0, 0, 
-								buffIm, paintx, painty, 
-								newImage.getWidth(), newImage.getHeight());
-					break;
+					// BLEND MODE
+					switch (editingContext.selectedBlendMode()) {
+						case OVERLAP:
+							// Do nothing
+						break;
 					
-					case SCREEN:
-					break;
+						case MULTIPLY:
+							
+							// FIXME out of bounds, blend mode
+							newImage = ImageProcessor.multiply(newImage, 
+									buffIm.getSubimage(paintx, painty, newImage.getWidth(), newImage.getHeight()));
+						break;
+						
+						case OVERLAY:
+							newImage = ImageProcessor.overlay(newImage, 0, 0, 
+									buffIm, paintx, painty, 
+									newImage.getWidth(), newImage.getHeight());
+						break;
+						
+						case SCREEN:
+						break;
+						
+						default:
+						break;
+					}
 					
-					default:
-					break;
+					newImage = ImageProcessor.setOpacity(newImage, editingContext.textureBrushOpacity());
+					buffG.drawImage(newImage, paintx, painty, null);
+				}
+			break;
+	
+			case MOVE_WORLD:
+				if (moveStartX == null) {
+					moveStartX = Mouse.x;
 				}
 				
-				newImage = ImageProcessor.setOpacity(newImage, editingContext.textureBrushOpacity());
-				buffG.drawImage(newImage, paintx, painty, null);
-			}
-		break;
-
-		case MOVE_WORLD:
-			if (moveStartX == null) {
-				moveStartX = Mouse.x;
-			}
-			
-			if (moveStartY == null) {
-				moveStartY = Mouse.y;
-			}
-
-			// detect a change and add it, what a might fine mess, but it works
-			if (Mouse.x - moveStartX != 0 
-					&& editingContext.xOffset() <= (getWidth() >> 1) &&
-					editingContext.xOffset() >= -1 * gameModel.worldWidthPixels() + (getWidth() >> 1)) {
-				editingContext.addToXOffset(Mouse.x - moveStartX);
-				moveStartX = Mouse.x;
-			} else if (editingContext.xOffset() >= (getWidth() >> 1)) {
-				editingContext.addToXOffset(-editingContext.xOffset() + (getWidth() >> 1));
-			} else if (editingContext.xOffset() <= -1 * gameModel.worldWidthPixels() + (getWidth() >> 1)) {
-				editingContext.addToXOffset(-editingContext.xOffset() + -1 * gameModel.worldWidthPixels() + (getWidth() >> 1));
-			}
-			
-			if (Mouse.y - moveStartY != 0 
-					&& editingContext.xOffset() <= (getHeight()) &&
-					editingContext.yOffset() >= -1 * gameModel.worldHeightPixels() + (getHeight() >> 1)) {
-				editingContext.addToYOffset(Mouse.y - moveStartY);
-				moveStartY = Mouse.y;
-			} else if (editingContext.yOffset() >= (getHeight() >> 1)) {
-				editingContext.addToYOffset(-editingContext.yOffset() + (getHeight() >> 1));
-			} else if (editingContext.yOffset() <= -1 * gameModel.worldHeightPixels() + (getHeight() >> 1)) {
-				editingContext.addToYOffset(-editingContext.yOffset() + -1 * gameModel.worldHeightPixels() + (getHeight() >> 1));
-			}
-
-			if (Keyboard.SPACE_BAR == KeyState.RELEASED) {
-				moveStartX = null;
-				moveStartY = null;
-				Keyboard.SPACE_BAR = KeyState.NOT_PRESSED;
-
-				editingContext.assignState(editingContext.previousState());
-			}
-		break;
-		
-		case ADD_SOUND:
-				if (Mouse.isLeftButtonClicked() && gameModel.assetLayers().size() != 0) {
-					Sound s = new Sound(editingContext.selectedSound());
-					s.setPosition(new Vector2f(Mouse.x - editingContext.xOffset(), 
-							Mouse.y - editingContext.yOffset()));
-					editingContext.selectedAssetLayer().addSound(s);
+				if (moveStartY == null) {
+					moveStartY = Mouse.y;
+				}
+	
+				// detect a change and add it, what a might fine mess, but it works
+				if (Mouse.x - moveStartX != 0 
+						&& editingContext.xOffset() <= (getWidth() >> 1) &&
+						editingContext.xOffset() >= -1 * gameModel.worldWidthPixels() + (getWidth() >> 1)) {
+					editingContext.addToXOffset(Mouse.x - moveStartX);
+					moveStartX = Mouse.x;
+				} else if (editingContext.xOffset() >= (getWidth() >> 1)) {
+					editingContext.addToXOffset(-editingContext.xOffset() + (getWidth() >> 1));
+				} else if (editingContext.xOffset() <= -1 * gameModel.worldWidthPixels() + (getWidth() >> 1)) {
+					editingContext.addToXOffset(-editingContext.xOffset() + -1 * gameModel.worldWidthPixels() + (getWidth() >> 1));
+				}
+				
+				if (Mouse.y - moveStartY != 0 
+						&& editingContext.xOffset() <= (getHeight()) &&
+						editingContext.yOffset() >= -1 * gameModel.worldHeightPixels() + (getHeight() >> 1)) {
+					editingContext.addToYOffset(Mouse.y - moveStartY);
+					moveStartY = Mouse.y;
+				} else if (editingContext.yOffset() >= (getHeight() >> 1)) {
+					editingContext.addToYOffset(-editingContext.yOffset() + (getHeight() >> 1));
+				} else if (editingContext.yOffset() <= -1 * gameModel.worldHeightPixels() + (getHeight() >> 1)) {
+					editingContext.addToYOffset(-editingContext.yOffset() + -1 * gameModel.worldHeightPixels() + (getHeight() >> 1));
+				}
+	
+				if (Keyboard.SPACE_BAR == KeyState.RELEASED) {
+					moveStartX = null;
+					moveStartY = null;
+					Keyboard.SPACE_BAR = KeyState.NOT_PRESSED;
+	
+					editingContext.assignState(editingContext.previousState());
 				}
 			break;
 			
-		default:
+			case ADD_SOUND:
+					if (Mouse.isLeftButtonClicked() && gameModel.assetLayers().size() != 0) {
+						Sound s = new Sound(editingContext.selectedSound());
+						s.setPosition(new Vector2f(Mouse.x - editingContext.xOffset(), 
+								Mouse.y - editingContext.yOffset()));
+						editingContext.selectedAssetLayer().addSound(s);
+					}
+			break;
+			
+			case ADD_SPAWN_POINT:
+				if (Mouse.isLeftButtonClicked() && gameModel.assetLayers().size() != 0) {
+					SpawnPoint sp = new SpawnPoint(editingContext.selectedSpawnPoint());
+					sp.setPosition(new Vector2f(Mouse.x - editingContext.xOffset(), 
+							Mouse.y - editingContext.yOffset()));
+					editingContext.selectedAssetLayer().addSpawnPoint(sp);
+				}
+			break;
+				
+			default:
 			break;
 		}
 	}
@@ -405,6 +419,33 @@ public class RenderPanel extends JComponent implements
 				g2d.drawImage(DefaultIcons.soundIcon.getImage(),
 					Mouse.x  - DefaultIcons.soundIcon.getIconWidth() / 2, 
 					Mouse.y - DefaultIcons.soundIcon.getIconHeight() / 2, null);
+			break;
+			
+			case ADD_SPAWN_POINT:
+				SpawnPoint sp = editingContext.selectedSpawnPoint();
+				ImageIcon chosenIcon = DefaultIcons.spawnIcon;
+				
+				if (sp != null) {
+					
+					switch (sp.team()) {
+						case 1:
+							chosenIcon = DefaultIcons.spawnIcon1;
+						break;
+						
+						case 2:
+							chosenIcon = DefaultIcons.spawnIcon2;
+						break;
+						
+						case 3:
+							chosenIcon = DefaultIcons.spawnIcon3;
+						break;
+					}
+					
+					g2d.drawImage(chosenIcon.getImage(),
+							Mouse.x  - chosenIcon.getIconWidth() / 2, 
+							Mouse.y - chosenIcon.getIconHeight() / 2, null);
+				}
+
 			break;
 	
 			default:
@@ -481,6 +522,9 @@ public class RenderPanel extends JComponent implements
 			case KeyEvent.VK_COMMA:
 				Keyboard.COMMA = KeyState.PRESSED;
 			break;
+			case KeyEvent.VK_S:
+				Keyboard.S = KeyState.PRESSED;
+			break;
 		}
 	}
 
@@ -499,6 +543,9 @@ public class RenderPanel extends JComponent implements
 			case KeyEvent.VK_COMMA:
 				Keyboard.COMMA = KeyState.RELEASED;
 			break;
+			case KeyEvent.VK_S:
+				Keyboard.S = KeyState.RELEASED;
+			break;
 		}
 	}
 
@@ -516,6 +563,9 @@ public class RenderPanel extends JComponent implements
 			break;
 			case KeyEvent.VK_COMMA:
 				Keyboard.COMMA = KeyState.TYPED;
+			break;
+			case KeyEvent.VK_S:
+				Keyboard.S = KeyState.TYPED;
 			break;
 		}
 	}

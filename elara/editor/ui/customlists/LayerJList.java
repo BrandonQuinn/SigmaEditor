@@ -44,8 +44,10 @@ public class LayerJList extends JList<Layer>
 			layerModel.addElement(layer);
 		}
 		
-		setSelectedIndex(0);
-		editingContext.setSelectedAssetLayer(layers.get(0));
+		if (!layerModel.isEmpty()) {
+			setSelectedIndex(0);
+			editingContext.setSelectedAssetLayer(layers.get(0));
+		}
 	}
 	
 	/* (non-Javadoc)

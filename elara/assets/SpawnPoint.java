@@ -6,6 +6,7 @@
 package elara.assets;
 
 import java.awt.Graphics2D;
+import javax.swing.ImageIcon;
 import org.joml.Vector2f;
 import elara.project.EditingContext;
 
@@ -23,19 +24,46 @@ public class SpawnPoint extends Entity
 		
 	}	
 	
+	/**
+	 * Copy constructor.
+	 * 
+	 * @param selectedSpawnPoint
+	 */
+	public SpawnPoint(SpawnPoint spawnPoint)
+	{
+		this.position = spawnPoint.position;
+		this.team = spawnPoint.team;
+	}
+
 	@Override
 	public void draw(int xOffset, int yOffset, Graphics2D g2d)
 	{
+		ImageIcon chosenIcon = DefaultIcons.spawnIcon;
+		
 		if (EditingContext.editingContext().gizmoRenderingEnabled()) {
-			int xpos = xOffset + (int)position.x - (DefaultIcons.soundIcon.getIconWidth() >> 1);
-			int ypos = yOffset + (int)position.y - (DefaultIcons.soundIcon.getIconHeight() >> 1);
+			int xpos = xOffset + (int)position.x - (DefaultIcons.spawnIcon.getIconWidth() >> 1);
+			int ypos = yOffset + (int)position.y - (DefaultIcons.spawnIcon.getIconHeight() >> 1);
 			
-			g2d.drawImage(DefaultIcons.soundIcon.getImage(), xpos, ypos, null);
+			switch (team) {
+				case 1:
+					chosenIcon = DefaultIcons.spawnIcon1;
+				break;
+				
+				case 2:
+					chosenIcon = DefaultIcons.spawnIcon2;
+				break;
+				
+				case 3:
+					chosenIcon = DefaultIcons.spawnIcon3;
+				break;
+			}
+			
+			g2d.drawImage(chosenIcon.getImage(), xpos, ypos, null);
 			
 			// setup and draw selection box
 			selectionBox.assignPosition(new Vector2f(xpos, ypos));
-			selectionBox.assignSize(DefaultIcons.soundIcon.getIconWidth(), 
-					DefaultIcons.soundIcon.getIconHeight());
+			selectionBox.assignSize(chosenIcon.getIconWidth(), 
+					chosenIcon.getIconHeight());
 			selectionBox.draw(xOffset, yOffset, g2d);
 		}
 	}

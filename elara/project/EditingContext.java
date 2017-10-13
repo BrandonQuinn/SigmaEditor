@@ -8,6 +8,7 @@ package elara.project;
 
 import elara.assets.Layer;
 import elara.assets.Sound;
+import elara.assets.SpawnPoint;
 import elara.assets.Texture;
 import elara.editor.imageprocessing.BlendMode;
 import elara.editor.imageprocessing.BrushFilter;
@@ -62,9 +63,14 @@ public class EditingContext
 		MOVE_WORLD,
 		
 		/**
-		 * Adding sounds to the game world
+		 * Adding sounds to the game world.
 		 */
-		ADD_SOUND
+		ADD_SOUND,
+		
+		/**
+		 * Adding spawn points to the game world.
+		 */
+		ADD_SPAWN_POINT
 	}
 	
 	private EditingState previousState = null;
@@ -114,6 +120,12 @@ public class EditingContext
 	 *===========================*/
 	
 	private Sound selectedSound;
+	
+	/*========================================*
+	 * ADD_SPAWN_POINT state fields           *
+	 *========================================*/
+	
+	private SpawnPoint selectedSpawnPoint;
 	
 	private Layer selectedAssetLayer;
 	
@@ -383,5 +395,22 @@ public class EditingContext
 	public void reset()
 	{
 		context = new EditingContext();
+	}
+
+	/**
+	 * @param spawnPoint
+	 */
+	public void assignSelectedSpawnPoint(SpawnPoint spawnPoint)
+	{
+		selectedSpawnPoint = spawnPoint;
+	}
+	
+	/**
+	 * Returns the currently selected spawn point.
+	 * @return
+	 */
+	public SpawnPoint selectedSpawnPoint()
+	{
+		return selectedSpawnPoint;
 	}
 }

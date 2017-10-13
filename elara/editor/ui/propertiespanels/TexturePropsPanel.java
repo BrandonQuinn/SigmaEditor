@@ -5,7 +5,6 @@
  */
 package elara.editor.ui.propertiespanels;
 
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -19,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
@@ -55,21 +53,16 @@ public class TexturePropsPanel extends JPanel
 	{
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		
-		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		add(scrollPane_1);
-		
-		JPanel borderPanel = new JPanel();
-		borderPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		scrollPane_1.setViewportView(borderPanel);
-		borderPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		JScrollPane scrollPane = new JScrollPane();
+		add(scrollPane);
 		
 		JPanel panel = new JPanel();
-		borderPanel.add(panel);
+		scrollPane.setViewportView(panel);
+		panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		GridBagLayout gbl_panel = new GridBagLayout();
-		gbl_panel.columnWidths = new int[]{0, 129, 0};
+		gbl_panel.columnWidths = new int[]{0, 130, 0};
 		gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0};
-		gbl_panel.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.columnWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 		
@@ -126,8 +119,8 @@ public class TexturePropsPanel extends JPanel
 		tiledPlacementChkBox.setSelected(editingContext.tiledPaintingEnabled());
 		tiledPlacementChkBox.addActionListener(this);
 		GridBagConstraints gbc_tiledPlacementChkBox = new GridBagConstraints();
+		gbc_tiledPlacementChkBox.fill = GridBagConstraints.HORIZONTAL;
 		gbc_tiledPlacementChkBox.insets = new Insets(0, 0, 5, 0);
-		gbc_tiledPlacementChkBox.anchor = GridBagConstraints.WEST;
 		gbc_tiledPlacementChkBox.gridx = 1;
 		gbc_tiledPlacementChkBox.gridy = 2;
 		panel.add(tiledPlacementChkBox, gbc_tiledPlacementChkBox);
@@ -145,7 +138,6 @@ public class TexturePropsPanel extends JPanel
 		opacitySpinner.setModel(new SpinnerNumberModel(100, 0, 100, 1));
 		
 		int value = (Integer) opacitySpinner.getValue();
-		editingContext.assignTextureBrushOpacity(value / 100.0f);
 		
 		GridBagConstraints gbc_opacitySpinner = new GridBagConstraints();
 		gbc_opacitySpinner.fill = GridBagConstraints.HORIZONTAL;
@@ -170,6 +162,7 @@ public class TexturePropsPanel extends JPanel
 		gbc_spinner.gridx = 1;
 		gbc_spinner.gridy = 4;
 		panel.add(spinner, gbc_spinner);
+		editingContext.assignTextureBrushOpacity(value / 100.0f);
 	}
 
 	/* (non-Javadoc)

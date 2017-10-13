@@ -7,11 +7,13 @@ package elara.editor.ui.customlists;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+import javax.swing.border.EmptyBorder;
 import elara.assets.Texture;
 import elara.editor.debug.LogType;
 import elara.editor.debug.StaticLogs;
@@ -25,8 +27,8 @@ public class TextureListRenderer extends JLabel implements ListCellRenderer<Text
 {
 	private static final long serialVersionUID = 1L;
 	
-	private static final int TEXTURE_WIDTH = 64;
-	private static final int TEXTURE_HEIGHT = 64;
+	private static final int TEXTURE_WIDTH = 32;
+	private static final int TEXTURE_HEIGHT = 32;
 	
 	public TextureListRenderer()
 	{
@@ -43,6 +45,7 @@ public class TextureListRenderer extends JLabel implements ListCellRenderer<Text
 			boolean isSelected,
 			boolean cellHasFocus)
 	{
+		
 		
 		// get the texture at a specific size
 		BufferedImage scaledImage = texture.scaledTo(TEXTURE_WIDTH, TEXTURE_HEIGHT);
@@ -62,7 +65,10 @@ public class TextureListRenderer extends JLabel implements ListCellRenderer<Text
 			setBackground(list.getBackground());
 			setForeground(Color.BLACK);
 		}
-				
+		
+		setPreferredSize(new Dimension(220, TEXTURE_HEIGHT + 2));
+		setBorder(new EmptyBorder(1, 1, 1, 1));
+		
 		return this;
 	}
 	

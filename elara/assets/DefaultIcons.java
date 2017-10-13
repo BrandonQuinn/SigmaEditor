@@ -45,6 +45,10 @@ public class DefaultIcons
 	 */
 	
 	public static ImageIcon soundIcon;
+	public static ImageIcon spawnIcon;
+	public static ImageIcon spawnIcon1;
+	public static ImageIcon spawnIcon2;
+	public static ImageIcon spawnIcon3;
 	public static ImageIcon newLayerIcon;
 	public static ImageIcon deleteLayerIcon;
 	public static ImageIcon textureLayersIcon;
@@ -61,9 +65,15 @@ public class DefaultIcons
 	
 	public static ImageIcon windowIcon;
 
+	
+
 	// check if icons exist otherwise set them to the blank icon
 	static {
 		soundIcon = new ImageIcon("res/icons/sound.png");
+		spawnIcon = new ImageIcon("res/icons/spawn.png");
+		spawnIcon1 = new ImageIcon("res/icons/spawn1.png");
+		spawnIcon2 = new ImageIcon("res/icons/spawn2.png");
+		spawnIcon3 = new ImageIcon("res/icons/spawn3.png");
 		newLayerIcon = new ImageIcon("res/icons/newLayer.png");
 		deleteLayerIcon = new ImageIcon("res/icons/deleteLayer.png");
 		textureLayersIcon = new ImageIcon("res/icons/textureLayers.png");
@@ -79,6 +89,26 @@ public class DefaultIcons
 		File testFile = new File("res/icons/sound.png");
 		if (!testFile.exists()) {
 			soundIcon.setImage(BLANK_ICON_32);
+		}
+		
+		testFile = new File("res/icons/spawn.png");
+		if (!testFile.exists()) {
+			spawnIcon.setImage(BLANK_ICON_32);
+		}
+		
+		testFile = new File("res/icons/spawn1.png");
+		if (!testFile.exists()) {
+			spawnIcon1.setImage(BLANK_ICON_32);
+		}
+		
+		testFile = new File("res/icons/spawn2.png");
+		if (!testFile.exists()) {
+			spawnIcon2.setImage(BLANK_ICON_32);
+		}
+		
+		testFile = new File("res/icons/spawn3.png");
+		if (!testFile.exists()) {
+			spawnIcon3.setImage(BLANK_ICON_32);
 		}
 		
 		testFile = new File("res/icons/newLayer.png");

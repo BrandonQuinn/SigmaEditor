@@ -46,8 +46,13 @@ public class Layer implements Drawable
 	public void draw(int xOffset, int yOffset, Graphics2D g2d)
 	{
 		// render sound gizmo
-		for (Sound sound : sounds) {
+		for (Sound sound: sounds) {
 			sound.draw(xOffset, yOffset, g2d);
+		}
+		
+		// render spawn point gizmo
+		for (SpawnPoint spawnPoint: spawnPoints) {
+			spawnPoint.draw(xOffset, yOffset, g2d);
 		}
 	}
 	
