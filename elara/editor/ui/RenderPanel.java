@@ -184,6 +184,9 @@ public class RenderPanel extends JComponent implements
 			
 			case ADD_SOUND:
 			break;
+
+			case ADD_SPAWN_POINT:
+			break;
 			
 			default:
 			break;
@@ -204,14 +207,26 @@ public class RenderPanel extends JComponent implements
 	{
 		switch (editingContext.state()) {
 			case SELECT:
+
+				if (Mouse.isLeftButtonDown() && AssetSelector.isMouseOnSelection()) {
+					AssetSelector.moveSelection();
+				} else {
+					AssetSelector.checkSelections(selectionRectangle.rectangle());
+					selectionRectangle.draw(g2d);
+				}
 				
-				if (Mouse.isLeftButtonDown()) {
+				if (Mouse.isLeftButtonClicked()) {
+					if (!AssetSelector.isMouseOnSelection()) {
+						AssetSelector.deselectAll();
+					}
+					
 					AssetSelector.checkSelections(Mouse.x, Mouse.y);
 				}
 				
-				selectionRectangle.draw(g2d);
-				AssetSelector.checkSelections(selectionRectangle.rectangle());
-				
+				if (!Mouse.isLeftButtonDown()) {
+					AssetSelector.resetMouseStart();
+				}
+
 			break;
 	
 			case TEXTURE_PAINT:

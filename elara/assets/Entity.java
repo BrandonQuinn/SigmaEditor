@@ -32,4 +32,13 @@ public abstract class Entity
 	{
 		this.position = pos;
 	}
+	
+	/**
+	 * Returns whether or not this object has been selected.
+	 * @return
+	 */
+	public boolean isSelected()
+	{
+		return isSelected;
+	}
 }
