@@ -20,4 +20,13 @@ public class Entity
 	{
 		return position;
 	}
+	
+	/**
+	 * Sets the position of the sound.
+	 * @param vector2f
+	 */
+	public void setPosition(Vector2f pos)
+	{
+		this.position = pos;
+	}
 }

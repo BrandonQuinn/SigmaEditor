@@ -24,9 +24,14 @@ public class Layer
 	private String name = "Untitled";
 	
 	/**
-	 * List of sounds on this layer
+	 * List of sounds on this layer.
 	 */
 	private ArrayList<Sound> sounds = new ArrayList<Sound>();
+	
+	/**
+	 * List of spawn points on this later.
+	 */
+	private ArrayList<SpawnPoint> spawnPoints = new ArrayList<SpawnPoint>();
 
 	public Layer(String name)
 	{
@@ -79,5 +84,33 @@ public class Layer
 	{
 		if (s != null)
 			sounds.add(s);
+	}
+	
+	/**
+	 * Get all the sounds on this layer.
+	 * @return
+	 */
+	public ArrayList<Sound> sounds()
+	{
+		return sounds;
+	}
+	
+	/**
+	 * Add a spawn point to this layer.
+	 * @param new spawn point 
+	 */
+	public void addSpawnPoint(SpawnPoint sp)
+	{
+		if (sp != null)
+			spawnPoints.add(sp);
+	}
+	
+	/**
+	 * Get all the spawn point on this layer.
+	 * @return
+	 */
+	public ArrayList<SpawnPoint> spawnPoints()
+	{
+		return spawnPoints;
 	}
 }

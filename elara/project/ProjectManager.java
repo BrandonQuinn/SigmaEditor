@@ -18,11 +18,14 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
+import org.joml.Vector2f;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import elara.assets.Layer;
 import elara.assets.Sound;
+import elara.assets.SpawnPoint;
 import elara.assets.Texture;
 import elara.editor.debug.LogType;
 import elara.editor.debug.SigmaException;
@@ -181,22 +184,20 @@ public class ProjectManager
 	 * functional for editing.
 	 * 
 	 * @param projectLocation
-	 * @param editingContext
-	 * @param projectContext
 	 * @throws SigmaException
 	 * @throws ParseException 
 	 * @throws IOException 
 	 * @throws FileNotFoundException 
 	 */
-	public void open(String projectLocation) throws SigmaException, FileNotFoundException, IOException, ParseException
+	public void open(String projectLocation) throws SigmaException, 
+		FileNotFoundException, 
+		IOException, 
+		ParseException
 	{
 		StaticLogs.debug.log(LogType.INFO, "Opening project at: " + projectLocation);
 
 		// create the parser and read the file
-		JSONParser parser = new JSONParser();
-		Object obj = parser.parse(new FileReader(projectLocation + "/"
-				+ ProjectStructure.CONFIG_FILE));
-		JSONObject jsonObject = (JSONObject) obj;
+		JSONObject jsonObject = JSON.read(projectLocation + "/" + ProjectStructure.CONFIG_FILE);
 
 		String projectName = (String) jsonObject.get("projectName");
 		int worldWidth = ((Long) jsonObject.get("worldWidth")).intValue();
@@ -207,7 +208,10 @@ public class ProjectManager
 		gameModel.assignWorldWidth(worldWidth);
 		gameModel.assignWorldHeight(worldHeight);
 		
-		// load textures
+		/*==========================================*
+		 * Load Placeable Textures                  *
+		 *==========================================*/
+
 		JSONArray textureArray = (JSONArray) jsonObject.get("textureList");
 		
 		for (int i = 0; i < textureArray.size(); i++) {
@@ -228,14 +232,16 @@ public class ProjectManager
 			}
 		}
 		
-		// load sounds
+		/*==========================================*
+		 * Load Placeable Sounds                    *
+		 *==========================================*/
+
 		JSONArray soundArray = (JSONArray) jsonObject.get("soundList");
 		
 		for (int i = 0; i < soundArray.size(); i++) {
 			JSONObject soundInfo = (JSONObject) soundArray.get(i);
 			String soundName = (String) soundInfo.get("name");
 			String soundFilename = (String) soundInfo.get("filename");
-			
 			File soundFile = new File(projectLocation + "/assets/sounds/" + soundFilename);
 
 			// check if the file exists and then add it
@@ -249,7 +255,10 @@ public class ProjectManager
 			}
 		}
 		
-		// load background textures
+		/*==========================================*
+		 * Load Ground Textures                     *
+		 *==========================================*/
+		
 		JSONArray bgTextureList = (JSONArray) jsonObject.get("textureLayers");
 		
 		for (int i = 0; i < bgTextureList.size(); i++) {
@@ -265,16 +274,74 @@ public class ProjectManager
 
 				/* 
 				 	Ok so... there's a reason for literally copying the image we just read...
-					for some reason the image loaded by ImageIO.read() take forever to draw on
+					for some reason the image loaded by ImageIO.read() takes forever to draw on
 					for example, when texture painting, it takes nearly twice as long.
 					So for that reason I copy it to a new image. It probably has something
 					to do with the format.
+					
+					Extra notes: after some research, it seems that it may be not getting
+					hardware accelerated for some reason. Honestly I didn't know any of 
+					this was hardware accelerated until recently. Java is very difficult to
+					predict when doing graphics. Perhaps thats why it' a bad idea. :P
 				*/
 				BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(),
 						BufferedImage.TYPE_INT_ARGB);
 				newImage.setAccelerationPriority(1.0f);
 				ImageProcessor.overlap(newImage, 0, 0, image, 0, 0, image.getWidth(), image.getHeight());
 				gameModel.groundTextureLayers().add(texIndex, newImage);
+				editingContext.setSelectedGroundTextureLayer(i);
+			}
+		}
+		
+		/*==========================================*
+		 * Load Asset Layers                        *
+		 *==========================================*/
+
+		JSONArray jsonLayerList = (JSONArray) jsonObject.get("assetLayers");
+		
+		if (jsonLayerList.size() > 0 && jsonLayerList.get(0) != null) {
+			Layer tmpLayer = null;
+			Sound tmpSound = null;
+			SpawnPoint tmpSP = null;
+			JSONObject currentJSONLayer = null;
+			JSONArray soundJSONList = null;
+			JSONObject tmpJSONSound = null;
+			JSONArray spJSONList = null;
+			JSONObject tmpJSONsp = null;
+			for (int i = 0; i < jsonLayerList.size(); i++) {
+				
+				// create the layer
+				currentJSONLayer = (JSONObject) jsonLayerList.get(i);
+				String name = (String) currentJSONLayer.get("name");
+				int layerIndex = ((Long) currentJSONLayer.get("index")).intValue();
+				tmpLayer = new Layer(name);
+				gameModel.assetLayers().add(layerIndex, tmpLayer);
+				
+				// Sounds: read in all the sounds and add them to their respective layer
+				soundJSONList = (JSONArray) currentJSONLayer.get("sounds");
+				for (int s = 0; s < soundJSONList.size(); s++) {
+					tmpJSONSound = (JSONObject) soundJSONList.get(s);
+					String soundName = (String) tmpJSONSound.get("name");
+					String soundFilename = (String) tmpJSONSound.get("filename");
+					float xpos = ((Double) tmpJSONSound.get("xpos")).floatValue();
+					float ypos = ((Double) tmpJSONSound.get("ypos")).floatValue();
+					tmpSound = new Sound(soundName, soundFilename);
+					tmpSound.setPosition(new Vector2f(xpos, ypos));
+					tmpLayer.addSound(tmpSound);
+				}
+				
+				// Spawn Points: read in all the spawn points and add them to the current layer
+				spJSONList = (JSONArray) currentJSONLayer.get("spawnPoints");
+				for (int s = 0; s < spJSONList.size(); s++) {
+					tmpJSONsp = (JSONObject) spJSONList.get(s);
+					int spTeam = ((Long) tmpJSONsp.get("team")).intValue();
+					float xpos = ((Double) tmpJSONsp.get("xpos")).floatValue();
+					float ypos = ((Double) tmpJSONsp.get("ypos")).floatValue();
+					tmpSP = new SpawnPoint();
+					tmpSP.assignTeam(spTeam);
+					tmpSP.setPosition(new Vector2f(xpos, ypos));
+					tmpLayer.addSpawnPoint(tmpSP);
+				}
 			}
 		}
 		
@@ -292,7 +359,7 @@ public class ProjectManager
 	 * @throws NullPointerException
 	 */
 	@SuppressWarnings("unchecked")
-	public void saveProject() throws SigmaException, 
+	public void save() throws SigmaException, 
 		FileNotFoundException, 
 		IOException, 
 		ParseException,
@@ -302,10 +369,12 @@ public class ProjectManager
 			ArrayList<BufferedImage> textureLayers = gameModel.groundTextureLayers();
 			
 			// read the configuration json file
-			JSONParser parser = new JSONParser();
-			Object obj = parser.parse(new FileReader(projectContext.projectPath() 
-					+ "/" + ProjectStructure.CONFIG_FILE));
-			JSONObject jsonObject = (JSONObject) obj;
+			JSONObject jsonObject = JSON.read(projectContext.projectPath() 
+					+ "/" + ProjectStructure.CONFIG_FILE);
+			
+			/*==========================================*
+			 * Save Ground Texture Layers               *
+			 *==========================================*/
 			
 			// add ground textures to json
 			JSONArray textureLayersList = (JSONArray) jsonObject.get("textureLayers");
@@ -326,13 +395,63 @@ public class ProjectManager
 				textureLayersList.add(listItem);
 			}
 			
+			/*==========================================*
+			 * Save Asset Layers                        *
+			 *==========================================*/
+			
+			ArrayList<Layer> layers = gameModel.assetLayers();
+			JSONArray jsonAssetLayers = (JSONArray) jsonObject.get("assetLayers");
+			jsonAssetLayers.clear();
+			
+			Layer currentLayer = null;
+			JSONObject tmpJSONLayer = null;
+			JSONArray tmpSoundList = null;
+			JSONObject tmpSound = null;
+			JSONArray tmpSpawnPointList = null;
+			JSONObject tmpSpawnPoint = null;
+			
+			for (int i = 0; i < layers.size(); i++) {
+				currentLayer = layers.get(i);
+				
+				tmpJSONLayer = new JSONObject();
+				tmpJSONLayer.put("index", i);
+				tmpJSONLayer.put("name", currentLayer.name());
+				
+				//  Sounds: add sounds to the list the sounds and add it to the layer
+				tmpSoundList = new JSONArray();
+				for (int s = 0; s < currentLayer.sounds().size(); s++) {
+					Sound sound = currentLayer.sounds().get(s);
+					tmpSound = new JSONObject();
+					tmpSound.put("name", sound.name());
+					tmpSound.put("filename", sound.filename());
+					tmpSound.put("xpos", sound.position().x);
+					tmpSound.put("ypos", sound.position().y);
+					tmpSoundList.add(tmpSound);
+					
+				}
+				tmpJSONLayer.put("sounds", tmpSoundList);
+				
+				// Spawn Points: add spawn points to the list the spawn points and add it to the layer
+				tmpSpawnPointList = new JSONArray();
+				for (int s = 0; s < currentLayer.spawnPoints().size(); s++) {
+					SpawnPoint sp = currentLayer.spawnPoints().get(s);
+					tmpSpawnPoint = new JSONObject();
+					tmpSpawnPoint.put("team", sp.team());
+					tmpSpawnPoint.put("xpos", sp.position().x);
+					tmpSpawnPoint.put("ypos", sp.position().y);
+					tmpSpawnPointList.add(tmpSpawnPoint);
+					
+				}
+				tmpJSONLayer.put("spawnPoints", tmpSpawnPointList);
+				
+				jsonAssetLayers.add(tmpJSONLayer);
+			}
+			
 			JSON.write(jsonObject, projectContext.projectPath() 
 					+ "/" + ProjectStructure.CONFIG_FILE);
 		} else {
 			throw new SigmaException("No project loaded.");
 		}
-		
-		
 	}
 	
 	/**
@@ -372,9 +491,8 @@ public class ProjectManager
 		}
 		
 		// add the texture to the project configuration
-		JSONParser parser = new JSONParser();
 		try {
-			JSONObject configObj = (JSONObject) parser.parse(new FileReader(configFile));
+			JSONObject configObj = JSON.read(configFile);
 			JSONArray textureList = (JSONArray) configObj.get("textureList");
 			JSONObject newTexObj = new JSONObject();
 			newTexObj.put("name", name);
@@ -382,7 +500,7 @@ public class ProjectManager
 			textureList.add(newTexObj);
 			
 			// write out
-			Files.write(configFile.toPath(), JSONFormatter.makePretty(configObj.toJSONString()).getBytes(), StandardOpenOption.WRITE);
+			JSON.write(configObj, configFile.getAbsolutePath());
 		} catch (IOException | ParseException e) {
 			StaticLogs.debug.log(LogType.ERROR, "Failed to add texture '" + textureFile.getAbsolutePath() 
 					+ "' to project configuration");
@@ -431,7 +549,6 @@ public class ProjectManager
 	}
 
 	/**
-	 * @param soundName
 	 * @param sourceSoundFile
 	 * @throws SigmaException 
 	 */
@@ -473,7 +590,9 @@ public class ProjectManager
 			soundList.add(newTexObj);
 			
 			// write out
-			Files.write(configFile.toPath(), JSONFormatter.makePretty(configObj.toJSONString()).getBytes(), StandardOpenOption.WRITE);
+			Files.write(configFile.toPath(),
+					JSONFormatter.makePretty(configObj.toJSONString()).getBytes(),
+					StandardOpenOption.WRITE);
 		} catch (IOException | ParseException e) {
 			StaticLogs.debug.log(LogType.ERROR, "Failed to add sound '" + sourceSoundFile.getAbsolutePath() 
 					+ "' to project configuration");

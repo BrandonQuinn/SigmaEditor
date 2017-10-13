@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -35,7 +35,7 @@ import elara.project.ProjectContext;
  * Description: Displays a list of texture layers and
  * gives controls to modfy them like creation or deletion.
  */
-public class TextureLayerDialog extends JDialog 
+public class TextureLayerDialog extends JFrame 
 	implements ActionListener, ListSelectionListener
 {
 	private static final long serialVersionUID = 1L;
@@ -65,6 +65,7 @@ public class TextureLayerDialog extends JDialog
 		setBounds(100, 100, 262, 360);
 		getContentPane().setLayout(new BorderLayout());
 		setLocationRelativeTo(null);
+		setAlwaysOnTop(true);
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.X_AXIS));

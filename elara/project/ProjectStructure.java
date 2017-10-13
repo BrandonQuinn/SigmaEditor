@@ -20,14 +20,21 @@ public class ProjectStructure
 	/**
 	 * Default project configuration JSON format.
 	 */
-	public static final String CONFIG_JSON_TEMPLATE = "{\n" + 
-				"\t\"projectName\": \"Untitled\",\n" + 
-				"\t\"worldWidth\": 100,\n" + 
+	public static final String CONFIG_JSON_TEMPLATE =
+			"{\n" +
+				"\t\"projectName\": \"Untitled\",\n" +
+				"\t\"worldWidth\": 100,\n" +
 				"\t\"worldHeight\": 100,\n" + 
 				"\t\"creationDate\": \"\",\n" +
 				"\t\"textureList\": [],\n" +
 				"\t\"soundList\": []" +
 				"\t\"textureLayers\": []," +
+				"\t\"assetLayers\": [" +
+					"\t\t\"\"{" +
+						"\t\t\t\"sounds\": []" +
+						"\t\t\t\"spawnPoints\": []" +
+					"\t\t}" +
+				"\t]," +
 			"}";
 	
 	/**

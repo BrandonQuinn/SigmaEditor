@@ -68,6 +68,7 @@ public class MainWindow extends JFrame implements
 	private JScrollPane leftScrollPane;
 	private JPanel propertiesPanel;
 	private TexturePropsPanel texturePropertiesPanel;
+	private AssetTreePanel assetTreePanel;
 	
 	/**
 	 * Buttons
@@ -195,6 +196,7 @@ public class MainWindow extends JFrame implements
 
 		// init combo box
 		comboBox.addItem("Texture Painting");
+		comboBox.addItem("Decals");
 		comboBox.addItem("Sound");
 		
 		leftSideNorthPanel.add(comboBox,BorderLayout.NORTH);
@@ -249,6 +251,9 @@ public class MainWindow extends JFrame implements
 		JPanel layerPanel = new JPanel();
 		rightSplitPane.setLeftComponent(layerPanel);
 		layerPanel.setLayout(new BorderLayout(0, 0));
+		
+		assetTreePanel = new AssetTreePanel();
+		rightSplitPane.setRightComponent(assetTreePanel);
 
 		JToolBar layerToolBar = new JToolBar();
 		layerToolBar.setFloatable(false);
@@ -394,13 +399,11 @@ public class MainWindow extends JFrame implements
 			waitingDialog.setVisible(true);
 			
 			try {
-				projectManager.saveProject();
+				projectManager.save();
 			} catch (SigmaException | IOException | ParseException | NullPointerException ex) {
 				waitingDialog.setVisible(false);
-				
 				StaticLogs.debug.log(LogType.CRITICAL,
 						"Failed to save project: " + ex.getMessage());
-				
 				JOptionPane.showMessageDialog(null,
 						"Failed to save project: " + ex.getMessage()
 								+ "\nCheck the logs.",
@@ -427,7 +430,6 @@ public class MainWindow extends JFrame implements
 
 				int fcResponse = fc.showOpenDialog(null);
 				if (fcResponse == JFileChooser.APPROVE_OPTION) {
-					
 					File selectedImage = fc.getSelectedFile();
 					String texName = JOptionPane.showInputDialog(null,
 							"Enter the name of the texture",
@@ -439,7 +441,6 @@ public class MainWindow extends JFrame implements
 						Texture loadedTexture = AssetLoader.loadTexture(texName, selectedImage);
 						textureList.addTexture(loadedTexture);
 						projectManager.addTexture(texName, selectedImage);
-						
 					} catch (IOException | SigmaException e2) {
 						JOptionPane.showMessageDialog(null,
 								"Failed to load texture",
@@ -536,9 +537,10 @@ public class MainWindow extends JFrame implements
 				Layer newLayer = new Layer(name);
 				gameModel.addAssetLayer(newLayer);
 				layerList.addLayer(newLayer);
+				layerList.setSelectedIndex(layerList.getModel().getSize() - 1);
 				editingContext.setSelectedAssetLayer(newLayer);
 			} else {
-				JOptionPane.showMessageDialog(this, "No project loaded", "No project", 
+				JOptionPane.showMessageDialog(this, "No project loaded", "No project",
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 		}
@@ -547,6 +549,7 @@ public class MainWindow extends JFrame implements
 			if (gameModel.assetLayers().size() > 0 && layerList.getSelectedIndex() != -1) {
 				gameModel.assetLayers().remove(layerList.getSelectedIndex());
 				layerList.removeLayer(layerList.getSelectedIndex());
+				layerList.setSelectedIndex(layerList.getModel().getSize() - 1);
 			}
 		} 
 		

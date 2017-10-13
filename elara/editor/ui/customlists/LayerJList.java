@@ -5,6 +5,7 @@
  */
 package elara.editor.ui.customlists;
 
+import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
@@ -36,6 +37,15 @@ public class LayerJList extends JList<Layer>
 		setCellRenderer(new LayerListRenderer());
 		addListSelectionListener(this);
 		setModel(layerModel);
+		
+		ArrayList<Layer> layers = gameModel.assetLayers();
+		
+		for (Layer layer : layers) {
+			layerModel.addElement(layer);
+		}
+		
+		setSelectedIndex(0);
+		editingContext.setSelectedAssetLayer(layers.get(0));
 	}
 	
 	/* (non-Javadoc)

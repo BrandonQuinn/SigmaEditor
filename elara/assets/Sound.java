@@ -5,8 +5,6 @@
  */
 package elara.assets;
 
-import org.joml.Vector2f;
-
 /**
  * Sound
  *
@@ -55,14 +53,5 @@ public class Sound extends Entity
 	public String filename()
 	{
 		return filename;
-	}
-
-	/**
-	 * Sets the position of the sound.
-	 * @param vector2f
-	 */
-	public void setPosition(Vector2f pos)
-	{
-		this.position = pos;
 	}
 }
