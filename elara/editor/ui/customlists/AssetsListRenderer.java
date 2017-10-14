@@ -54,6 +54,10 @@ implements ListCellRenderer<Entity>
 			setForeground(Color.BLACK);
 		}
 		
+		if (entity.isSelected()) {
+			setBackground(new Color(46, 211, 74));
+		}
+		
 		setPreferredSize(new Dimension(120, 15));
 		
 		return this;

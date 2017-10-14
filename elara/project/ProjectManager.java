@@ -298,7 +298,7 @@ public class ProjectManager
 
 		JSONArray jsonLayerList = (JSONArray) jsonObject.get("assetLayers");
 		
-		if (jsonLayerList.size() > 0 && jsonLayerList.get(0) != null) {
+		if (jsonLayerList!= null && jsonLayerList.size() > 0 && jsonLayerList.get(0) != null) {
 			Layer tmpLayer = null;
 			Sound tmpSound = null;
 			SpawnPoint tmpSP = null;

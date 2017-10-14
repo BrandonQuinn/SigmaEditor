@@ -159,29 +159,21 @@ public class AssetSelector
 			startY = Mouse.y;
 		}
 		
-		System.out.println("START");
-		
 		// go through all entities and move them the amount 
 		// the mouse has moved
 		for (Entity entity : selEnt.values()) {
 			
-			System.out.println("Moving: " + entity.toString());
-			System.out.println("amount x: " + (Mouse.x - startX));
-			System.out.println("amount y: " + (Mouse.y - startY));
-			
 			if (Mouse.x - startX != 0) {
-				entity.position = entity.position.add(Mouse.x - startX, 0.0f);
+				entity.position.add(Mouse.x - startX, 0.0f);
 			}
 			
 			if (Mouse.y - startY != 0) {
-				entity.position = entity.position.add(0.0f, Mouse.y - startY);
+				entity.position.add(0.0f, Mouse.y - startY);
 			}
 		}
 		
 		startX = Mouse.x;
 		startY = Mouse.y;
-		
-		System.out.println("BREAK");
 	}
 	
 	/**

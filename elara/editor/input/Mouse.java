@@ -70,4 +70,17 @@ public class Mouse
 		
 		return false;
 	}
+
+	/**
+	 * @return
+	 */
+	public static boolean isMiddleButtonClicked()
+	{
+		if (middleButton == MouseState.CLICKED) {
+			middleButton = MouseState.NOT_PRESSED;
+			return true;
+		}
+		
+		return false;
+	}
 }

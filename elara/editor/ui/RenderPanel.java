@@ -104,7 +104,6 @@ public class RenderPanel extends JComponent implements
 		handleInput();
 		drawMouseCursor(g2d);
 		handleEditingState(g2d);
-		
 		drawDebugInfo(g2d);
 
 		RenderStats.frameTime = System.currentTimeMillis() - time;
@@ -217,7 +216,7 @@ public class RenderPanel extends JComponent implements
 			case SELECT:
 
 				// click and hold down on non-selection
-				if (Mouse.isLeftButtonClicked() && !selectionRectangle.isDrawn() && !AssetSelector.isMouseOnSelection()) {
+				if (Mouse.isLeftButtonDown() && !selectionRectangle.isDrawn() && !AssetSelector.isMouseOnSelection()) {
 					// deselect all
 					AssetSelector.deselectAll();
 					// check selection at this point
@@ -236,6 +235,10 @@ public class RenderPanel extends JComponent implements
 				
 				if (!Mouse.isLeftButtonDown() && !selectionRectangle.isDrawn()) {
 					AssetSelector.resetMouseStart();
+				}
+				
+				if (Mouse.isLeftButtonClicked()) {
+					mainWindow.evaluateState();
 				}
 				
 			break;
@@ -360,12 +363,11 @@ public class RenderPanel extends JComponent implements
 				} else if (editingContext.yOffset() <= -1 * gameModel.worldHeightPixels() + (getHeight() >> 1)) {
 					editingContext.addToYOffset(-editingContext.yOffset() + -1 * gameModel.worldHeightPixels() + (getHeight() >> 1));
 				}
-	
+				
 				if (Keyboard.SPACE_BAR == KeyState.RELEASED) {
 					moveStartX = null;
 					moveStartY = null;
-					Keyboard.SPACE_BAR = KeyState.NOT_PRESSED;
-	
+					Keyboard.SPACE_BAR = KeyState.NOT_PRESSED;	
 					editingContext.assignState(editingContext.previousState());
 				}
 			break;
@@ -508,6 +510,14 @@ public class RenderPanel extends JComponent implements
 	public void mouseEntered(MouseEvent e)
 	{
 		grabFocus();
+		
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			Mouse.setLeftButtonState(MouseState.NOT_PRESSED);
+		} else if (e.getButton() == MouseEvent.BUTTON2) {
+			Mouse.setMiddleButtonState(MouseState.NOT_PRESSED);
+		} else if (e.getButton() == MouseEvent.BUTTON3) {
+			Mouse.setRightButtonState(MouseState.NOT_PRESSED);
+		}
 	}
 
 	@Override

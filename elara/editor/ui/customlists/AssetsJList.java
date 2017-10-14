@@ -43,7 +43,7 @@ public class AssetsJList extends JList<Entity>
 	public void valueChanged(ListSelectionEvent lse)
 	{
 		if (getSelectedIndex() != -1) {
-			getSelectedValue().setSelected(true);
+			model.get(getSelectedIndex()).setSelected(true);
 		}
 	}
 	

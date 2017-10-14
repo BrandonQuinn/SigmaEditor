@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -23,7 +24,9 @@ import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.json.simple.parser.ParseException;
+import elara.assets.AssetSelector;
 import elara.assets.DefaultIcons;
+import elara.assets.Entity;
 import elara.assets.Layer;
 import elara.assets.Sound;
 import elara.assets.Texture;
@@ -593,6 +596,35 @@ public class MainWindow extends JFrame implements
 	{
 		switch(editingContext.state()) {
 			case SELECT:
+				
+				/*
+				 * This nice little feature makes sure that if we are in select mode
+				 * and selection objects that we can modify the properties of
+				 * any single selected entity.
+				 * 
+				 * It will replace the properties panel to be for the currently selected
+				 * object.
+				 * 
+				 * Perhaps I'll soo make it so that as long as the entities
+				 * selected are all the same then you can en-masse change properties
+				 * of all selected entities.
+				 */
+				Iterator<Entity> iter = AssetSelector.selectedEntities().iterator();
+				if (AssetSelector.selectedEntities().size() == 1) {
+					Entity entity = iter.next();
+					
+					if (entity instanceof Sound) {
+						propertiesPanel.removeAll();
+						propertiesPanel.add(soundPropertiesPanel, BorderLayout.CENTER);
+						propertiesPanel.updateUI();
+						editingContext.setSelectedSound((Sound)entity);
+					} else {
+						propertiesPanel.removeAll();
+						propertiesPanel.add(new JPanel(), BorderLayout.CENTER);
+						propertiesPanel.updateUI();
+					}
+				}
+				
 			break;
 			
 			case TEXTURE_PAINT:
@@ -616,7 +648,7 @@ public class MainWindow extends JFrame implements
 			default:
 			break;
 		}
-		
+
 		assetsList.loadFromContext();
 		texturePropertiesPanel.assignOpacity((int)(editingContext.textureBrushOpacity() * 100.0f));
 	}
