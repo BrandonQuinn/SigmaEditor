@@ -9,6 +9,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import elara.assets.AssetSelector;
 import elara.assets.Entity;
 import elara.project.EditingContext;
 
@@ -44,6 +45,7 @@ public class AssetsJList extends JList<Entity>
 	{
 		if (getSelectedIndex() != -1) {
 			model.get(getSelectedIndex()).setSelected(true);
+			AssetSelector.manualSelectEntity(model.get(getSelectedIndex()));
 		}
 	}
 	

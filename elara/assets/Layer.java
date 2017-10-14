@@ -35,6 +35,11 @@ public class Layer implements Drawable
 	 */
 	private ArrayList<SpawnPoint> spawnPoints = new ArrayList<SpawnPoint>();
 
+	/**
+	 * Should we render this layer?
+	 */
+	private boolean isRendered = true;
+	
 	public Layer(String name)
 	{
 		this.name = name;
@@ -50,9 +55,11 @@ public class Layer implements Drawable
 	@Override
 	public void draw(int xOffset, int yOffset, Graphics2D g2d)
 	{
-		// render sound gizmo
-		for (Entity entity: entities) {
-			entity.draw(xOffset, yOffset, g2d);
+		if (isRendered) {
+			// render sound gizmo
+			for (Entity entity: entities) {
+				entity.draw(xOffset, yOffset, g2d);
+			}
 		}
 	}
 	
@@ -124,5 +131,23 @@ public class Layer implements Drawable
 	public ArrayList<Entity> entities()
 	{
 		return entities;
+	}
+
+	/**
+	 * Returns whether or not to return this layer.
+	 * @return
+	 */
+	public boolean isRendered()
+	{
+		return isRendered;
+	}
+
+	/**
+	 * Tells this layer whether it should render or not.
+	 * @param b
+	 */
+	public void setRendered(boolean rendered)
+	{
+		isRendered = rendered;
 	}
 }

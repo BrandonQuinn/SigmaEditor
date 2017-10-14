@@ -55,7 +55,7 @@ public class AboutDialog extends JDialog
 		
 		JTextPane txtpnElaraEditor = new JTextPane();
 		txtpnElaraEditor.setEditable(false);
-		txtpnElaraEditor.setText("Elara Editor 0.0.2\r\n\r\nCurrently in development.\r\n\r\nBuild by Brandon Quinn as a side project with the intention of using it to make a small top-down shooter game.\r\n\r\nLibraries and Frameworks\r\n\r\n- JOML\r\n- lwjgl");
+		txtpnElaraEditor.setText("Elara Editor v0.0.2-dev \r\n\r\nCurrently in development.\r\n\r\nBuild by Brandon Quinn as a side project with the intention of using it to make a small top-down shooter game.\r\n\r\nLibraries and Frameworks\r\n\r\n- JOML\r\n- lwjglJOML\r\n- JSON.simpleJOML\r\n- Gson");
 		scrollPane.setViewportView(txtpnElaraEditor);
 	}
 }

@@ -623,6 +623,10 @@ public class MainWindow extends JFrame implements
 						propertiesPanel.add(new JPanel(), BorderLayout.CENTER);
 						propertiesPanel.updateUI();
 					}
+				} else if (propertiesPanel != null) {
+					propertiesPanel.removeAll();
+					propertiesPanel.add(new JPanel(), BorderLayout.CENTER);
+					propertiesPanel.updateUI();
 				}
 				
 			break;

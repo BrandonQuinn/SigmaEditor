@@ -184,4 +184,13 @@ public class AssetSelector
 		startX = null;
 		startY = null;
 	}
+
+	/**
+	 * Allows us to manually add in an entity the the selected list.
+	 * @param entity
+	 */
+	public static void manualSelectEntity(Entity entity)
+	{
+		selEnt.put(entity.toString(), entity);
+	}
 }

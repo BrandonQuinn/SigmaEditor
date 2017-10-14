@@ -6,18 +6,17 @@
 package elara.editor.ui;
 
 import java.awt.BorderLayout;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JProgressBar;
 
 /**
  * WaitingDialog
  *
  * Description:
  */
-public class WaitingDialog extends JFrame
+public class WaitingDialog extends JDialog
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -38,13 +37,8 @@ public class WaitingDialog extends JFrame
 		contentPanel.setLayout(null);
 		
 		messageLbl = new JLabel(message);
-		messageLbl.setBounds(10, 11, 225, 14);
+		messageLbl.setBounds(10, 24, 225, 14);
 		contentPanel.add(messageLbl);
-		
-		JProgressBar progressBar = new JProgressBar();
-		progressBar.setIndeterminate(true);
-		progressBar.setBounds(10, 36, 265, 14);
-		contentPanel.add(progressBar);
 	}
 	
 	/**
