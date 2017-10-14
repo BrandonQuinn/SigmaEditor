@@ -208,25 +208,24 @@ public class RenderPanel extends JComponent implements
 		switch (editingContext.state()) {
 			case SELECT:
 
-				if (Mouse.isLeftButtonDown() && AssetSelector.isMouseOnSelection()) {
-					AssetSelector.moveSelection();
-				} else {
-					AssetSelector.checkSelections(selectionRectangle.rectangle());
-					selectionRectangle.draw(g2d);
-				}
-				
-				if (Mouse.isLeftButtonClicked()) {
-					if (!AssetSelector.isMouseOnSelection()) {
-						AssetSelector.deselectAll();
-					}
-					
+				// click and hold down on non-selection
+				if (Mouse.isLeftButtonDown() && !selectionRectangle.isDrawn() && !AssetSelector.isMouseOnSelection()) {
+					// deselect all
+					AssetSelector.deselectAll();
+					// check selection at this point
 					AssetSelector.checkSelections(Mouse.x, Mouse.y);
 				}
 				
-				if (!Mouse.isLeftButtonDown()) {
+				// click and hold on selection
+				if (Mouse.isLeftButtonDown() && !selectionRectangle.isDrawn() && AssetSelector.isMouseOnSelection()) {
+					AssetSelector.moveSelection();
+				} else {
+					// we are not moving our selection, so draw the selection rectangle
+					AssetSelector.checkSelections(selectionRectangle);
+					selectionRectangle.draw(g2d);
 					AssetSelector.resetMouseStart();
 				}
-
+				
 			break;
 	
 			case TEXTURE_PAINT:
@@ -521,11 +520,23 @@ public class RenderPanel extends JComponent implements
 	public void mouseReleased(MouseEvent e)
 	{
 		if (e.getButton() == MouseEvent.BUTTON1) {
-			Mouse.setLeftButtonState(MouseState.NOT_PRESSED);
+			if (Mouse.isLeftButtonDown()) {
+				Mouse.setLeftButtonState(MouseState.CLICKED);
+			} else {
+				Mouse.setLeftButtonState(MouseState.NOT_PRESSED);
+			}
 		} else if (e.getButton() == MouseEvent.BUTTON2) {
-			Mouse.setMiddleButtonState(MouseState.NOT_PRESSED);
+			if (Mouse.isMiddleButtonDown()) {
+				Mouse.setMiddleButtonState(MouseState.CLICKED);
+			} else {
+				Mouse.setMiddleButtonState(MouseState.NOT_PRESSED);
+			}
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
-			Mouse.setRightButtonState(MouseState.NOT_PRESSED);
+			if (Mouse.isRightButtonDown()) {
+				Mouse.setRightButtonState(MouseState.CLICKED);
+			} else {
+				Mouse.setRightButtonState(MouseState.NOT_PRESSED);
+			}
 		}
 	}
 

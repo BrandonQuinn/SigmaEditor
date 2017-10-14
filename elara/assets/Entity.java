@@ -41,4 +41,13 @@ public abstract class Entity
 	{
 		return isSelected;
 	}
+
+	/**
+	 * Sets this entity as selected.
+	 * @param b
+	 */
+	public void setSelected(boolean isSelected)
+	{
+		isSelected = true;
+	}
 }

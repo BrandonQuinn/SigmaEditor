@@ -34,15 +34,21 @@ public class SpawnPoint extends Entity
 		this.position = spawnPoint.position;
 		this.team = spawnPoint.team;
 	}
-
+	
+	// tmp values
+	private Vector2f tmp = new Vector2f(0, 0);
+	private int xpos = 0;
+	private int ypos = 0;
+	private ImageIcon chosenIcon = DefaultIcons.spawnIcon;
+	
 	@Override
 	public void draw(int xOffset, int yOffset, Graphics2D g2d)
 	{
-		ImageIcon chosenIcon = DefaultIcons.spawnIcon;
+		chosenIcon = DefaultIcons.spawnIcon;
 		
 		if (EditingContext.editingContext().gizmoRenderingEnabled()) {
-			int xpos = xOffset + (int)position.x - (DefaultIcons.spawnIcon.getIconWidth() >> 1);
-			int ypos = yOffset + (int)position.y - (DefaultIcons.spawnIcon.getIconHeight() >> 1);
+			xpos = xOffset + (int)position.x - (DefaultIcons.spawnIcon.getIconWidth() >> 1);
+			ypos = yOffset + (int)position.y - (DefaultIcons.spawnIcon.getIconHeight() >> 1);
 			
 			switch (team) {
 				case 1:
@@ -61,7 +67,7 @@ public class SpawnPoint extends Entity
 			g2d.drawImage(chosenIcon.getImage(), xpos, ypos, null);
 		
 			// setup and draw selection box
-			selectionBox.assignPosition(new Vector2f(xpos, ypos));
+			selectionBox.assignPosition(tmp.set(xpos, ypos));
 			selectionBox.assignSize(chosenIcon.getIconWidth(), 
 					chosenIcon.getIconHeight());
 			if (isSelected) {

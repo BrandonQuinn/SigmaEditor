@@ -7,9 +7,10 @@ package elara.assets;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import elara.editor.input.Mouse;
+import elara.editor.ui.SelectionRectangle;
 import elara.project.EditingContext;
 
 /**
@@ -25,18 +26,15 @@ public class AssetSelector
 	private static Point point;
 	private static Integer startX = null;
 	private static Integer startY = null;
-	
-	private static ArrayList<Entity> selectedEntities = new ArrayList<Entity>();
-	
-	// jesus christ... FIXME use hashtable instead
-	private static HashMap<String, Entity> selEnt = new HashMap<String, Entity>(1000);
+
+	private static HashMap<String, Entity> selEnt = new HashMap<String, Entity>(2000);
 	
 	/**
 	 * Find all entities in the game world that are inside the given 
 	 * rectangle.
 	 * @param rectangle
 	 */
-	public static void checkSelections(Rectangle rectangle)
+	public static void checkSelections(SelectionRectangle rectangle)
 	{
 		selectedLayer = editingContext.selectedAssetLayer();
 		
@@ -44,11 +42,15 @@ public class AssetSelector
 			for (Entity entity : selectedLayer.entities()) {
 				Rectangle rect = entity.selectionBox.rectangle();
 				
-				if (rectangle.intersects(rect)) {
+				if (rectangle.rectangle().intersects(rect)) {
 					if (selEnt.get(entity.toString()) == null) {
 						entity.isSelected = true;
-						selectedEntities.add(entity);
 						selEnt.put(entity.toString(), entity);
+					}
+				} else {
+					if (selEnt.get(entity.toString()) != null && rectangle.isDrawn()) {
+						entity.isSelected = false;
+						selEnt.remove(entity.toString());
 					}
 				}
 			}
@@ -88,7 +90,6 @@ public class AssetSelector
 				
 				if (selEnt.get(topmost.toString()) == null) {
 					topmost.isSelected = true;
-					selectedEntities.add(topmost);
 					selEnt.put(topmost.toString(), topmost);
 				}
 			}
@@ -103,10 +104,9 @@ public class AssetSelector
 		selectedLayer = editingContext.selectedAssetLayer();
 		
 		if (selectedLayer != null) {
-			for (Entity entity : selectedLayer.entities()) {
+			for (Entity entity : selEnt.values()) {
 				entity.isSelected = false;
 			}
-			selectedEntities.clear();
 			selEnt.clear();
 		}
 	}
@@ -115,9 +115,9 @@ public class AssetSelector
 	 * Returns a list of all selected entities.
 	 * @return
 	 */
-	public static ArrayList<Entity> selectedEntities()
+	public static Collection<Entity> selectedEntities()
 	{
-		return selectedEntities;
+		return selEnt.values();
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class AssetSelector
 	{
 		selectedLayer = editingContext.selectedAssetLayer();
 		
-		for (Entity entity : selectedEntities) {
+		for (Entity entity : selEnt.values()) {
 			Rectangle rect = entity.selectionBox.rectangle();
 			point = new Point(Mouse.x, Mouse.y);
 			if (rect.contains(point)) {
@@ -161,14 +161,14 @@ public class AssetSelector
 		
 		// go through all entities and move them the amount 
 		// the mouse has moved
-		for (Entity entity : selectedEntities) {
+		for (Entity entity : selEnt.values()) {
 			if (Mouse.x - startX != 0) {
-				entity.position.add(Mouse.x - startX, 0.0f);
+				entity.position = entity.position.add(Mouse.x - startX, 0.0f);
 				startX = Mouse.x;
 			}
 			
 			if (Mouse.y - startY != 0) {
-				entity.position.add(0.0f, Mouse.y - startY);
+				entity.position = entity.position.add(0.0f, Mouse.y - startY);
 				startY = Mouse.y;
 			}
 		}

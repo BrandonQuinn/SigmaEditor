@@ -32,6 +32,7 @@ import elara.editor.debug.LogType;
 import elara.editor.debug.SigmaException;
 import elara.editor.debug.StaticLogs;
 import elara.editor.rendering.RenderUpdateThread;
+import elara.editor.ui.customlists.AssetsJList;
 import elara.editor.ui.customlists.LayerJList;
 import elara.editor.ui.customlists.SoundJList;
 import elara.editor.ui.customlists.SpawnPointJList;
@@ -68,8 +69,13 @@ public class MainWindow extends JFrame implements
 	private JLabel statusLabel;
 	private JScrollPane leftScrollPane;
 	private JPanel propertiesPanel;
-	private TexturePropsPanel texturePropertiesPanel;
-	private AssetTreePanel assetTreePanel;
+	
+	/**
+	 * Misc panels or components needed.
+	 */
+	private TexturePropsPanel texturePropertiesPanel = new TexturePropsPanel();
+	private SoundPropsPanel soundPropertiesPanel = new SoundPropsPanel();
+	private AssetsJList assetsList = new AssetsJList();
 	
 	/**
 	 * Buttons
@@ -115,8 +121,6 @@ public class MainWindow extends JFrame implements
 		setLocationRelativeTo(null);
 		setIconImage(DefaultIcons.windowIcon.getImage());
 
-		texturePropertiesPanel = new TexturePropsPanel();
-		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
@@ -212,7 +216,7 @@ public class MainWindow extends JFrame implements
 		leftScrollPane.setViewportView(textureList);
 		
 		soundList = new SoundJList(this);
-		layerList = new LayerJList();
+		layerList = new LayerJList(this);
 		spawnPointList = new SpawnPointJList();
 		
 		JPanel leftSideSouthPanel = new JPanel();
@@ -256,8 +260,7 @@ public class MainWindow extends JFrame implements
 		rightSplitPane.setLeftComponent(layerPanel);
 		layerPanel.setLayout(new BorderLayout(0, 0));
 		
-		assetTreePanel = new AssetTreePanel();
-		rightSplitPane.setRightComponent(assetTreePanel);
+		rightSplitPane.setRightComponent(new JScrollPane(assetsList));
 
 		JToolBar layerToolBar = new JToolBar();
 		layerToolBar.setFloatable(false);
@@ -603,7 +606,7 @@ public class MainWindow extends JFrame implements
 			
 			case ADD_SOUND:
 				propertiesPanel.removeAll();
-				propertiesPanel.add(new SoundPropsPanel(), BorderLayout.CENTER);
+				propertiesPanel.add(soundPropertiesPanel, BorderLayout.CENTER);
 				propertiesPanel.updateUI();
 			break;
 			
@@ -611,6 +614,7 @@ public class MainWindow extends JFrame implements
 			break;
 		}
 		
+		assetsList.loadFromContext();
 		texturePropertiesPanel.assignOpacity((int)(editingContext.textureBrushOpacity() * 100.0f));
 	}
 }

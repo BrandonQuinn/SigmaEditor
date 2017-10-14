@@ -9,7 +9,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import org.joml.Vector2f;
-import org.newdawn.slick.geom.Circle;
 
 /**
  * AssetSelectionBox
@@ -22,13 +21,10 @@ public class AssetSelectionBox
 	implements Drawable
 {
 	private static final Color BOX_COLOR = new Color(8, 255, 0);
-	private static final int BORDER = 0;
+	private static final int BORDER = 2;
 	
 	// surrounding rectangle
 	private Rectangle rect = new Rectangle(0, 0, 10, 10);
-	
-	// A circle that appears in the center which enables movement
-	private Circle moveCircle = new Circle(0, 0, 8.0f);
 
 	/**
 	 * Draw the selection box around selected assets.
@@ -38,14 +34,6 @@ public class AssetSelectionBox
 	{
 		Color tmp = g2d.getColor();
 		g2d.setColor(BOX_COLOR);
-
-		moveCircle.setCenterX((int)rect.getCenterX());
-		moveCircle.setCenterY((int)rect.getCenterY());
-		
-		g2d.drawOval((int)moveCircle.getCenterX() - (int)(moveCircle.radius) / 2, 
-				(int)moveCircle.getCenterY() - (int)(moveCircle.radius) / 2, 
-				(int)moveCircle.radius, 
-				(int)(moveCircle.radius));
 		
 		g2d.drawRect(rect.x, rect.y, 
 					rect.width, rect.height);

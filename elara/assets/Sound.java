@@ -40,6 +40,10 @@ public class Sound extends Entity
 		this.filename = copySrc.filename;
 	}
 	
+	private Vector2f tmp = new Vector2f(0, 0);
+	private int xpos = 0;
+	private int ypos = 0;
+	
 	/**
 	 * Draw the sound.
 	 */
@@ -47,13 +51,13 @@ public class Sound extends Entity
 	public void draw(int xOffset, int yOffset, Graphics2D g2d)
 	{
 		if (EditingContext.editingContext().gizmoRenderingEnabled()) {
-			int xpos = xOffset + (int)position.x - (DefaultIcons.soundIcon.getIconWidth() >> 1);
-			int ypos = yOffset + (int)position.y - (DefaultIcons.soundIcon.getIconHeight() >> 1);
+			xpos = xOffset + (int)position.x - (DefaultIcons.soundIcon.getIconWidth() >> 1);
+			ypos = yOffset + (int)position.y - (DefaultIcons.soundIcon.getIconHeight() >> 1);
 			
 			g2d.drawImage(DefaultIcons.soundIcon.getImage(), xpos, ypos, null);
 			
 			// setup and draw selection box
-			selectionBox.assignPosition(new Vector2f(xpos, ypos));
+			selectionBox.assignPosition(tmp.set(xpos, ypos));
 			selectionBox.assignSize(DefaultIcons.soundIcon.getIconWidth(), 
 					DefaultIcons.soundIcon.getIconHeight());
 			if (isSelected) {

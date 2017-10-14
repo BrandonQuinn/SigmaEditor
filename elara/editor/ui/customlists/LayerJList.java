@@ -11,6 +11,7 @@ import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import elara.assets.Layer;
+import elara.editor.ui.MainWindow;
 import elara.project.EditingContext;
 import elara.project.GameModel;
 
@@ -32,8 +33,11 @@ public class LayerJList extends JList<Layer>
 	
 	private DefaultListModel<Layer> layerModel = new DefaultListModel<Layer>();
 	
-	public LayerJList()
+	private MainWindow mainWindow;
+	
+	public LayerJList(MainWindow mainWindow)
 	{
+		this.mainWindow = mainWindow;
 		setCellRenderer(new LayerListRenderer());
 		addListSelectionListener(this);
 		setModel(layerModel);
@@ -60,6 +64,7 @@ public class LayerJList extends JList<Layer>
 		
 		if (selectedIndex > -1) {
 			editingContext.setSelectedAssetLayer(gameModel.assetLayers().get(selectedIndex));
+			mainWindow.evaluateState();
 		}
 	}
 	/**

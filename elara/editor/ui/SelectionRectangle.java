@@ -18,6 +18,8 @@ import elara.editor.input.Mouse;
  */
 public class SelectionRectangle
 {
+	private boolean isDrawn = false;
+	
 	private int startX = 0, startY = 0;
 	private boolean startSet = false;
 	
@@ -69,6 +71,13 @@ public class SelectionRectangle
 				height = Mouse.y - startY;
 			}
 			
+			// when the size is 0, then there can't be anything
+			// that intersects with it
+			if (width == 0 || height == 0)
+				isDrawn = false;
+			else
+				isDrawn = true;
+			
 			// draw border
 			g2d.setColor(new Color(93, 138, 153, 180));
 			g2d.drawRect(topLeftX, topLeftY, width, height);
@@ -81,6 +90,7 @@ public class SelectionRectangle
 		}
 
 		if (!Mouse.isLeftButtonDown()) {
+			isDrawn = false;
 			startSet = false;
 			startX = 0;
 			startY = 0;
@@ -94,5 +104,15 @@ public class SelectionRectangle
 	public Rectangle rectangle()
 	{
 		return new Rectangle(topLeftX, topLeftY, width, height);
+	}
+	
+	/**
+	 * Returns whether or not the selection recetangle
+	 * is currently being drawn.
+	 * @return
+	 */
+	public boolean isDrawn() 
+	{
+		return isDrawn;
 	}
 }
