@@ -71,7 +71,7 @@ public class MainWindow extends JFrame implements
 	private JPanel propertiesPanel;
 	
 	/**
-	 * Misc panels or components needed.
+	 * Misc panels or components needed
 	 */
 	private TexturePropsPanel texturePropertiesPanel = new TexturePropsPanel();
 	private SoundPropsPanel soundPropertiesPanel = new SoundPropsPanel();
@@ -610,7 +610,10 @@ public class MainWindow extends JFrame implements
 				propertiesPanel.updateUI();
 			break;
 			
-		default:
+			case ADD_SPAWN_POINT:
+			break;
+			
+			default:
 			break;
 		}
 		

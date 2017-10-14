@@ -41,7 +41,7 @@ public class AssetsJList extends JList<Entity>
 	 */
 	@Override
 	public void valueChanged(ListSelectionEvent lse)
-	{getSelectedValue().setSelected(true);
+	{
 		if (getSelectedIndex() != -1) {
 			getSelectedValue().setSelected(true);
 		}

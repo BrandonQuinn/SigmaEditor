@@ -197,6 +197,14 @@ public class RenderPanel extends JComponent implements
 	private Integer moveStartX = null;
 	private Integer moveStartY = null;
 	
+	BufferedImage paintTexture;
+	BufferedImage buffIm;
+	Graphics2D buffG;
+	BufferedImage newImage;
+	Graphics2D ng;
+	int paintx = 0;
+	int painty = 0;
+	
 	/**
 	 * Basically switch throw all the editing states and make the
 	 * edits
@@ -209,7 +217,7 @@ public class RenderPanel extends JComponent implements
 			case SELECT:
 
 				// click and hold down on non-selection
-				if (Mouse.isLeftButtonDown() && !selectionRectangle.isDrawn() && !AssetSelector.isMouseOnSelection()) {
+				if (Mouse.isLeftButtonClicked() && !selectionRectangle.isDrawn() && !AssetSelector.isMouseOnSelection()) {
 					// deselect all
 					AssetSelector.deselectAll();
 					// check selection at this point
@@ -223,6 +231,10 @@ public class RenderPanel extends JComponent implements
 					// we are not moving our selection, so draw the selection rectangle
 					AssetSelector.checkSelections(selectionRectangle);
 					selectionRectangle.draw(g2d);
+					
+				}
+				
+				if (!Mouse.isLeftButtonDown() && !selectionRectangle.isDrawn()) {
 					AssetSelector.resetMouseStart();
 				}
 				
@@ -230,20 +242,24 @@ public class RenderPanel extends JComponent implements
 	
 			case TEXTURE_PAINT:
 				if (Mouse.isLeftButtonDown() && editingContext.getSelectedGroundLayerIndex() != -1) {
-					BufferedImage paintTexture = editingContext.selectedTexture().image();
-					BufferedImage buffIm = gameModel.groundTextureLayers()
+					paintTexture = editingContext.selectedTexture().image();
+					
+					// only chage the buffered image if a different one has been selected
+					if (buffIm != gameModel.groundTextureLayers().get(editingContext.getSelectedGroundLayerIndex())) {
+						buffIm = gameModel.groundTextureLayers()
 							.get(editingContext.getSelectedGroundLayerIndex());
 					
-					Graphics2D buffG = buffIm.createGraphics();
+						buffG = buffIm.createGraphics();
+					}
 					
-					BufferedImage newImage = new BufferedImage(
+					newImage = new BufferedImage(
 							paintTexture.getWidth(), paintTexture.getHeight(), 
 							BufferedImage.TYPE_INT_ARGB);
-					Graphics2D ng = newImage.createGraphics();
+					ng = newImage.createGraphics();
 					ng.drawImage(paintTexture, 0, 0, null);
 					
-					int paintx = (Mouse.x - (paintTexture.getWidth() >> 1)) + editingContext.xOffset() * -1;
-					int painty = (Mouse.y - (paintTexture.getHeight() >> 1)) + editingContext.yOffset() * -1;
+					paintx = (Mouse.x - (paintTexture.getWidth() >> 1)) + editingContext.xOffset() * -1;
+					painty = (Mouse.y - (paintTexture.getHeight() >> 1)) + editingContext.yOffset() * -1;
 					
 					// create a new image which handles tiling
 					if (editingContext.tiledPaintingEnabled()) {
@@ -360,6 +376,7 @@ public class RenderPanel extends JComponent implements
 						s.setPosition(new Vector2f(Mouse.x - editingContext.xOffset(), 
 								Mouse.y - editingContext.yOffset()));
 						editingContext.selectedAssetLayer().addSound(s);
+						mainWindow.evaluateState();
 					}
 			break;
 			
@@ -369,6 +386,7 @@ public class RenderPanel extends JComponent implements
 					sp.setPosition(new Vector2f(Mouse.x - editingContext.xOffset(), 
 							Mouse.y - editingContext.yOffset()));
 					editingContext.selectedAssetLayer().addSpawnPoint(sp);
+					mainWindow.evaluateState();
 				}
 			break;
 				

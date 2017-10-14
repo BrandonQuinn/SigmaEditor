@@ -158,17 +158,14 @@ public class ImageProcessor
 		int[] RGBA = new int[4];
 		for (int x = 0; x < src.getWidth(); x++) {
 			for (int y = 0; y < src.getHeight(); y++) {
-				try {
-					RGBA = raster.getPixel(x, y, RGBA);
-					raster.setPixel(x, y, new int[] {
-							RGBA[0],
-							RGBA[1],
-							RGBA[2],
-							MathUtil.clamp((int) (((RGBA[3] / 255.0) * opacity) * 255.0), 0, 255)
-					});
-				} catch (ArrayIndexOutOfBoundsException e) {
-					continue; // just don't write on that pixel and continue
-				}
+				RGBA = raster.getPixel(x, y, RGBA);
+				RGBA[3] = MathUtil.clamp(RGBA[3], 1, 255);
+				raster.setPixel(x, y, new int[] {
+						RGBA[0],
+						RGBA[1],
+						RGBA[2],
+						MathUtil.clamp((int) ((RGBA[3] / 255.0f) * opacity * 255.0f), 0, 255)
+				});
 			}
 		}
 		
