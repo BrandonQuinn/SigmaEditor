@@ -35,6 +35,7 @@ public class ProjectStructure
 						"\t\t\t\"spawnPoints\": []" +
 					"\t\t}" +
 				"\t]," +
+				"\t\"scripts\": []," +
 			"}";
 	
 	/**

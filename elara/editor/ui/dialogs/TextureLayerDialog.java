@@ -3,7 +3,7 @@
  * Date Created: 7 Oct. 2017
  * File : TextureLayerDialog.java
  */
-package elara.editor.ui;
+package elara.editor.ui.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

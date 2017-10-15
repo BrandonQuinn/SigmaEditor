@@ -3,6 +3,8 @@ package elara.project;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
 import javax.imageio.ImageIO;
 import elara.assets.Texture;
 import elara.editor.debug.SigmaException;
@@ -19,8 +21,8 @@ import elara.editor.debug.SigmaException;
  *============================================================*/
 
 public class AssetLoader
-{
-	
+{	
+	private static ProjectContext projCon = ProjectContext.projectContext();
 	/**
 	 * Loads a texture from a file.
 	 * 
@@ -36,5 +38,41 @@ public class AssetLoader
 		BufferedImage bufferedImage = ImageIO.read(imageToLoad);
 		Texture texture = new Texture(name, imageToLoad, bufferedImage);
 		return texture;
+	}
+	
+	/**
+	 * Reads the contents of a scripts.
+	 * 
+	 * @param scriptFile
+	 * @return
+	 * @throws IOException
+	 */
+	public static String loadScript(String scriptFile) throws IOException {
+		File file = new File(projCon.projectPath() + "/assets/scripts/" + scriptFile);
+		List<String> lines = Files.readAllLines(file.toPath());
+		
+		String output = "";
+		for (String str : lines) {
+			output += str + "\n";
+		}
+		
+		return output;
+	}
+
+	/**
+	 * Saves a script.
+	 * 
+	 * @param elementAt
+	 * @throws IOException 
+	 */
+	public static void saveScript(String script, String code) throws IOException
+	{
+		File file = new File(projCon.projectPath() + "/assets/scripts/" + script);
+		Files.write(file.toPath(), code.getBytes());
+	}
+	
+	public static void deleteScript(String script) throws IOException {
+		File file = new File(projCon.projectPath() + "/assets/scripts/" + script);
+		Files.delete(file.toPath());
 	}
 }

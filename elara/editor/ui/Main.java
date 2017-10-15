@@ -11,6 +11,8 @@ import org.json.simple.parser.ParseException;
 import elara.editor.debug.LogType;
 import elara.editor.debug.StackTraceUtil;
 import elara.editor.debug.StaticLogs;
+import elara.editor.ui.dialogs.ErrorDialog;
+import elara.editor.ui.dialogs.RecentProjectsDialog;
 import elara.editor.util.JSON;
 import elara.project.ProjectManager;
 
@@ -47,11 +49,12 @@ public class Main
 			ErrorDialog eDialog = new ErrorDialog("Could not load the system look and feel.",
 					StackTraceUtil.stackTraceToString(e));
 			eDialog.setVisible(true); // error dialog probably not needed
+			return;
 		}
 
 		initialise();
 		
-		// open recent projects dialog
+		// allow user to open a recent project
 		RecentProjectsDialog rpg = new RecentProjectsDialog();
 		rpg.setVisible(true);
 		

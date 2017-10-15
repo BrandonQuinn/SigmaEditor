@@ -35,11 +35,16 @@ import elara.editor.debug.LogType;
 import elara.editor.debug.SigmaException;
 import elara.editor.debug.StaticLogs;
 import elara.editor.rendering.RenderUpdateThread;
+import elara.editor.ui.codeeditor.CodeEditor;
 import elara.editor.ui.customlists.AssetsJList;
 import elara.editor.ui.customlists.LayerJList;
 import elara.editor.ui.customlists.SoundJList;
 import elara.editor.ui.customlists.SpawnPointJList;
 import elara.editor.ui.customlists.TextureJList;
+import elara.editor.ui.dialogs.AboutDialog;
+import elara.editor.ui.dialogs.NewProjectDialog;
+import elara.editor.ui.dialogs.TextureLayerDialog;
+import elara.editor.ui.dialogs.WaitingDialog;
 import elara.editor.ui.propertiespanels.SoundPropsPanel;
 import elara.editor.ui.propertiespanels.TexturePropsPanel;
 import elara.project.AssetLoader;
@@ -104,6 +109,7 @@ public class MainWindow extends JFrame implements
 	private JMenuItem saveProjectItem;
 	private JMenuItem loadTextureItem;
 	private JMenuItem loadSoundItem;
+	private JMenuItem openCodeEditorItem;
 	private JMenuItem aboutItem;
 	
 	/**
@@ -153,6 +159,12 @@ public class MainWindow extends JFrame implements
 		loadSoundItem.addActionListener(this);
 		mnAssets.add(loadSoundItem);
 
+		JMenu codeMenu = new JMenu("Code/Scripts");
+		openCodeEditorItem = new JMenuItem("Code Editor"); 
+		openCodeEditorItem.addActionListener(this);
+		codeMenu.add(openCodeEditorItem);
+		menuBar.add(codeMenu);
+		
 		JMenu mnHelp = new JMenu("Help");
 		
 		aboutItem = new JMenuItem("About");
@@ -573,6 +585,15 @@ public class MainWindow extends JFrame implements
 			editingContext.assignState(EditingContext.EditingState.SELECT);
 			textureList.setSelectedIndices(new int[] {});
 		} 
+		
+		/*==============================================*
+		 * CODE/SCRIPTS MENU
+		 *==============================================*/
+		
+		else if (source == openCodeEditorItem) {
+			CodeEditor codeEditor = new CodeEditor();
+			codeEditor.setVisible(true);
+		}
 		
 		/*==============================================*
 		 * HELP MENU

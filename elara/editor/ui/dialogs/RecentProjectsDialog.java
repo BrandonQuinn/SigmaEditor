@@ -3,7 +3,7 @@
  * Date Created: 12 Oct. 2017
  * File : RecentProjectsDialog.java
  */
-package elara.editor.ui;
+package elara.editor.ui.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;

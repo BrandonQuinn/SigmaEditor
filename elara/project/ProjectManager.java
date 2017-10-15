@@ -348,6 +348,22 @@ public class ProjectManager
 			}
 		}
 		
+		/*==========================================*
+		 * Load Scripts                             *
+		 *==========================================*/
+		
+		JSONArray scriptList = (JSONArray) jsonObject.get("scripts");
+		
+		if (scriptList != null) {
+			for (int i = 0; i < scriptList.size(); i++) {
+				JSONObject scriptObj = (JSONObject) scriptList.get(i);
+				if (scriptObj != null) {
+					String filename = (String) scriptObj.get("filename");
+					projectContext.addScript(filename);
+				}
+			}
+		}
+		
 		projectContext.setProjectLoaded(true);
 		StaticLogs.debug.log(LogType.INFO, "Project opened '" + projectLocation + "'");
 	}
@@ -606,5 +622,67 @@ public class ProjectManager
 	public static ProjectManager manager()
 	{
 		return instance;
+	}
+
+	/**
+	 * Creates a script with the given name in the project directory.
+	 * @param string
+	 * @throws IOException 
+	 * @throws SigmaException 
+	 * @throws ParseException 
+	 */
+	@SuppressWarnings("unchecked")
+	public void addScript(String filename) 
+			throws IOException, 
+			SigmaException, 
+			ParseException
+	{
+		File scriptFile = new File(projectContext.projectPath() + "/assets/scripts/" + filename);
+		
+		// if it exists do not create and warn user
+		if (scriptFile.exists()) {
+			StaticLogs.debug.log(LogType.ERROR, "Script with name: '" + filename + "' already exists");
+			throw new SigmaException("Script with name: '" + filename + "' already exists");
+		} else {
+			scriptFile.createNewFile();
+		}
+		
+		projectContext.addScript(filename);
+		
+		// add the script to the configuration
+		File configFile = new File(projectContext.projectPath() + "/" + ProjectStructure.CONFIG_FILE);
+		JSONObject obj = JSON.read(configFile);
+		JSONArray scriptArr = (JSONArray) obj.get("scripts");
+		JSONObject newScriptObj = new JSONObject();
+		newScriptObj.put("filename", filename);
+		scriptArr.add(newScriptObj);
+		JSON.write(obj, configFile.getAbsolutePath());
+	}
+
+	/**
+	 * Removes a script from the config file.
+	 * 
+	 * @param script
+	 * @throws IOException 
+	 * @throws ParseException 
+	 */
+	@SuppressWarnings("unchecked")
+	public void deleteScript(String script) throws IOException, ParseException
+	{
+		File configFile = new File(projectContext.projectPath() + "/" + ProjectStructure.CONFIG_FILE);
+		JSONObject obj = JSON.read(configFile);
+		JSONArray scriptArr = (JSONArray) obj.get("scripts");
+		
+		JSONObject scriptObj = null;
+		for (int i = 0; i < scriptArr.size(); i++) {
+			scriptObj = (JSONObject) scriptArr.get(i);
+			
+			if (((String)scriptObj.get("filename")).equals(script)) {
+				scriptArr.remove(i);
+			}
+		}
+		
+		obj.replace("scripts", scriptArr);
+		JSON.write(obj, configFile.getAbsolutePath());
 	}
 }

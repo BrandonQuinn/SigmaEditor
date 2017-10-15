@@ -8,6 +8,8 @@ package elara.project;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import elara.assets.Sound;
 import elara.assets.Texture;
 
@@ -30,6 +32,8 @@ public class ProjectContext
 	private String projectName = "";
 	private String projectDirectory = "";
 	private File projectDirFile;
+	
+	private HashMap<String, String> scriptList = new HashMap<String, String>(100);
 	
 	/**
 	 * List of loaded textures which can be used.
@@ -147,10 +151,37 @@ public class ProjectContext
 	}
 
 	/**
+	 * Adds a script to the context.
+	 * @param script
+	 */
+	public void addScript(String script)
+	{
+		scriptList.put(script, script);
+	}
+	
+	/**
+	 * Returns a list of filenames of scripts.
+	 * @return
+	 */
+	public Collection<String> scriptList() 
+	{
+		return scriptList.values();
+	}
+	
+	/**
 	 * Creates a new instance.
 	 */
 	public void reset()
 	{
 		instance = new ProjectContext();
+	}
+
+	/**
+	 * Removes the script from the list of script.
+	 * @param script
+	 */
+	public void deleteScript(String script)
+	{
+		scriptList.remove(script);
 	}
 }

@@ -3,7 +3,7 @@
  * Date Created: 3 Oct. 2017
  * File : WaitingDialog.java
  */
-package elara.editor.ui;
+package elara.editor.ui.dialogs;
 
 import java.awt.BorderLayout;
 import javax.swing.JDialog;
