@@ -193,6 +193,11 @@ public class RenderPanel extends JComponent implements
 			
 		}
 	}
+	
+	/*	 
+	 * All this stuff is essentially anything that we may not 
+	 * want to be recreating all the time in the loop. 
+	 */
 
 	private Integer moveStartX = null;
 	private Integer moveStartY = null;
@@ -204,6 +209,9 @@ public class RenderPanel extends JComponent implements
 	Graphics2D ng;
 	int paintx = 0;
 	int painty = 0;
+	
+	BufferedImage placeDecalImage = null;
+	Texture previousDecal = null;
 	
 	/**
 	 * Basically switch throw all the editing states and make the
@@ -433,20 +441,19 @@ public class RenderPanel extends JComponent implements
 						 */
 						int hypotenuse = (int) Math.sqrt((decal.image().getWidth() << 1) * (decal.image().getHeight() << 1));
 						
-						// copy the image so we don't affect the original one
-						BufferedImage placeImage = new BufferedImage(hypotenuse, 
+						placeDecalImage = new BufferedImage(hypotenuse, 
 								hypotenuse, 
 								BufferedImage.TYPE_INT_ARGB);
 						
 						// create the new image we are going to place and rotate it
-						Graphics2D pgi = placeImage.createGraphics();
-						pgi.rotate(Math.toRadians(editCon.decalRotation()), placeImage.getWidth() >> 1, placeImage.getHeight() >> 1);
-						pgi.drawImage(decal.image(), (placeImage.getWidth() >> 1) - (decal.image().getWidth() >> 1), 
-								(placeImage.getHeight() >> 1) - (decal.image().getHeight() >> 1), null);
+						Graphics2D pgi = placeDecalImage.createGraphics();
+						pgi.rotate(Math.toRadians(editCon.decalRotation()), placeDecalImage.getWidth() >> 1, placeDecalImage.getHeight() >> 1);
+						pgi.drawImage(decal.image(), (placeDecalImage.getWidth() >> 1) - (decal.image().getWidth() >> 1), 
+								(placeDecalImage.getHeight() >> 1) - (decal.image().getHeight() >> 1), null);
 						
 						Graphics2D dest = texLayer.createGraphics();
-						dest.drawImage(placeImage, (paintx + (decal.image().getHeight() >> 1)) - (placeImage.getWidth() >> 1), 
-								(painty + (decal.image().getWidth() >> 1)) - (placeImage.getHeight() >> 1), null);
+						dest.drawImage(placeDecalImage, (paintx + (decal.image().getHeight() >> 1)) - (placeDecalImage.getWidth() >> 1), 
+								(painty + (decal.image().getWidth() >> 1)) - (placeDecalImage.getHeight() >> 1), null);
 					}
 				}
 				
