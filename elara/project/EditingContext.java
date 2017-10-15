@@ -70,7 +70,14 @@ public class EditingContext
 		/**
 		 * Adding spawn points to the game world.
 		 */
-		ADD_SPAWN_POINT
+		ADD_SPAWN_POINT,
+		
+		/**
+		 * Add in decals, or single images which certain tools
+		 * to creates certain effects like randomisation of grass blades,
+		 * things of that nature.
+		 */
+		DECAL_PLACEMENT
 	}
 	
 	private EditingState previousState = null;
@@ -126,6 +133,17 @@ public class EditingContext
 	 *========================================*/
 	
 	private SpawnPoint selectedSpawnPoint;
+	
+	/*========================================*
+	 * DECAL PLACEMENT state fields           *
+	 *========================================*/
+	
+	private Texture selectedDecal;
+	
+	/**
+	 * Amount to rotate decals by in degrees.
+	 */
+	private double decalRotation = 0.0;
 	
 	private Layer selectedAssetLayer;
 	
@@ -412,5 +430,42 @@ public class EditingContext
 	public SpawnPoint selectedSpawnPoint()
 	{
 		return selectedSpawnPoint;
+	}
+	
+	/**
+	 * Set the current selected decal.
+	 * @param selectedDecal
+	 */
+	public void assignSelectedDecal(Texture selectedDecal)
+	{
+		this.selectedDecal = selectedDecal;
+	}
+	
+	/**
+	 * Returns the currently selected decal.
+	 * @return
+	 */
+	public Texture selectedDecal()
+	{
+		return selectedDecal;
+	}
+
+	/**
+	 * Set the amount to rotate a decal by.
+	 * @param rotationDegrees
+	 */
+	public void assignDecalRotation(double rotationDegrees) {
+		decalRotation = rotationDegrees;
+	}
+	
+	/**
+	 * Returns the amount to rotate a decal by.
+	 * In degrees.
+	 * 
+	 * @return
+	 */
+	public double decalRotation()
+	{
+		return decalRotation;
 	}
 }

@@ -37,6 +37,7 @@ import elara.editor.debug.StaticLogs;
 import elara.editor.rendering.RenderUpdateThread;
 import elara.editor.ui.codeeditor.CodeEditor;
 import elara.editor.ui.customlists.AssetsJList;
+import elara.editor.ui.customlists.DecalJList;
 import elara.editor.ui.customlists.LayerJList;
 import elara.editor.ui.customlists.SoundJList;
 import elara.editor.ui.customlists.SpawnPointJList;
@@ -84,6 +85,7 @@ public class MainWindow extends JFrame implements
 	private TexturePropsPanel texturePropertiesPanel = new TexturePropsPanel();
 	private SoundPropsPanel soundPropertiesPanel = new SoundPropsPanel();
 	private AssetsJList assetsList = new AssetsJList();
+	private DecalJList decalList = new DecalJList();
 	
 	/**
 	 * Buttons
@@ -108,6 +110,7 @@ public class MainWindow extends JFrame implements
 	private JMenuItem openProjectItem;
 	private JMenuItem saveProjectItem;
 	private JMenuItem loadTextureItem;
+	private JMenuItem loadDecalItem;
 	private JMenuItem loadSoundItem;
 	private JMenuItem openCodeEditorItem;
 	private JMenuItem aboutItem;
@@ -155,12 +158,16 @@ public class MainWindow extends JFrame implements
 		loadTextureItem.addActionListener(this);
 		mnAssets.add(loadTextureItem);
 		
+		loadDecalItem = new JMenuItem("Import Decal");
+		loadDecalItem.addActionListener(this);
+		mnAssets.add(loadDecalItem);
+		
 		loadSoundItem = new JMenuItem("Import Sound");
 		loadSoundItem.addActionListener(this);
 		mnAssets.add(loadSoundItem);
 
-		JMenu codeMenu = new JMenu("Code/Scripts");
-		openCodeEditorItem = new JMenuItem("Code Editor"); 
+		JMenu codeMenu = new JMenu("Scripting");
+		openCodeEditorItem = new JMenuItem("Script Editor"); 
 		openCodeEditorItem.addActionListener(this);
 		codeMenu.add(openCodeEditorItem);
 		menuBar.add(codeMenu);
@@ -462,7 +469,7 @@ public class MainWindow extends JFrame implements
 						// add the texture to the project and to the texture list in the GUI
 						Texture loadedTexture = AssetLoader.loadTexture(texName, selectedImage);
 						textureList.addTexture(loadedTexture);
-						projectManager.addTexture(texName, selectedImage);
+						projectManager.importTexture(texName, selectedImage);
 					} catch (IOException | SigmaException e2) {
 						JOptionPane.showMessageDialog(null,
 								"Failed to load texture",
@@ -483,6 +490,53 @@ public class MainWindow extends JFrame implements
 						JOptionPane.ERROR_MESSAGE);
 			}
 		} 
+		
+		/*==============================================*
+		 * LOAD DECAL
+		 *==============================================*/
+		
+		else if (source == loadDecalItem) {
+			if (projectContext.isProjectLoaded()) {
+				JFileChooser fc = new JFileChooser();
+				fc.setDialogTitle("Import dECAL");
+				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				fc.setAcceptAllFileFilterUsed(false);
+
+				FileNameExtensionFilter decalFilter = new FileNameExtensionFilter("Decals", "jpg", "jpeg", "png");
+				fc.addChoosableFileFilter(decalFilter);
+
+				int fcResponse = fc.showOpenDialog(null);
+				if (fcResponse == JFileChooser.APPROVE_OPTION) {
+					File selectedImage = fc.getSelectedFile();
+					String decalName = JOptionPane.showInputDialog(null,
+							"Enter the name of the decal",
+							"Decal name",
+							JOptionPane.PLAIN_MESSAGE);
+
+					try {
+						// add the texture to the project and to the texture list in the GUI
+						Texture decal = projectManager.importDecal(decalName, selectedImage);
+						decalList.addDecal(decal);
+					} catch (IOException | ParseException e2) {
+						JOptionPane.showMessageDialog(null,
+								"Failed to load decal",
+								"IOException | ParseException",
+								JOptionPane.ERROR_MESSAGE);
+						StaticLogs.debug.log(LogType.ERROR,
+								"Failed to load decal, " + e2.getMessage());
+						return;
+					}
+				}
+				
+				setTitle(Constants.EDITOR_TITLE + " | " + projectContext.projectName());
+			} else { 
+				// no project is loaded, show a warning
+				JOptionPane.showMessageDialog(null,
+						"There is currently no project loaded.",
+						"No Project",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		}
 		
 		/*==============================================*
 		 * LOAD SOUND
@@ -511,7 +565,7 @@ public class MainWindow extends JFrame implements
 					soundList.addSound(sound);
 					
 					try {
-						projectManager.addSound(soundName, sourceSoundFile);
+						projectManager.importSound(soundName, sourceSoundFile);
 					} catch (SigmaException e1) {
 						JOptionPane.showMessageDialog(null,
 								e1,
@@ -542,6 +596,8 @@ public class MainWindow extends JFrame implements
 					leftScrollPane.setViewportView(spawnPointList);
 				} else if (selectedItem.equals("Sounds")) {
 					leftScrollPane.setViewportView(soundList);
+				} else if (selectedItem.equals("Decals")) {
+					leftScrollPane.setViewportView(decalList);
 				}
 			}
 		} 

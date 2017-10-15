@@ -9,6 +9,7 @@ package elara.project;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -364,6 +365,25 @@ public class ProjectManager
 			}
 		}
 		
+		/*==========================================*
+		 * Load Decals                              *
+		 *==========================================*/
+		
+		JSONArray decalList = (JSONArray) jsonObject.get("decals");
+		
+		if (decalList != null) {
+			for (int i = 0; i < decalList.size(); i++) {
+				JSONObject decalObj = (JSONObject) decalList.get(i);
+				if (decalObj != null) {
+					String name = (String) decalObj.get("name");
+					String filename = (String) decalObj.get("filename");
+					Texture newDecal = new Texture(name, new File(projectLocation + "/assets/images/decals/" + filename));
+					newDecal.assignImage(ImageIO.read(new File(projectLocation + "/assets/images/decals/" + filename)));
+					projectContext.addDecal(newDecal);
+				}
+			}
+		}
+		
 		projectContext.setProjectLoaded(true);
 		StaticLogs.debug.log(LogType.INFO, "Project opened '" + projectLocation + "'");
 	}
@@ -466,8 +486,6 @@ public class ProjectManager
 				jsonAssetLayers.add(tmpJSONLayer);
 			}
 			
-			JSON.write(jsonObject, projectContext.projectPath() 
-					+ "/" + ProjectStructure.CONFIG_FILE);
 		} else {
 			throw new SigmaException("No project loaded.");
 		}
@@ -483,7 +501,7 @@ public class ProjectManager
 	 * @throws SigmaException
 	 */
 	@SuppressWarnings("unchecked")
-	public void addTexture(String name, File textureFile) throws SigmaException
+	public void importTexture(String name, File textureFile) throws SigmaException
 	{	
 		// check if the texture already exists
 		for (Texture texture : projectContext.loadedTextures()) {
@@ -546,7 +564,7 @@ public class ProjectManager
 	 * @throws SigmaException 
 	 */
 	@SuppressWarnings("unchecked")
-	public void addSound(String name, File sourceSoundFile) throws SigmaException
+	public void importSound(String name, File sourceSoundFile) throws SigmaException
 	{
 		// check if the sound already exists
 		for (Sound sound : projectContext.sounds()) {
@@ -596,6 +614,66 @@ public class ProjectManager
 		// add our new sound to the project context
 		Sound newSound = new Sound(name, sourceSoundFile.getName());
 		projectContext.addSound(newSound);
+	}
+	
+	
+	/**
+	 * Adds a file to the project configuration and context.
+	 * 
+	 * @param name
+	 * @param file
+	 * @throws IOException 
+	 * @throws ParseException 
+	 * @throws FileNotFoundException 
+	 */
+	@SuppressWarnings("unchecked")
+	public Texture importDecal(String name, File file) 
+			throws FileNotFoundException, 
+			ParseException, 
+			IOException {
+		
+		Texture decal = null;
+		
+		if (projectContext.isProjectLoaded()) {
+			
+			/**
+			 * First, copy the image to the project's decal directory.
+			 */
+			
+			File newDecalFile = new File(projectContext.projectPath() + "/assets/images/decals/" + file.getName());
+			
+			if (newDecalFile.exists()) {
+				newDecalFile.delete();
+			}
+			newDecalFile.createNewFile();
+			Files.copy(file.toPath(), new FileOutputStream(newDecalFile));
+			
+			/*
+			 * Second, add the decal to the project configuration.
+			 */
+			
+			File configFile = new File(projectContext.projectPath() + "/"+ ProjectStructure.CONFIG_FILE);
+			
+			JSONObject jsonConfig = JSON.read(configFile);
+			JSONArray decalArr = (JSONArray) jsonConfig.get("decals");
+			
+			JSONObject newDecal = new JSONObject();
+			newDecal.put("name", name);
+			newDecal.put("filename", file.getName());
+			decalArr.add(newDecal);
+			jsonConfig.replace("decals", decalArr);
+			
+			JSON.write(jsonConfig, configFile.getAbsolutePath());
+			
+			decal = new Texture(name, newDecalFile);
+			decal.assignImage(ImageIO.read(newDecalFile));
+			projectContext.addDecal(decal);
+		} else {
+			StaticLogs.debug.log(LogType.WARNING, "Tried to import decal: " + file.getAbsolutePath() 
+				+ ", but no project was loaded");
+		}
+		
+		return decal;
 	}
 	
 	/**

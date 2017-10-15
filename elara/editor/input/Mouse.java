@@ -59,6 +59,8 @@ public class Mouse
 	}
 
 	/**
+	 * Is the left mouse button clicked? Meaning it was pressed
+	 * then released.
 	 * @return
 	 */
 	public static boolean isLeftButtonClicked()
@@ -72,6 +74,8 @@ public class Mouse
 	}
 
 	/**
+	 * Is the middle mouse button clicked? Meaning it was pressed
+	 * then released.
 	 * @return
 	 */
 	public static boolean isMiddleButtonClicked()

@@ -41,6 +41,11 @@ public class ProjectContext
 	private ArrayList<Texture> textures = new ArrayList<Texture>();
 	
 	/**
+	 * A list of loaded decals which can be placed.
+	 */
+	private ArrayList<Texture> decals = new ArrayList<Texture>();
+	
+	/**
 	 * List of sounds, but only their meta data.
 	 * Sound are loaded in as needed. They generally
 	 * don't need to be played in the editor.
@@ -173,7 +178,7 @@ public class ProjectContext
 	 */
 	public void reset()
 	{
-		instance = new ProjectContext();
+		ProjectContext.instance = new ProjectContext();
 	}
 
 	/**
@@ -183,5 +188,23 @@ public class ProjectContext
 	public void deleteScript(String script)
 	{
 		scriptList.remove(script);
+	}
+
+	/**
+	 * Adds a texture to the context.
+	 * @param decal
+	 */
+	public void addDecal(Texture decal) 
+	{
+		decals.add(decal);
+	}
+	
+	/**
+	 * Gets the list of loaded decals.
+	 * @return
+	 */
+	public ArrayList<Texture> loadedDecals()
+	{
+		return decals;
 	}
 }

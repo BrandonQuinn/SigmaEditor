@@ -23,7 +23,8 @@ import elara.editor.debug.StaticLogs;
  *
  * Description: Custom renderer for a JList of Texture instances.
  */
-public class TextureListRenderer extends JLabel implements ListCellRenderer<Texture>
+public class TextureListRenderer extends JLabel 
+	implements ListCellRenderer<Texture>
 {
 	private static final long serialVersionUID = 1L;
 	

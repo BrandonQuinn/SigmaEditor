@@ -36,6 +36,7 @@ public class ProjectStructure
 					"\t\t}" +
 				"\t]," +
 				"\t\"scripts\": []," +
+				"\t\"decals\": []," +
 			"}";
 	
 	/**

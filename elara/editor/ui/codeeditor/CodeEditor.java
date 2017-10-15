@@ -28,6 +28,7 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.json.simple.parser.ParseException;
+import elara.assets.DefaultIcons;
 import elara.editor.debug.SigmaException;
 import elara.project.AssetLoader;
 import elara.project.ProjectContext;
@@ -77,6 +78,7 @@ public class CodeEditor extends JFrame
 	public CodeEditor()
 	{
 		setTitle("Script Editor");
+		setIconImage(DefaultIcons.windowIcon.getImage());
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setSize(toolkit.getScreenSize().width / 2, 
 				(int)(toolkit.getScreenSize().height / 1.5f));
