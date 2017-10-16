@@ -21,7 +21,9 @@ import elara.project.ProjectManager;
  * 
  * TODO Threaded texture painting, blending, OpenCL?
  * TODO Texture modifiers like blur, dodge, burn
- * TODO Keyboard shortcuts
+ * TODO Brush size
+ * TODO Entity parenting
+ * TODO Entity deletion
  * 
  */
 

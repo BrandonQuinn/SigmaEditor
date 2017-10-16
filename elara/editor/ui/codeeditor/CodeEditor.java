@@ -61,6 +61,10 @@ public class CodeEditor extends JFrame
 	
 	private JSplitPane scriptCodeSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 	
+	/**
+	 * Stores the current state of the source code for each scripts.
+	 * This could end up being very space inefficient. We'll see.
+	 */
 	private ArrayList<String> scriptBuffer = new ArrayList<String>();
 	
 	private int currentSelection = -1;
