@@ -84,6 +84,11 @@ public class ImageProcessor
 		Rectangle destRect = new Rectangle(x1, y1, width1, width2);
 		Rectangle srcRect = new Rectangle(x2, y2, width2, height2);
 		
+		System.out.println("Dest pos:" + destRect.getX() + ", " + destRect.getY());
+		System.out.println("Dest dim:" + destRect.getWidth() + ", " + destRect.getHeight());
+		System.out.println("Src pos:" + srcRect.getX() + ", " + srcRect.getY());
+		System.out.println("Src dim:" + srcRect.getWidth() + ", " + srcRect.getHeight());
+		
 		/* 
 		 * Now we will want to essentially loop over these rectangles of pixels and multiply
 		 * checking we are staying within the bounds of both images.
@@ -91,8 +96,8 @@ public class ImageProcessor
 		
 		int[] srcTmp = new int[4];
 		int[] destTmp = new int[4]; 
-		for (int destX = (int)destRect.getX(), srcX = (int)srcRect.getX(); srcX < srcRect.getWidth(); destX++, srcX++) {
-			for (int destY = (int)destRect.getY(), srcY = (int)srcRect.getY(); srcY < srcRect.getHeight(); destY++, srcY++) {
+		for (int destX = x1, srcX = x2; srcX < src.getWidth(); destX++, srcX++) {
+			for (int destY = y1, srcY = y2; srcY < src.getHeight(); destY++, srcY++) {
 				
 				// prevent doing operations if we are less than the bounds
 				if (destX < 0) continue;
@@ -102,11 +107,11 @@ public class ImageProcessor
 				if (srcY < 0) continue;
 				
 				// prevent position from coming too far off the size of the images
-				if (srcX > destRect.getHeight() - 1) continue;
-				if (srcY > destRect.getHeight() - 1) continue;
+				if (srcX > dest.getWidth() - 1) continue;
+				if (srcY > dest.getHeight() - 1) continue;
 				
-				if (destX > srcRect.getHeight() - 1) continue;
-				if (destY > srcRect.getHeight() - 1) continue;
+				if (destX > src.getWidth() - 1) continue;
+				if (destY > src.getHeight() - 1) continue;
 				
 				srcRaster.getPixel(srcX, srcY, srcTmp);
 				destRaster.getPixel(destX, destY, destTmp);
