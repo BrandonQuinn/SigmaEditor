@@ -17,6 +17,8 @@ import elara.editor.util.MathUtil;
  *
  * Description: Modify images, combine images etc.
  * Just a bunch of function to do those things.
+ * 
+ * TODO Screen blend mode
  */
 public class ImageProcessor
 {
@@ -167,6 +169,7 @@ public class ImageProcessor
 	 * Change the opacity of every pixel on the given image.
 	 * 
 	 * FIXME Opacity has weird effect at low factors like 0.02
+	 * No idea what is causing the above problem.
 	 * 
 	 * @param newImage
 	 * @param textureBrushOpacity

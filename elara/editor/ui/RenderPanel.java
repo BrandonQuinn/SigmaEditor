@@ -254,47 +254,49 @@ public class RenderPanel extends JComponent implements
 	
 			case TEXTURE_PAINT:
 				
+				if (Keyboard.BRACE_LEFT == KeyState.PRESSED) {
+					editCon.assignBrushSize(editCon.brushSize() - 0.01f);
+				}
+				
+				if (Keyboard.BRACE_RIGHT == KeyState.PRESSED) {
+					editCon.assignBrushSize(editCon.brushSize() + 0.01f);
+				}
+				
 				if (Mouse.isLeftButtonDown() && editCon.getSelectedGroundLayerIndex() != -1) {
 					paintTexture = editCon.selectedTexture().image();
 					
-					// only chage the buffered image if a different one has been selected
+					// only change the buffered image if a different one has been selected
 					if (buffIm != gameModel.groundTextureLayers().get(editCon.getSelectedGroundLayerIndex())) {
-						buffIm = gameModel.groundTextureLayers()
-							.get(editCon.getSelectedGroundLayerIndex());
-					
+						buffIm = gameModel.groundTextureLayers().get(editCon.getSelectedGroundLayerIndex());
 						buffG = buffIm.createGraphics();
 					}
 					
+					int newImgWidth = (int)(paintTexture.getWidth() * editCon.brushSize());
+					int newImgHeight = (int)(paintTexture.getHeight() * editCon.brushSize());
+					
 					newImage = new BufferedImage(
-							paintTexture.getWidth(), paintTexture.getHeight(), 
+							newImgWidth, newImgHeight, 
 							BufferedImage.TYPE_INT_ARGB);
 					ng = newImage.createGraphics();
 					ng.drawImage(paintTexture, 0, 0, null);
 					
-					paintx = (Mouse.x - (paintTexture.getWidth() >> 1)) + editCon.xOffset() * -1;
-					painty = (Mouse.y - (paintTexture.getHeight() >> 1)) + editCon.yOffset() * -1;
+					paintx = (Mouse.x - (newImgWidth >> 1)) + editCon.xOffset() * -1;
+					painty = (Mouse.y - (newImgHeight >> 1)) + editCon.yOffset() * -1;
 					
 					// create a new image which handles tiling
 					if (editCon.tiledPaintingEnabled()) {
-						ng.drawImage(paintTexture, 
-								0 - (paintx % newImage.getWidth()), 
-								0 - (painty % newImage.getHeight()),
-								null);
+						// number of times to repeat the texture
+						int numTexRpt = (int) (editCon.brushSize() + 1);
 						
-						ng.drawImage(paintTexture, 
-								(0 - (paintx % newImage.getWidth()) + newImage.getWidth()), 
-								0 - (painty % newImage.getHeight()),
-								null);
-						
-						ng.drawImage(paintTexture, 
-								(0 - (paintx % newImage.getWidth()) + newImage.getWidth()), 
-								(0 - (painty % newImage.getHeight()) + newImage.getHeight()),
-								null);
-						
-						ng.drawImage(paintTexture, 
-								0 - (paintx % newImage.getWidth()), 
-								(0 - (painty % newImage.getHeight()) + newImage.getHeight()),
-								null);
+						for (int xt = 0; xt < numTexRpt+1; xt++) {
+							for (int yt = 0; yt < numTexRpt+1; yt++) {
+							// left to right
+							ng.drawImage(paintTexture, 
+									(0 - (paintx % paintTexture.getWidth()) + (paintTexture.getWidth() * xt)), 
+									(0 - (painty % paintTexture.getHeight()) + (paintTexture.getHeight() * yt)),
+									null);
+							}
+						}
 					}
 	
 					// BRUSH TYPE
@@ -324,7 +326,7 @@ public class RenderPanel extends JComponent implements
 						case MULTIPLY:
 							
 							subBuffIm = ImageProcessor.subImg(buffIm, paintx, painty, 
-									newImage.getWidth(), newImage.getHeight());
+									newImgWidth, newImgHeight);
 							newImage = ImageProcessor.multiply(newImage, subBuffIm);
 						
 						break;
@@ -332,7 +334,7 @@ public class RenderPanel extends JComponent implements
 						case OVERLAY:
 							
 							subBuffIm = ImageProcessor.subImg(buffIm, paintx, painty, 
-									newImage.getWidth(), newImage.getHeight());
+									newImgWidth, newImgHeight);
 							newImage = ImageProcessor.overlay(newImage, subBuffIm);
 							
 						break;
@@ -360,7 +362,13 @@ public class RenderPanel extends JComponent implements
 					moveStartY = Mouse.y;
 				}
 	
-				// detect a change and add it, what a might fine mess, but it works
+				/* detect a change and add it, what a might fine mess, but it works
+				 * This code is complicated because it's blocking the user from moving
+				 * too for left, right, above or bellow the game world. It's limited
+				 * to half the width or high, so at least half of the size of the editor
+				 * window will always have the actual game or level visible. Can't go farther.
+				 */
+				
 				if (Mouse.x - moveStartX != 0 
 						&& editCon.xOffset() <= (getWidth() >> 1) &&
 						editCon.xOffset() >= -1 * gameModel.worldWidthPixels() + (getWidth() >> 1)) {
@@ -394,18 +402,20 @@ public class RenderPanel extends JComponent implements
 			
 			case ADD_SOUND:
 				
-					if (Mouse.isLeftButtonClicked() && gameModel.assetLayers().size() != 0) {
-						Sound s = new Sound(editCon.selectedSound());
-						s.setPosition(new Vector2f(Mouse.x - editCon.xOffset(), 
-								Mouse.y - editCon.yOffset()));
-						editCon.selectedAssetLayer().addSound(s);
-						mainWindow.evaluateState();
-					}
+				// check if clicked and then add a new sound the curretly selected layer
+				if (Mouse.isLeftButtonClicked() && gameModel.assetLayers().size() != 0) {
+					Sound s = new Sound(editCon.selectedSound());
+					s.setPosition(new Vector2f(Mouse.x - editCon.xOffset(), 
+							Mouse.y - editCon.yOffset()));
+					editCon.selectedAssetLayer().addSound(s);
+					mainWindow.evaluateState();
+				}
 					
 			break;
 			
 			case ADD_SPAWN_POINT:
 				
+				// check if clicked and then add a new spawn point to the currently selected layer
 				if (Mouse.isLeftButtonClicked() && gameModel.assetLayers().size() != 0) {
 					SpawnPoint sp = new SpawnPoint(editCon.selectedSpawnPoint());
 					sp.setPosition(new Vector2f(Mouse.x - editCon.xOffset(), 
@@ -441,6 +451,7 @@ public class RenderPanel extends JComponent implements
 						 * going across the width and will overun. Thus, the width of the new image needs to be
 						 * the length of the diagnal.
 						 */
+						
 						int hypotenuse = (int) Math.sqrt((decal.image().getWidth() << 1) * (decal.image().getHeight() << 1));
 						
 						placeDecalImage = new BufferedImage(hypotenuse, 
@@ -486,6 +497,7 @@ public class RenderPanel extends JComponent implements
 
 		g2d.setColor(new Color(50, 50, 50));
 
+		// draw a simple grid
 		for (int x = 0; x < gameModel.worldWidthPixels() + 1; x += GameModel.GRID_SIZE) {
 			for (int y = 0; y < gameModel.worldHeightPixels() + 1; y += GameModel.GRID_SIZE) {
 
@@ -519,8 +531,10 @@ public class RenderPanel extends JComponent implements
 				BufferedImage selectedImage = editCon.selectedTexture().image();
 				g2d.setColor(new Color(255, 255, 255));
 				g2d.setStroke(new BasicStroke(2.0f));
-				g2d.drawOval(Mouse.x - (selectedImage.getWidth() >> 1), Mouse.y - (selectedImage.getHeight() >> 1), 
-						selectedImage.getWidth(), selectedImage.getHeight());
+				g2d.drawOval((int)(Mouse.x - ((selectedImage.getWidth() * editCon.brushSize()) / 2)), 
+					(int)(Mouse.y - ((selectedImage.getHeight() * editCon.brushSize()) / 2)), 
+					(int)(selectedImage.getWidth() * editCon.brushSize()), 
+					(int)(selectedImage.getHeight() * editCon.brushSize()));
 				
 			break;
 	
@@ -676,6 +690,12 @@ public class RenderPanel extends JComponent implements
 			case KeyEvent.VK_S:
 				Keyboard.S = KeyState.PRESSED;
 			break;
+			case KeyEvent.VK_BRACERIGHT:
+				Keyboard.BRACE_RIGHT = KeyState.PRESSED;
+			break;
+			case KeyEvent.VK_BRACELEFT:
+				Keyboard.BRACE_LEFT = KeyState.PRESSED;
+			break;
 		}
 	}
 
@@ -696,6 +716,12 @@ public class RenderPanel extends JComponent implements
 			break;
 			case KeyEvent.VK_S:
 				Keyboard.S = KeyState.RELEASED;
+			break;
+			case KeyEvent.VK_BRACERIGHT:
+				Keyboard.BRACE_RIGHT = KeyState.RELEASED;
+			break;
+			case KeyEvent.VK_BRACELEFT:
+				Keyboard.BRACE_LEFT = KeyState.RELEASED;
 			break;
 		}
 	}
@@ -718,6 +744,12 @@ public class RenderPanel extends JComponent implements
 			case KeyEvent.VK_S:
 				Keyboard.S = KeyState.TYPED;
 			break;
+			case KeyEvent.VK_BRACERIGHT:
+				Keyboard.BRACE_RIGHT = KeyState.TYPED;
+			break;
+			case KeyEvent.VK_BRACELEFT:
+				Keyboard.BRACE_LEFT = KeyState.TYPED;
+			break;
 		}
 	}
 
@@ -735,9 +767,6 @@ public class RenderPanel extends JComponent implements
 		Mouse.y = e.getY();
 	}
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseWheelListener#mouseWheelMoved(java.awt.event.MouseWheelEvent)
-	 */
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e)
 	{

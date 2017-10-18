@@ -16,4 +16,6 @@ public class Keyboard
 	public static KeyState SPACE_BAR = KeyState.RELEASED;
 	public static KeyState PERIOD = KeyState.RELEASED;
 	public static KeyState COMMA = KeyState.RELEASED;
+	public static KeyState BRACE_RIGHT = KeyState.RELEASED;
+	public static KeyState BRACE_LEFT = KeyState.RELEASED;
 }

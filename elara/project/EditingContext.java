@@ -121,6 +121,12 @@ public class EditingContext
 	 */
 	private float textureBrushOpacity = 1.0f;
 	
+	/**
+	 * The size of the texture painting brush as a percentage
+	 * of the width of the texture being painted.
+	 */
+	private float brushSize = 1.0f;
+	
 	
 	/*===========================*
 	 * ADD_SOUND state fields    *
@@ -467,5 +473,28 @@ public class EditingContext
 	public double decalRotation()
 	{
 		return decalRotation;
+	}
+
+	/**
+	 * The size of the brush as a percentage. It will be 
+	 * a percentage of the width of the texture image being
+	 * painted.
+	 * 
+	 * @return
+	 */
+	public float brushSize()
+	{
+		return brushSize;
+	}
+	
+	/**
+	 * Set's the brush size, it's a percentage of the width
+	 * of the texture being painted.
+	 * 
+	 * @param brushSize
+	 */
+	public void assignBrushSize(float brushSize) 
+	{
+		this.brushSize = MathUtil.clamp(brushSize, 0.05f, 2.0f);
 	}
 }
