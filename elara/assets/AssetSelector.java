@@ -77,6 +77,7 @@ public class AssetSelector
 			}
 			
 			if (topmost != null) {
+				
 				/* 
 				 * By the nature of the way assets are rendered on each layer, the most
 				 * recently access value, that is the higher the index or further down the list

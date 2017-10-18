@@ -313,6 +313,8 @@ public class RenderPanel extends JComponent implements
 						break;
 					}
 					
+					BufferedImage subBuffIm;
+					
 					// BLEND MODE
 					switch (editCon.selectedBlendMode()) {
 						case OVERLAP:
@@ -321,17 +323,17 @@ public class RenderPanel extends JComponent implements
 					
 						case MULTIPLY:
 							
-							// FIXME out of bounds, blend mode
-							newImage = ImageProcessor.multiply(newImage, 0, 0, newImage.getWidth(), newImage.getHeight(),
-									buffIm, paintx, painty, newImage.getWidth(), newImage.getHeight());
+							subBuffIm = ImageProcessor.subImg(buffIm, paintx, painty, 
+									newImage.getWidth(), newImage.getHeight());
+							newImage = ImageProcessor.multiply(newImage, subBuffIm);
 						
 						break;
 						
 						case OVERLAY:
 							
-							newImage = ImageProcessor.overlay(newImage, 0, 0, 
-									buffIm, paintx, painty, 
+							subBuffIm = ImageProcessor.subImg(buffIm, paintx, painty, 
 									newImage.getWidth(), newImage.getHeight());
+							newImage = ImageProcessor.overlay(newImage, subBuffIm);
 							
 						break;
 						

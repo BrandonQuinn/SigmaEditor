@@ -8,7 +8,8 @@ package elara.editor.imageprocessing;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import org.newdawn.slick.geom.Rectangle;
+import elara.editor.debug.LogType;
+import elara.editor.debug.StaticLogs;
 import elara.editor.util.MathUtil;
 
 /**
@@ -57,65 +58,40 @@ public class ImageProcessor
 	/**
 	 * Multiplies their pixel values.
 	 * 
+	 * Both images must be the same size.
+	 * 
 	 * @param dest
 	 * @param src
 	 * @return
 	 */
-	public static BufferedImage multiply(BufferedImage dest, int x1, int y1, int width1, int height1,
-			BufferedImage src, int x2, int y2, int width2, int height2)
+	public static BufferedImage multiply(BufferedImage dest, BufferedImage src)
 	{
 		WritableRaster destRaster = dest.getRaster();
 		WritableRaster srcRaster = src.getRaster();
 		
-		/*
-		 * The destination image needs it's own rectangle which will be where the 
-		 * source image is multiplied on to.
-		 * So there's two rectangles that are sub-images or sub-sets of pixels from
-		 * both the source and destination.
-		 * 
-		 * Then we'll need to effectively create two loops that each loop over the
-		 * separated sub-images.
-		 * 
-		 * The destination image and the given location is where the multiplication will start
-		 * on the destination and the source x, y is where we will get the pixels to multiply from
-		 * in the 
-		 */
-
-		Rectangle destRect = new Rectangle(x1, y1, width1, width2);
-		Rectangle srcRect = new Rectangle(x2, y2, width2, height2);
-		
-		System.out.println("Dest pos:" + destRect.getX() + ", " + destRect.getY());
-		System.out.println("Dest dim:" + destRect.getWidth() + ", " + destRect.getHeight());
-		System.out.println("Src pos:" + srcRect.getX() + ", " + srcRect.getY());
-		System.out.println("Src dim:" + srcRect.getWidth() + ", " + srcRect.getHeight());
-		
-		/* 
-		 * Now we will want to essentially loop over these rectangles of pixels and multiply
-		 * checking we are staying within the bounds of both images.
-		 */
+		if (dest.getWidth() != src.getWidth() || dest.getHeight() != src.getHeight()) {
+			StaticLogs.debug.log(LogType.ERROR, "Failed image multiply operation, "
+					+ "images not the same size");
+			return dest;
+		}
 		
 		int[] srcTmp = new int[4];
 		int[] destTmp = new int[4]; 
-		for (int destX = x1, srcX = x2; srcX < src.getWidth(); destX++, srcX++) {
-			for (int destY = y1, srcY = y2; srcY < src.getHeight(); destY++, srcY++) {
+		for (int x = 0; x < dest.getWidth(); x++) {
+			for (int y = 0; y < dest.getHeight(); y++) {
+				// don't break the bounds of the source image
+				if (x < 0 || x >= src.getWidth()) {
+					continue;
+				}
 				
-				// prevent doing operations if we are less than the bounds
-				if (destX < 0) continue;
-				if (destY < 0) continue;
+				if (y < 0 || y >= src.getHeight()) {
+					continue;
+				}
+				
+				srcRaster.getPixel(x, y, srcTmp);
+				destRaster.getPixel(x, y, destTmp);
 
-				if (srcX < 0) continue;
-				if (srcY < 0) continue;
-				
-				// prevent position from coming too far off the size of the images
-				if (srcX > dest.getWidth() - 1) continue;
-				if (srcY > dest.getHeight() - 1) continue;
-				
-				if (destX > src.getWidth() - 1) continue;
-				if (destY > src.getHeight() - 1) continue;
-				
-				srcRaster.getPixel(srcX, srcY, srcTmp);
-				destRaster.getPixel(destX, destY, destTmp);
-				destRaster.setPixel(destX, destY, new int[] {
+				destRaster.setPixel(x, y, new int[] {
 					MathUtil.clamp((int)(((srcTmp[0] / 255.0f) * (destTmp[0] / 255.0f)) * 255), 0, 255),
 					MathUtil.clamp((int)(((srcTmp[1] / 255.0f) * (destTmp[1] / 255.0f)) * 255), 0, 255),
 					MathUtil.clamp((int)(((srcTmp[2] / 255.0f) * (destTmp[2] / 255.0f)) * 255), 0, 255),
@@ -128,7 +104,8 @@ public class ImageProcessor
 	}
 	
 	/**
-	 * Overlay filter
+	 * Overlay filter.
+	 * 
 	 * @param height 
 	 * @param width 
 	 * @param fromY 
@@ -140,46 +117,46 @@ public class ImageProcessor
 	 * @param srcScreen
 	 * @return
 	 */
-	public static BufferedImage overlay(BufferedImage dest, int toX, int toY, 
-			BufferedImage src, int fromX, int fromY, 
-			int width, int height)
+	public static BufferedImage overlay(BufferedImage dest, BufferedImage src)
 	{
 		WritableRaster destRaster = dest.getRaster();
 		WritableRaster srcRaster = src.getRaster();
 		
+		if (dest.getWidth() != src.getWidth() || dest.getHeight() != src.getHeight()) {
+			StaticLogs.debug.log(LogType.ERROR, "Failed image multiply operation, "
+					+ "images not the same size");
+			return dest;
+		}
+		
 		int[] RGBA = new int[4];
 		int[] srcTmp = new int[4];
 		int[] destTmp = new int[4];
-		for (int destX = toX, srcX = fromX, i = 0; i < width; destX++, srcX++, i++) {
-			for (int destY = toY, srcY = fromY, t = 0; t < height; destY++, srcY++, t++) {
-				try {
-					srcRaster.getPixel(srcX, srcY, srcTmp);
-					destRaster.getPixel(destX, destY, destTmp);
-					
-					if (destTmp[0] < (127.5f)) {
-						RGBA[0] = (int)(2 * (destTmp[0] / 255.0f) * (srcTmp[0] / 255.0f) * 255);
-					} else {
-						RGBA[0] = (int)((1 - 2 * (1 - (destTmp[0] / 255.0f)) * (1 - (srcTmp[0] / 255.0f))) * 255);
-					}
-					
-					if (destTmp[1] < (127.5f)) {
-						RGBA[1] = (int)(2 * (destTmp[1] / 255.0f) * (srcTmp[1] / 255.0f) * 255);
-					} else {
-						RGBA[1] = (int)((1 - 2 * (1 - (destTmp[1] / 255.0f)) * (1 - (srcTmp[1] / 255.0f))) * 255);
-					}
-					
-					if (destTmp[2] < (127.5f)) {
-						RGBA[2] = (int)(2 * (destTmp[2] / 255.0f) * (srcTmp[2] / 255.0f) * 255);
-					} else {
-						RGBA[2] = (int)((1 - 2 * (1 - (destTmp[2] / 255.0f)) * (1 - (srcTmp[2] / 255.0f))) * 255);
-					}
-					
-					RGBA[3] = destTmp[3];
-					
-					destRaster.setPixel(destX, destY, RGBA);
-				} catch (ArrayIndexOutOfBoundsException e) {
-					continue; // just don't write on that pixel and continue
+		for (int x = 0; x < dest.getWidth(); x++) {
+			for (int y = 0; y < dest.getHeight(); y++) {
+				srcRaster.getPixel(x, y, srcTmp);
+				destRaster.getPixel(x, y, destTmp);
+				
+				if (destTmp[0] < (127.5f)) {
+					RGBA[0] = (int)(2 * (destTmp[0] / 255.0f) * (srcTmp[0] / 255.0f) * 255);
+				} else {
+					RGBA[0] = (int)((1 - 2 * (1 - (destTmp[0] / 255.0f)) * (1 - (srcTmp[0] / 255.0f))) * 255);
 				}
+				
+				if (destTmp[1] < (127.5f)) {
+					RGBA[1] = (int)(2 * (destTmp[1] / 255.0f) * (srcTmp[1] / 255.0f) * 255);
+				} else {
+					RGBA[1] = (int)((1 - 2 * (1 - (destTmp[1] / 255.0f)) * (1 - (srcTmp[1] / 255.0f))) * 255);
+				}
+				
+				if (destTmp[2] < (127.5f)) {
+					RGBA[2] = (int)(2 * (destTmp[2] / 255.0f) * (srcTmp[2] / 255.0f) * 255);
+				} else {
+					RGBA[2] = (int)((1 - 2 * (1 - (destTmp[2] / 255.0f)) * (1 - (srcTmp[2] / 255.0f))) * 255);
+				}
+				
+				RGBA[3] = destTmp[3];
+				
+				destRaster.setPixel(x, y, RGBA);
 			}
 		}
 		
@@ -214,6 +191,44 @@ public class ImageProcessor
 		}
 		
 		return src;
+	}
+	
+	/**
+	 * This function provides a subimage, however, it also makes sure
+	 * to check the bounds don't get overrun.
+	 * 
+	 * @param im
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	public static BufferedImage subImg(BufferedImage im, int x, int y, int width, int height) {
+		BufferedImage newImg = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_ARGB);
+		WritableRaster raster = newImg.getRaster();
+		WritableRaster oldRaster = im.getRaster();
+
+		/*
+		 * Draw the image and replace an pixels that are out of bounds with
+		 * blank pixels.
+		 */
+		int[] blankPixel = new int[] {0, 0, 0, 255};
+
+		for (int xold = x, xnew = 0; xnew < width; xold++, xnew++) {
+			for (int yold = y, ynew = 0; ynew < height; yold++, ynew++) {
+				if (xold < 0 || xold >= im.getWidth()) {
+					raster.setPixel(xnew, ynew, blankPixel);
+				} else if (yold < 0 || yold >= im.getHeight()) {
+					raster.setPixel(xnew, ynew, blankPixel);
+				} else {
+					raster.setPixel(xnew, ynew, oldRaster.getPixel(xold, yold, (int[]) null));
+				}
+			}
+		}
+		
+		return newImg;
 	}
 
 	/**

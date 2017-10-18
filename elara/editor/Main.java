@@ -1,5 +1,5 @@
 
-package elara.editor.ui;
+package elara.editor;
 
 import java.io.IOException;
 import javax.swing.JOptionPane;
@@ -11,6 +11,7 @@ import org.json.simple.parser.ParseException;
 import elara.editor.debug.LogType;
 import elara.editor.debug.StackTraceUtil;
 import elara.editor.debug.StaticLogs;
+import elara.editor.ui.MainWindow;
 import elara.editor.ui.dialogs.ErrorDialog;
 import elara.editor.ui.dialogs.RecentProjectsDialog;
 import elara.editor.util.JSON;

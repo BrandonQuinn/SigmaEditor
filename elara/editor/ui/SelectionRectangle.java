@@ -5,6 +5,7 @@
  */
 package elara.editor.ui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -18,6 +19,8 @@ import elara.editor.input.Mouse;
  */
 public class SelectionRectangle
 {
+	private final float BORDER_THICKNESS = 2.0f;
+	
 	private boolean isDrawn = false;
 	
 	private int startX = 0, startY = 0;
@@ -79,8 +82,10 @@ public class SelectionRectangle
 				isDrawn = true;
 			
 			// draw border
+			g2d.setStroke(new BasicStroke(BORDER_THICKNESS));
 			g2d.setColor(new Color(93, 138, 153, 180));
 			g2d.drawRect(topLeftX, topLeftY, width, height);
+			g2d.setStroke(new BasicStroke(1.0f));
 			
 			// draw center
 			g2d.setColor(new Color(137, 227, 255, 100));
