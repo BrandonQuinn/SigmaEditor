@@ -27,6 +27,7 @@ import elara.assets.Sound;
 import elara.assets.SpawnPoint;
 import elara.assets.Texture;
 import elara.editor.imageprocessing.ImageProcessor;
+import elara.editor.input.InputManager;
 import elara.editor.input.KeyState;
 import elara.editor.input.Keyboard;
 import elara.editor.input.Mouse;
@@ -55,6 +56,7 @@ public class RenderPanel extends JComponent implements
 
 	private EditingContext editCon = EditingContext.editingContext();
 	private GameModel gameModel = GameModel.gameModel();
+	private InputManager inMan = InputManager.inputManager();
 
 	private MainWindow mainWindow;
 
@@ -141,7 +143,8 @@ public class RenderPanel extends JComponent implements
 		g2d.drawString("Tool: " + editCon.state().toString() + " | "
 				+ "Selected Texture Layer: " + (editCon.getSelectedGroundLayerIndex() + 1)
 				+ " | Offset x:" + editCon.xOffset() + ", y: " + editCon.yOffset()
-				+ " | Memory Usage: " + Runtime.getRuntime().totalMemory()/1000000 + "MB/" + Runtime.getRuntime().maxMemory()/1000000 + "MB", 5, 15);
+				+ " | Memory Usage: " + Runtime.getRuntime().totalMemory()/1000000 + "MB/" 
+				+ Runtime.getRuntime().maxMemory()/1000000 + "MB", 5, 15);
 		
 		g2d.drawString("Frame Time: " + RenderStats.frameTime + "ms", 5, 30);
 	}
@@ -151,6 +154,8 @@ public class RenderPanel extends JComponent implements
 	 */
 	private void handleInput()
 	{
+		inMan.pollInput();
+		
 		// handle space bar pressed and change state only when we are just enterting this state
 		if ((Keyboard.SPACE_BAR == KeyState.PRESSED)
 				&& editCon.state() != EditingState.MOVE_WORLD) {
@@ -254,11 +259,11 @@ public class RenderPanel extends JComponent implements
 	
 			case TEXTURE_PAINT:
 				
-				if (Keyboard.BRACE_LEFT == KeyState.PRESSED) {
+				if (Keyboard.BRACKET_LEFT == KeyState.PRESSED) {
 					editCon.assignBrushSize(editCon.brushSize() - 0.01f);
 				}
 				
-				if (Keyboard.BRACE_RIGHT == KeyState.PRESSED) {
+				if (Keyboard.BRACKET_RIGHT == KeyState.PRESSED) {
 					editCon.assignBrushSize(editCon.brushSize() + 0.01f);
 				}
 				
@@ -691,10 +696,10 @@ public class RenderPanel extends JComponent implements
 				Keyboard.S = KeyState.PRESSED;
 			break;
 			case KeyEvent.VK_BRACERIGHT:
-				Keyboard.BRACE_RIGHT = KeyState.PRESSED;
+				Keyboard.BRACKET_RIGHT = KeyState.PRESSED;
 			break;
 			case KeyEvent.VK_BRACELEFT:
-				Keyboard.BRACE_LEFT = KeyState.PRESSED;
+				Keyboard.BRACKET_LEFT = KeyState.PRESSED;
 			break;
 		}
 	}
@@ -718,10 +723,10 @@ public class RenderPanel extends JComponent implements
 				Keyboard.S = KeyState.RELEASED;
 			break;
 			case KeyEvent.VK_BRACERIGHT:
-				Keyboard.BRACE_RIGHT = KeyState.RELEASED;
+				Keyboard.BRACKET_RIGHT = KeyState.RELEASED;
 			break;
 			case KeyEvent.VK_BRACELEFT:
-				Keyboard.BRACE_LEFT = KeyState.RELEASED;
+				Keyboard.BRACKET_LEFT = KeyState.RELEASED;
 			break;
 		}
 	}
@@ -745,10 +750,10 @@ public class RenderPanel extends JComponent implements
 				Keyboard.S = KeyState.TYPED;
 			break;
 			case KeyEvent.VK_BRACERIGHT:
-				Keyboard.BRACE_RIGHT = KeyState.TYPED;
+				Keyboard.BRACKET_RIGHT = KeyState.TYPED;
 			break;
 			case KeyEvent.VK_BRACELEFT:
-				Keyboard.BRACE_LEFT = KeyState.TYPED;
+				Keyboard.BRACKET_LEFT = KeyState.TYPED;
 			break;
 		}
 	}

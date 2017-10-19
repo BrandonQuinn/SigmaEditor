@@ -8,7 +8,7 @@ package elara.editor.input;
 /**
  * Mouse
  *
- * Description:
+ * Description: Just mouse inputs...
  */
 public class Mouse
 {

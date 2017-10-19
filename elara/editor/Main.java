@@ -11,6 +11,7 @@ import org.json.simple.parser.ParseException;
 import elara.editor.debug.LogType;
 import elara.editor.debug.StackTraceUtil;
 import elara.editor.debug.StaticLogs;
+import elara.editor.input.InputManager;
 import elara.editor.ui.MainWindow;
 import elara.editor.ui.dialogs.ErrorDialog;
 import elara.editor.ui.dialogs.RecentProjectsDialog;
@@ -20,9 +21,7 @@ import elara.project.ProjectManager;
 /*
  * The big TODO LIST
  * 
- * TODO Threaded texture painting, blending, OpenCL?
  * TODO Texture modifiers like blur, dodge, burn
- * TODO Brush size
  * TODO Entity parenting
  * TODO Entity deletion
  * 
@@ -90,5 +89,12 @@ public class Main
 			JOptionPane.showMessageDialog(null, "Failed to load editor configuration.", 
 					"ParseException", JOptionPane.ERROR_MESSAGE);
 		}
+		
+		InputManager inMan = InputManager.inputManager();
+		inMan.logControllerInfo(StaticLogs.debug);
+		
+		Thread inputThread = new Thread(inMan);
+		inputThread.setName("Input Event Thread");
+		inputThread.start();
 	}
 }
