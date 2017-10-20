@@ -151,6 +151,13 @@ public class EditingContext
 	 */
 	private double decalRotation = 0.0;
 	
+	/**
+	 * Rotation speed when rotating decals. 
+	 * It's basically the amount added to the current speed, 
+	 * or subtracted.
+	 */
+	private double rotationSpeed = 0.01;
+	
 	private Layer selectedAssetLayer;
 	
 	/**
@@ -461,7 +468,7 @@ public class EditingContext
 	 * @param rotationDegrees
 	 */
 	public void assignDecalRotation(double rotationDegrees) {
-		decalRotation = rotationDegrees;
+		decalRotation = MathUtil.cycleClamp(rotationDegrees, 0.0, 360.0);
 	}
 	
 	/**
@@ -496,5 +503,25 @@ public class EditingContext
 	public void assignBrushSize(float brushSize) 
 	{
 		this.brushSize = MathUtil.clamp(brushSize, 0.05f, 2.0f);
+	}
+	
+	/**
+	 * Returns the rotation speed of decal rotation.
+	 * 
+	 * @return
+	 */
+	public double rotationSpeed()
+	{
+		return rotationSpeed;
+	}
+	
+	/**
+	 * Set the value for the rotation speed.
+	 * 
+	 * @param rotSpeed
+	 */
+	public void assignRotationSpeed(double rotSpeed)
+	{
+		rotationSpeed = rotSpeed;
 	}
 }

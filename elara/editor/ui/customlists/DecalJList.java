@@ -10,6 +10,7 @@ import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import elara.assets.Texture;
+import elara.editor.ui.MainWindow;
 import elara.project.EditingContext;
 import elara.project.EditingContext.EditingState;
 import elara.project.ProjectContext;
@@ -29,8 +30,11 @@ public class DecalJList extends JList<Texture>
 	
 	private DefaultListModel<Texture> model = new DefaultListModel<Texture>();
 	
-	public DecalJList()
+	private MainWindow mainWindow;
+	
+	public DecalJList(MainWindow mainWindow)
 	{
+		this.mainWindow = mainWindow;
 		setCellRenderer(new TextureListRenderer());
 		addListSelectionListener(this);
 		setModel(model);
@@ -48,6 +52,7 @@ public class DecalJList extends JList<Texture>
 		if (index != -1) {
 			editCon.assignSelectedDecal(model.get(index));
 			editCon.assignState(EditingState.DECAL_PLACEMENT);
+			mainWindow.evaluateState();
 		}
 	}
 	

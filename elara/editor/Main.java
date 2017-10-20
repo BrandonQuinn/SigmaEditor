@@ -39,30 +39,10 @@ public class Main
 {
 	private static ProjectManager pc = ProjectManager.manager();
 	
-	// private static final String SYNTH_STYLE_FILE = "elara/editor/ui/laf/synthStyle.xml";
+	// private static final String SYNTH_STYLE_FILE = "res/synth/synthStyle.xml";
 	
 	public static void main(String args[])
 	{
-		System.setProperty("-Dsun.java2d.opengl", "true");
-		
-		// load the system look and feel
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			
-			// experimental
-			/*
-			 * SynthLookAndFeel lookAndFeel = new SynthLookAndFeel();
-			 * lookAndFeel.load(ClassLoader.getSystemResource(SYNTH_STYLE_FILE));
-			 * UIManager.setLookAndFeel(lookAndFeel);
-			*/
-		} catch (ClassNotFoundException | InstantiationException | 
-				IllegalAccessException | UnsupportedLookAndFeelException e) {
-			ErrorDialog eDialog = new ErrorDialog("Could not load the system look and feel.",
-					StackTraceUtil.stackTraceToString(e));
-			eDialog.setVisible(true); // error dialog probably not needed
-			return;
-		}
-
 		initialise();
 		
 		// allow user to open a recent project
@@ -79,6 +59,28 @@ public class Main
 	 */
 	private static void initialise()
 	{
+		System.setProperty("-Dsun.java2d.opengl", "true");
+		
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | 
+				IllegalAccessException | UnsupportedLookAndFeelException e) {
+			ErrorDialog eDialog = new ErrorDialog("Could not load the system look and feel.",
+					StackTraceUtil.stackTraceToString(e));
+			eDialog.setVisible(true); // error dialog probably not needed
+			return;
+		}
+		
+		/*try {
+			SynthLookAndFeel lookAndFeel = new SynthLookAndFeel();
+			lookAndFeel.load(new File(SYNTH_STYLE_FILE).toURL());
+			UIManager.setLookAndFeel(lookAndFeel);
+		} catch (UnsupportedLookAndFeelException | java.text.ParseException | IOException e1) {
+			e1.printStackTrace();
+		}*/
+		
+		
+		
 		// load the configuration for the editor
 		try {
 			JSONObject editorConfig = JSON.read("conf/editor.config");

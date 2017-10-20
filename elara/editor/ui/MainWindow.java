@@ -46,6 +46,7 @@ import elara.editor.ui.dialogs.AboutDialog;
 import elara.editor.ui.dialogs.NewProjectDialog;
 import elara.editor.ui.dialogs.TextureLayerDialog;
 import elara.editor.ui.dialogs.WaitingDialog;
+import elara.editor.ui.propertiespanels.DecalPropsPanel;
 import elara.editor.ui.propertiespanels.SoundPropsPanel;
 import elara.editor.ui.propertiespanels.TexturePropsPanel;
 import elara.project.AssetLoader;
@@ -84,8 +85,8 @@ public class MainWindow extends JFrame implements
 	 */
 	private TexturePropsPanel texturePropertiesPanel = new TexturePropsPanel();
 	private SoundPropsPanel soundPropertiesPanel = new SoundPropsPanel();
+	private DecalPropsPanel decalPropertiesPanel = new DecalPropsPanel();
 	private AssetsJList assetsList = new AssetsJList();
-	private DecalJList decalList = new DecalJList();
 	
 	/**
 	 * Buttons
@@ -102,6 +103,7 @@ public class MainWindow extends JFrame implements
 	private SoundJList soundList;
 	private LayerJList layerList;
 	private SpawnPointJList spawnPointList;
+	private DecalJList decalList;
 
 	/**
 	 * Menu Items
@@ -240,6 +242,7 @@ public class MainWindow extends JFrame implements
 		soundList = new SoundJList(this);
 		layerList = new LayerJList(this);
 		spawnPointList = new SpawnPointJList();
+		decalList = new DecalJList(this);
 		
 		JPanel leftSideSouthPanel = new JPanel();
 		leftSideSouthPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
@@ -726,11 +729,18 @@ public class MainWindow extends JFrame implements
 			case ADD_SPAWN_POINT:
 			break;
 			
+			case DECAL_PLACEMENT:
+				propertiesPanel.removeAll();
+				propertiesPanel.add(decalPropertiesPanel, BorderLayout.CENTER);
+				propertiesPanel.updateUI();
+			break;
+			
 			default:
 			break;
 		}
 
 		assetsList.loadFromContext();
 		texturePropertiesPanel.assignOpacity((int)(editingContext.textureBrushOpacity() * 100.0f));
+		decalPropertiesPanel.assignRotation(editingContext.decalRotation());
 	}
 }

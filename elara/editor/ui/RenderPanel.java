@@ -279,8 +279,7 @@ public class RenderPanel extends JComponent implements
 					int newImgWidth = (int)(paintTexture.getWidth() * editCon.brushSize());
 					int newImgHeight = (int)(paintTexture.getHeight() * editCon.brushSize());
 					
-					newImage = new BufferedImage(
-							newImgWidth, newImgHeight, 
+					newImage = new BufferedImage( newImgWidth, newImgHeight, 
 							BufferedImage.TYPE_INT_ARGB);
 					ng = newImage.createGraphics();
 					ng.drawImage(paintTexture, 0, 0, null);
@@ -367,7 +366,8 @@ public class RenderPanel extends JComponent implements
 					moveStartY = Mouse.y();
 				}
 	
-				/* detect a change and add it, what a might fine mess, but it works
+				/* 
+				 * Detect a change and add it, what a might fine mess, but it works
 				 * This code is complicated because it's blocking the user from moving
 				 * too for left, right, above or bellow the game world. It's limited
 				 * to half the width or high, so at least half of the size of the editor
@@ -435,7 +435,8 @@ public class RenderPanel extends JComponent implements
 				
 				// you spin me right 'round baby right 'round
 				if (Mouse.isMiddleButtonDown()) {
-					editCon.assignDecalRotation(editCon.decalRotation() + 0.2);
+					editCon.assignDecalRotation(editCon.decalRotation() + (0.1 + editCon.rotationSpeed()));
+					mainWindow.evaluateState();
 				}
 				
 				if (Mouse.isLeftButtonClicked()) {

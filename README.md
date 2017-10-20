@@ -6,7 +6,9 @@
 
 ### Version 0.0 Build 3 Release Notes
 
-- None yet...
+- Mouse position now done with jinput
+- Input event handling done after polling, as opposed to in a separate thread
+- Decal properties panel with rotation and rotation speed
 
 ### Dependencies
 - [JSON.Simple](https://github.com/fangyidong/json-simpl)

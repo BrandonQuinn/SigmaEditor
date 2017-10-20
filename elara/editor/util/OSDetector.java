@@ -40,5 +40,4 @@ public class OSDetector
 
 		return OS.UNKNOWN;
 	}
-
 }
