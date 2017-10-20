@@ -39,6 +39,8 @@ public class Main
 {
 	private static ProjectManager pc = ProjectManager.manager();
 	
+	// private static final String SYNTH_STYLE_FILE = "elara/editor/ui/laf/synthStyle.xml";
+	
 	public static void main(String args[])
 	{
 		System.setProperty("-Dsun.java2d.opengl", "true");
@@ -46,8 +48,15 @@ public class Main
 		// load the system look and feel
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-				| UnsupportedLookAndFeelException e) {
+			
+			// experimental
+			/*
+			 * SynthLookAndFeel lookAndFeel = new SynthLookAndFeel();
+			 * lookAndFeel.load(ClassLoader.getSystemResource(SYNTH_STYLE_FILE));
+			 * UIManager.setLookAndFeel(lookAndFeel);
+			*/
+		} catch (ClassNotFoundException | InstantiationException | 
+				IllegalAccessException | UnsupportedLookAndFeelException e) {
 			ErrorDialog eDialog = new ErrorDialog("Could not load the system look and feel.",
 					StackTraceUtil.stackTraceToString(e));
 			eDialog.setVisible(true); // error dialog probably not needed
@@ -90,11 +99,8 @@ public class Main
 					"ParseException", JOptionPane.ERROR_MESSAGE);
 		}
 		
+		// create and setup input
 		InputManager inMan = InputManager.inputManager();
 		inMan.logControllerInfo(StaticLogs.debug);
-		
-		Thread inputThread = new Thread(inMan);
-		inputThread.setName("Input Event Thread");
-		inputThread.start();
 	}
 }

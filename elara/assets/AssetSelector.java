@@ -134,7 +134,7 @@ public class AssetSelector
 		
 		for (Entity entity : selEnt.values()) {
 			Rectangle rect = entity.selectionBox.rectangle();
-			point = new Point(Mouse.x, Mouse.y);
+			point = new Point(Mouse.x(), Mouse.y());
 			if (rect.contains(point)) {
 				return true;
 			}
@@ -153,28 +153,28 @@ public class AssetSelector
 	public static void moveSelection()
 	{
 		if (startX == null) {
-			startX = Mouse.x;
+			startX = Mouse.x();
 		}
 		
 		if (startY == null) {
-			startY = Mouse.y;
+			startY = Mouse.y();
 		}
 		
 		// go through all entities and move them the amount 
 		// the mouse has moved
 		for (Entity entity : selEnt.values()) {
 			
-			if (Mouse.x - startX != 0) {
-				entity.position.add(Mouse.x - startX, 0.0f);
+			if (Mouse.x() - startX != 0) {
+				entity.position.add(Mouse.x() - startX, 0.0f);
 			}
 			
-			if (Mouse.y - startY != 0) {
-				entity.position.add(0.0f, Mouse.y - startY);
+			if (Mouse.y() - startY != 0) {
+				entity.position.add(0.0f, Mouse.y() - startY);
 			}
 		}
 		
-		startX = Mouse.x;
-		startY = Mouse.y;
+		startX = Mouse.x();
+		startY = Mouse.y();
 	}
 	
 	/**

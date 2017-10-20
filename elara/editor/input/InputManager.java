@@ -24,20 +24,9 @@ import net.java.games.input.EventQueue;
  *****************************************************************/
 
 public class InputManager
-	implements Runnable
 {
 	private static InputManager inMan = new InputManager();
-	
-	/**
-	 * Polling input?
-	 */
-	private boolean polling = true;
-	
-	/**
-	 * Input event handling frequency.
-	 */
-	private static final int EVENT_HANDLE_FREQ = 16;
-	
+
 	/**
 	 * All controllers detected.
 	 */
@@ -111,40 +100,16 @@ public class InputManager
 		if (keyboard != null) {
 			keyboard.poll();
 		}
-	}
-	
-
-	/**
-	 * Loop over the event queues
-	 */
-	@Override
-	public void run()
-	{
-		boolean tmp = false;
+		
 		Event mouseEvent = new Event();
 		Event keyboardEvent = new Event();
-		while (polling) {
-			
-			// get the next mouseEvent
-			tmp = mouseEventQueue.getNextEvent(mouseEvent);
-			if (tmp == true) {
-				interpretMouseEvent(mouseEvent);
-				tmp = false;
-			}
-			
-			// next keyboard event
-			tmp = keyboardEventQueue.getNextEvent(keyboardEvent);
-			if (tmp == true) {
-				interpretKeyboardEvent(keyboardEvent);
-				tmp = false;
-			}
-			
-			try {
-				Thread.sleep(EVENT_HANDLE_FREQ);
-			} catch (InterruptedException e) {
-				StaticLogs.debug.log(LogType.CRITICAL, "Event handling thread was interrupted on sleep");
-				e.printStackTrace();
-			}
+		
+		while (mouseEventQueue.getNextEvent(mouseEvent)) {
+			interpretMouseEvent(mouseEvent);
+		}
+		
+		while (keyboardEventQueue.getNextEvent(keyboardEvent)) {
+			interpretKeyboardEvent(keyboardEvent);
 		}
 	}
 
@@ -153,34 +118,59 @@ public class InputManager
 	 */
 	private void interpretKeyboardEvent(Event keyboardEvent)
 	{
-		Component c = keyboardEvent.getComponent();
-		System.out.println(c.getPollData());
-		System.out.println(c.getName());
+		Component comp = keyboardEvent.getComponent();
 		
 		// brackets
 		
-		if (c.getName().equals("[")) {
+		if (comp.getName().equals("[")) {
 			if (keyboardEvent.getValue() == 1.0) {
 				Keyboard.BRACKET_LEFT = KeyState.PRESSED;
 			} else {
 				Keyboard.BRACKET_LEFT = KeyState.RELEASED;
 			}
-		} else if (c.getName().equals("]")) {
+		} else if (comp.getName().equals("]")) {
 			if (keyboardEvent.getValue() == 1.0) {
 				Keyboard.BRACKET_RIGHT = KeyState.PRESSED;
 			} else {
 				Keyboard.BRACKET_RIGHT = KeyState.RELEASED;
 			}
+		} 
+		
+		// grammar
+		
+		else if (comp.getName().equals(".")) {
+			if (keyboardEvent.getValue() == 1.0) {
+				Keyboard.PERIOD = KeyState.PRESSED;
+			} else {
+				Keyboard.PERIOD = KeyState.RELEASED;
+			}
+		} else if (comp.getName().equals(",")) {
+			if (keyboardEvent.getValue() == 1.0) {
+				Keyboard.COMMA = KeyState.PRESSED;
+			} else {
+				Keyboard.COMMA = KeyState.RELEASED;
+			}
 		}
 	}
 
+	
 	/**
+	 * Takes each mouse event and turns it in to something more
+	 * useable.
+	 * 
 	 * @param mouseEvent
 	 */
 	private void interpretMouseEvent(Event mouseEvent)
 	{
-		Component c = mouseEvent.getComponent();
-		System.out.println(c.getName());
+		Component comp = mouseEvent.getComponent();
+		
+		if (comp.getName().equals("x")) {
+			Mouse.incrementX((int) mouseEvent.getValue());
+		}
+		
+		if (comp.getName().equals("y")) {
+			Mouse.incrementY((int) mouseEvent.getValue());
+		}
 	}
 
 	/**

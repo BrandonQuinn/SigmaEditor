@@ -234,7 +234,7 @@ public class RenderPanel extends JComponent implements
 					// deselect all
 					AssetSelector.deselectAll();
 					// check selection at this point
-					AssetSelector.checkSelections(Mouse.x, Mouse.y);
+					AssetSelector.checkSelections(Mouse.x(), Mouse.y());
 				}
 				
 				// click and hold on selection
@@ -285,8 +285,8 @@ public class RenderPanel extends JComponent implements
 					ng = newImage.createGraphics();
 					ng.drawImage(paintTexture, 0, 0, null);
 					
-					paintx = (Mouse.x - (newImgWidth >> 1)) + editCon.xOffset() * -1;
-					painty = (Mouse.y - (newImgHeight >> 1)) + editCon.yOffset() * -1;
+					paintx = (Mouse.x() - (newImgWidth >> 1)) + editCon.xOffset() * -1;
+					painty = (Mouse.y() - (newImgHeight >> 1)) + editCon.yOffset() * -1;
 					
 					// create a new image which handles tiling
 					if (editCon.tiledPaintingEnabled()) {
@@ -360,11 +360,11 @@ public class RenderPanel extends JComponent implements
 			case MOVE_WORLD:
 				
 				if (moveStartX == null) {
-					moveStartX = Mouse.x;
+					moveStartX = Mouse.x();
 				}
 				
 				if (moveStartY == null) {
-					moveStartY = Mouse.y;
+					moveStartY = Mouse.y();
 				}
 	
 				/* detect a change and add it, what a might fine mess, but it works
@@ -374,22 +374,22 @@ public class RenderPanel extends JComponent implements
 				 * window will always have the actual game or level visible. Can't go farther.
 				 */
 				
-				if (Mouse.x - moveStartX != 0 
+				if (Mouse.x() - moveStartX != 0 
 						&& editCon.xOffset() <= (getWidth() >> 1) &&
 						editCon.xOffset() >= -1 * gameModel.worldWidthPixels() + (getWidth() >> 1)) {
-					editCon.addToXOffset(Mouse.x - moveStartX);
-					moveStartX = Mouse.x;
+					editCon.addToXOffset(Mouse.x() - moveStartX);
+					moveStartX = Mouse.x();
 				} else if (editCon.xOffset() >= (getWidth() >> 1)) {
 					editCon.addToXOffset(-editCon.xOffset() + (getWidth() >> 1));
 				} else if (editCon.xOffset() <= -1 * gameModel.worldWidthPixels() + (getWidth() >> 1)) {
 					editCon.addToXOffset(-editCon.xOffset() + -1 * gameModel.worldWidthPixels() + (getWidth() >> 1));
 				}
 				
-				if (Mouse.y - moveStartY != 0 
+				if (Mouse.y() - moveStartY != 0 
 						&& editCon.xOffset() <= (getHeight()) &&
 						editCon.yOffset() >= -1 * gameModel.worldHeightPixels() + (getHeight() >> 1)) {
-					editCon.addToYOffset(Mouse.y - moveStartY);
-					moveStartY = Mouse.y;
+					editCon.addToYOffset(Mouse.y() - moveStartY);
+					moveStartY = Mouse.y();
 				} else if (editCon.yOffset() >= (getHeight() >> 1)) {
 					editCon.addToYOffset(-editCon.yOffset() + (getHeight() >> 1));
 				} else if (editCon.yOffset() <= -1 * gameModel.worldHeightPixels() + (getHeight() >> 1)) {
@@ -410,8 +410,8 @@ public class RenderPanel extends JComponent implements
 				// check if clicked and then add a new sound the curretly selected layer
 				if (Mouse.isLeftButtonClicked() && gameModel.assetLayers().size() != 0) {
 					Sound s = new Sound(editCon.selectedSound());
-					s.setPosition(new Vector2f(Mouse.x - editCon.xOffset(), 
-							Mouse.y - editCon.yOffset()));
+					s.setPosition(new Vector2f(Mouse.x() - editCon.xOffset(), 
+							Mouse.y() - editCon.yOffset()));
 					editCon.selectedAssetLayer().addSound(s);
 					mainWindow.evaluateState();
 				}
@@ -423,8 +423,8 @@ public class RenderPanel extends JComponent implements
 				// check if clicked and then add a new spawn point to the currently selected layer
 				if (Mouse.isLeftButtonClicked() && gameModel.assetLayers().size() != 0) {
 					SpawnPoint sp = new SpawnPoint(editCon.selectedSpawnPoint());
-					sp.setPosition(new Vector2f(Mouse.x - editCon.xOffset(), 
-							Mouse.y - editCon.yOffset()));
+					sp.setPosition(new Vector2f(Mouse.x() - editCon.xOffset(), 
+							Mouse.y() - editCon.yOffset()));
 					editCon.selectedAssetLayer().addSpawnPoint(sp);
 					mainWindow.evaluateState();
 				}
@@ -446,8 +446,8 @@ public class RenderPanel extends JComponent implements
 							= gameModel.groundTextureLayers().get(groundLayerIndex);
 						
 						// get the positon to place the decal.
-						paintx = (Mouse.x - (decal.image().getWidth() >> 1)) + editCon.xOffset() * -1;
-						painty = (Mouse.y - (decal.image().getHeight() >> 1)) + editCon.yOffset() * -1;
+						paintx = (Mouse.x() - (decal.image().getWidth() >> 1)) + editCon.xOffset() * -1;
+						painty = (Mouse.y() - (decal.image().getHeight() >> 1)) + editCon.yOffset() * -1;
 
 						/*
 						 * Since the image is going to be rotated and we have create a new image to
@@ -527,7 +527,7 @@ public class RenderPanel extends JComponent implements
 		switch (editCon.state()) {
 			case SELECT:
 				
-				g2d.drawImage(cursorImage.getImage(), Mouse.x - 8, Mouse.y - 8, null);
+				g2d.drawImage(cursorImage.getImage(), Mouse.x() - 8, Mouse.y() - 8, null);
 				
 			break;
 	
@@ -536,8 +536,8 @@ public class RenderPanel extends JComponent implements
 				BufferedImage selectedImage = editCon.selectedTexture().image();
 				g2d.setColor(new Color(255, 255, 255));
 				g2d.setStroke(new BasicStroke(2.0f));
-				g2d.drawOval((int)(Mouse.x - ((selectedImage.getWidth() * editCon.brushSize()) / 2)), 
-					(int)(Mouse.y - ((selectedImage.getHeight() * editCon.brushSize()) / 2)), 
+				g2d.drawOval((int)(Mouse.x() - ((selectedImage.getWidth() * editCon.brushSize()) / 2)), 
+					(int)(Mouse.y() - ((selectedImage.getHeight() * editCon.brushSize()) / 2)), 
 					(int)(selectedImage.getWidth() * editCon.brushSize()), 
 					(int)(selectedImage.getHeight() * editCon.brushSize()));
 				
@@ -546,16 +546,16 @@ public class RenderPanel extends JComponent implements
 			case MOVE_WORLD:
 				
 				g2d.drawImage(DefaultIcons.moveWorldIcon.getImage(), 
-						Mouse.x - DefaultIcons.moveWorldIcon.getIconWidth() / 2, 
-						Mouse.y - DefaultIcons.moveWorldIcon.getIconHeight() / 2, null);
+						Mouse.x() - DefaultIcons.moveWorldIcon.getIconWidth() / 2, 
+						Mouse.y() - DefaultIcons.moveWorldIcon.getIconHeight() / 2, null);
 				
 			break;
 			
 			case ADD_SOUND:
 				
 				g2d.drawImage(DefaultIcons.soundIcon.getImage(),
-					Mouse.x  - (DefaultIcons.soundIcon.getIconWidth() >> 1), 
-					Mouse.y - (DefaultIcons.soundIcon.getIconHeight() >> 1), null);
+					Mouse.x()  - (DefaultIcons.soundIcon.getIconWidth() >> 1), 
+					Mouse.y() - (DefaultIcons.soundIcon.getIconHeight() >> 1), null);
 				
 			break;
 			
@@ -580,26 +580,26 @@ public class RenderPanel extends JComponent implements
 					}
 					
 					g2d.drawImage(chosenIcon.getImage(),
-							Mouse.x  - (chosenIcon.getIconWidth() >> 1), 
-							Mouse.y - (chosenIcon.getIconHeight() >> 1), null);
+							Mouse.x()  - (chosenIcon.getIconWidth() >> 1), 
+							Mouse.y() - (chosenIcon.getIconHeight() >> 1), null);
 				}
 
 			break;
 	
 			case DECAL_PLACEMENT:
 
-				g2d.rotate(Math.toRadians(editCon.decalRotation()), Mouse.x, Mouse.y);
+				g2d.rotate(Math.toRadians(editCon.decalRotation()), Mouse.x(), Mouse.y());
 				
 				g2d.drawImage(editCon.selectedDecal().image(), 
-						Mouse.x - (editCon.selectedDecal().image().getWidth() >> 1), 
-						Mouse.y - (editCon.selectedDecal().image().getHeight() >> 1), null);
+						Mouse.x() - (editCon.selectedDecal().image().getWidth() >> 1), 
+						Mouse.y() - (editCon.selectedDecal().image().getHeight() >> 1), null);
 
-				g2d.rotate(Math.toRadians(-editCon.decalRotation()), Mouse.x, Mouse.y);
+				g2d.rotate(Math.toRadians(-editCon.decalRotation()), Mouse.x(), Mouse.y());
 				
 			break;
 			
 			default:
-				g2d.drawImage(cursorImage.getImage(), Mouse.x - 8, Mouse.y - 8, null);
+				g2d.drawImage(cursorImage.getImage(), Mouse.x() - 8, Mouse.y() - 8, null);
 		}
 	}
 
@@ -627,6 +627,8 @@ public class RenderPanel extends JComponent implements
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
 			Mouse.setRightButtonState(MouseState.NOT_PRESSED);
 		}
+		
+		Mouse.setEntered(true, e);
 	}
 
 	@Override
@@ -639,6 +641,8 @@ public class RenderPanel extends JComponent implements
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
 			Mouse.setRightButtonState(MouseState.NOT_PRESSED);
 		}
+		
+		Mouse.setEntered(false, e);
 	}
 
 	@Override
@@ -686,12 +690,6 @@ public class RenderPanel extends JComponent implements
 			case KeyEvent.VK_SPACE:
 				Keyboard.SPACE_BAR = KeyState.PRESSED;
 			break;
-			case KeyEvent.VK_PERIOD:
-				Keyboard.PERIOD = KeyState.PRESSED;
-			break;
-			case KeyEvent.VK_COMMA:
-				Keyboard.COMMA = KeyState.PRESSED;
-			break;
 			case KeyEvent.VK_S:
 				Keyboard.S = KeyState.PRESSED;
 			break;
@@ -712,12 +710,6 @@ public class RenderPanel extends JComponent implements
 		switch (keyCode) {
 			case KeyEvent.VK_SPACE:
 				Keyboard.SPACE_BAR = KeyState.RELEASED;
-			break;
-			case KeyEvent.VK_PERIOD:
-				Keyboard.PERIOD = KeyState.RELEASED;
-			break;
-			case KeyEvent.VK_COMMA:
-				Keyboard.COMMA = KeyState.RELEASED;
 			break;
 			case KeyEvent.VK_S:
 				Keyboard.S = KeyState.RELEASED;
@@ -740,12 +732,6 @@ public class RenderPanel extends JComponent implements
 			case KeyEvent.VK_SPACE:
 				Keyboard.SPACE_BAR = KeyState.TYPED;
 			break;
-			case KeyEvent.VK_PERIOD:
-				Keyboard.PERIOD = KeyState.TYPED;
-			break;
-			case KeyEvent.VK_COMMA:
-				Keyboard.COMMA = KeyState.TYPED;
-			break;
 			case KeyEvent.VK_S:
 				Keyboard.S = KeyState.TYPED;
 			break;
@@ -761,15 +747,13 @@ public class RenderPanel extends JComponent implements
 	@Override
 	public void mouseDragged(MouseEvent e)
 	{
-		Mouse.x = e.getX();
-		Mouse.y = e.getY();
+
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e)
 	{
-		Mouse.x = e.getX();
-		Mouse.y = e.getY();
+
 	}
 
 	@Override

@@ -44,8 +44,8 @@ public class SelectionRectangle
 		
 		// get the starting position
 		if (Mouse.isLeftButtonDown() && !startSet) {
-			startX = Mouse.x;
-			startY = Mouse.y;
+			startX = Mouse.x();
+			startY = Mouse.y();
 			startSet = true;
 		}
 
@@ -54,24 +54,24 @@ public class SelectionRectangle
 			// draw border
 
 			// figure out which direction we are going in to draw the rect
-			if (Mouse.x < startX) {
-				topLeftX = Mouse.x;
-				width = startX - Mouse.x;
+			if (Mouse.x() < startX) {
+				topLeftX = Mouse.x();
+				width = startX - Mouse.x();
 			}
 			
-			if (Mouse.x > startX) {
+			if (Mouse.x() > startX) {
 				topLeftX = startX;
-				width = Mouse.x - startX;
+				width = Mouse.x() - startX;
 			}
 			
-			if (Mouse.y < startY) {
-				topLeftY = Mouse.y;
-				height = startY - Mouse.y;
+			if (Mouse.y() < startY) {
+				topLeftY = Mouse.y();
+				height = startY - Mouse.y();
 			}
 			
-			if (Mouse.y > startY) {
+			if (Mouse.y() > startY) {
 				topLeftY = startY;
-				height = Mouse.y - startY;
+				height = Mouse.y() - startY;
 			}
 			
 			// when the size is 0, then there can't be anything

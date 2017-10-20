@@ -1,4 +1,7 @@
 package elara.editor.input;
+
+import java.awt.event.MouseEvent;
+
 /**
  * Author: Brandon
  * Date Created: 4 Oct. 2017
@@ -12,13 +15,83 @@ package elara.editor.input;
  */
 public class Mouse
 {
-	public static int x = 0;
-	public static int y = 0;
+	private static boolean entered = false;
+	private static int exitedX = 0;
+	private static int exitedY = 0;
+	
+	private static int x = 0;
+	private static int y = 0;
 	
 	private static MouseState leftButton = MouseState.NOT_PRESSED;
 	private static MouseState middleButton = MouseState.NOT_PRESSED;
 	private static MouseState rightButton = MouseState.NOT_PRESSED;
 
+	
+	/**
+	 * Returns the x position of the mouse.
+	 * @return
+	 */
+	public static synchronized int x() 
+	{
+		if (!entered) {
+			return exitedX;
+		}
+		
+		return x;
+	}
+	
+	
+	/**
+	 * Returns the y position of the mouse.
+	 * @return
+	 */
+	public static synchronized int y()
+	{
+		if (!entered) {
+			return exitedY;
+		}
+		
+		return y;
+	}
+	
+	/**
+	 * Increments the mouse x position.
+	 * 
+	 * @param inc
+	 */
+	public static synchronized void incrementX(int inc)
+	{
+		Mouse.x += inc;
+	}
+	
+	
+	/**
+	 * Increments the mouse y position.
+	 * @param inc
+	 */
+	public static synchronized void incrementY(int inc)
+	{
+		Mouse.y += inc;
+	}
+	
+	/**
+	 * Sets the x position.
+	 * @param x
+	 */
+	public static synchronized void assignX(int x)
+	{
+		Mouse.x = x;
+	}
+	
+	/**
+	 * Sets the y position.
+	 * @param y
+	 */
+	public static synchronized void assignY(int y)
+	{
+		Mouse.y = y;
+	}
+	
 	public static boolean isLeftButtonDown()
 	{
 		if (leftButton == MouseState.PRESSED) {
@@ -86,5 +159,24 @@ public class Mouse
 		}
 		
 		return false;
+	}
+
+	/**
+	 * Set's whether or not the mouse cursor is inside the render
+	 * frame.
+	 * 
+	 * @param b
+	 */
+	public static synchronized void setEntered(boolean b, MouseEvent me)
+	{
+		entered = b;
+		
+		Mouse.x = me.getX();
+		Mouse.y = me.getY();
+		
+		if (!b) {
+			exitedX = me.getX();
+			exitedY = me.getY();
+		}
 	}
 }
