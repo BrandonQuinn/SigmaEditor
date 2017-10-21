@@ -19,7 +19,7 @@ import elara.editor.input.Mouse;
  */
 public class SelectionRectangle
 {
-	private final float BORDER_THICKNESS = 2.0f;
+	private final float BORDER_THICKNESS = 1.0f;
 	
 	private boolean isDrawn = false;
 	
@@ -83,12 +83,12 @@ public class SelectionRectangle
 			
 			// draw border
 			g2d.setStroke(new BasicStroke(BORDER_THICKNESS));
-			g2d.setColor(new Color(93, 138, 153, 180));
+			g2d.setColor(new Color(21, 83, 119, 180));
 			g2d.drawRect(topLeftX, topLeftY, width, height);
 			g2d.setStroke(new BasicStroke(1.0f));
 			
 			// draw center
-			g2d.setColor(new Color(137, 227, 255, 100));
+			g2d.setColor(new Color(90, 181, 234, 100));
 			g2d.fillRect(topLeftX + 1, topLeftY + 1, width - 1, height - 1);
 
 			g2d.setColor(Color.WHITE);

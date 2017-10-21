@@ -1,7 +1,6 @@
 
 package elara.editor.ui;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -23,6 +22,7 @@ import javax.swing.JComponent;
 import org.joml.Vector2f;
 import elara.assets.AssetSelector;
 import elara.assets.DefaultIcons;
+import elara.assets.Entity;
 import elara.assets.Sound;
 import elara.assets.SpawnPoint;
 import elara.assets.Texture;
@@ -131,7 +131,7 @@ public class RenderPanel extends JComponent implements
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		
 		g2d.setColor(Color.white);
-		g2d.setFont(new Font("Tahoma", Font.BOLD, 12));
+		g2d.setFont(new Font("Consolas", Font.BOLD, 12));
 	}
 
 	/**
@@ -207,16 +207,17 @@ public class RenderPanel extends JComponent implements
 	private Integer moveStartX = null;
 	private Integer moveStartY = null;
 	
-	BufferedImage paintTexture;
-	BufferedImage buffIm;
-	Graphics2D buffG;
-	BufferedImage newImage;
-	Graphics2D ng;
-	int paintx = 0;
-	int painty = 0;
+	private BufferedImage paintTexture;
+	private BufferedImage buffIm;
+	private Graphics2D buffG;
+	private BufferedImage newImage;
+	private Graphics2D ng;
+	private int paintx = 0;
+	private int painty = 0;
 	
-	BufferedImage placeDecalImage = null;
-	Texture previousDecal = null;
+	private BufferedImage placeDecalImage = null;
+	
+	private boolean selectionMoved = false;
 	
 	/**
 	 * Basically switch throw all the editing states and make the
@@ -233,6 +234,7 @@ public class RenderPanel extends JComponent implements
 				if (Mouse.isLeftButtonDown() && !selectionRectangle.isDrawn() && !AssetSelector.isMouseOnSelection()) {
 					// deselect all
 					AssetSelector.deselectAll();
+					
 					// check selection at this point
 					AssetSelector.checkSelections(Mouse.x(), Mouse.y());
 				}
@@ -244,7 +246,6 @@ public class RenderPanel extends JComponent implements
 					// we are not moving our selection, so draw the selection rectangle
 					AssetSelector.checkSelections(selectionRectangle);
 					selectionRectangle.draw(g2d);
-					
 				}
 				
 				if (!Mouse.isLeftButtonDown() && !selectionRectangle.isDrawn()) {
@@ -253,6 +254,40 @@ public class RenderPanel extends JComponent implements
 				
 				if (Mouse.isLeftButtonClicked()) {
 					mainWindow.evaluateState();
+				}
+				
+				// allow the user to move the selection a single pixel at a time using the arrow keys
+				
+				if (Keyboard.UP == KeyState.PRESSED) {
+					if (!selectionMoved) {
+						for (Entity entity : AssetSelector.selectedEntities()) {
+							entity.setPosition(new Vector2f(entity.position().x, entity.position().y - 1));
+						}
+						selectionMoved = true;
+					}
+				} else if (Keyboard.DOWN == KeyState.PRESSED) {
+					if (!selectionMoved) {
+						for (Entity entity : AssetSelector.selectedEntities()) {
+							entity.setPosition(new Vector2f(entity.position().x, entity.position().y + 1));
+						}
+						selectionMoved = true;
+					}
+				} else if (Keyboard.LEFT == KeyState.PRESSED) {
+					if (!selectionMoved) {
+						for (Entity entity : AssetSelector.selectedEntities()) {
+							entity.setPosition(new Vector2f(entity.position().x - 1, entity.position().y));
+						}
+						selectionMoved = true;
+					}
+				} else if (Keyboard.RIGHT == KeyState.PRESSED) {
+					if (!selectionMoved) {
+						for (Entity entity : AssetSelector.selectedEntities()) {
+							entity.setPosition(new Vector2f(entity.position().x + 1, entity.position().y));
+						}
+						selectionMoved = true;
+					}
+				} else {
+					selectionMoved = false;
 				}
 				
 			break;
@@ -440,6 +475,7 @@ public class RenderPanel extends JComponent implements
 				}
 				
 				if (Mouse.isLeftButtonClicked()) {
+					
 					Texture decal = editCon.selectedDecal();
 					int groundLayerIndex = editCon.getSelectedGroundLayerIndex();
 					if (groundLayerIndex != -1) {
@@ -506,16 +542,11 @@ public class RenderPanel extends JComponent implements
 		// draw a simple grid
 		for (int x = 0; x < gameModel.worldWidthPixels() + 1; x += GameModel.GRID_SIZE) {
 			for (int y = 0; y < gameModel.worldHeightPixels() + 1; y += GameModel.GRID_SIZE) {
+				g2d.drawLine(x + editCon.xOffset(), 0 + editCon.yOffset(),
+					x + editCon.xOffset(), gameModel.worldHeightPixels() + editCon.yOffset());
 
-				g2d.drawLine(x + editCon.xOffset(), 
-						0 + editCon.yOffset(),
-						x + editCon.xOffset(), 
-						gameModel.worldHeightPixels() + editCon.yOffset());
-
-				g2d.drawLine(0 + editCon.xOffset(), 
-						y + editCon.yOffset(), 
-						gameModel.worldWidthPixels() + editCon.xOffset(), 
-						y + editCon.yOffset());
+				g2d.drawLine(0 + editCon.xOffset(), y + editCon.yOffset(), 
+					gameModel.worldWidthPixels() + editCon.xOffset(), y + editCon.yOffset());
 			}
 		}
 	}
@@ -536,7 +567,6 @@ public class RenderPanel extends JComponent implements
 				
 				BufferedImage selectedImage = editCon.selectedTexture().image();
 				g2d.setColor(new Color(255, 255, 255));
-				g2d.setStroke(new BasicStroke(2.0f));
 				g2d.drawOval((int)(Mouse.x() - ((selectedImage.getWidth() * editCon.brushSize()) / 2)), 
 					(int)(Mouse.y() - ((selectedImage.getHeight() * editCon.brushSize()) / 2)), 
 					(int)(selectedImage.getWidth() * editCon.brushSize()), 
@@ -547,8 +577,8 @@ public class RenderPanel extends JComponent implements
 			case MOVE_WORLD:
 				
 				g2d.drawImage(DefaultIcons.moveWorldIcon.getImage(), 
-						Mouse.x() - DefaultIcons.moveWorldIcon.getIconWidth() / 2, 
-						Mouse.y() - DefaultIcons.moveWorldIcon.getIconHeight() / 2, null);
+						Mouse.x() - (DefaultIcons.moveWorldIcon.getIconWidth() >> 1), 
+						Mouse.y() - (DefaultIcons.moveWorldIcon.getIconHeight() >> 1), null);
 				
 			break;
 			
@@ -581,7 +611,7 @@ public class RenderPanel extends JComponent implements
 					}
 					
 					g2d.drawImage(chosenIcon.getImage(),
-							Mouse.x()  - (chosenIcon.getIconWidth() >> 1), 
+							Mouse.x() - (chosenIcon.getIconWidth() >> 1), 
 							Mouse.y() - (chosenIcon.getIconHeight() >> 1), null);
 				}
 
@@ -694,12 +724,6 @@ public class RenderPanel extends JComponent implements
 			case KeyEvent.VK_S:
 				Keyboard.S = KeyState.PRESSED;
 			break;
-			case KeyEvent.VK_BRACERIGHT:
-				Keyboard.BRACKET_RIGHT = KeyState.PRESSED;
-			break;
-			case KeyEvent.VK_BRACELEFT:
-				Keyboard.BRACKET_LEFT = KeyState.PRESSED;
-			break;
 		}
 	}
 
@@ -715,12 +739,6 @@ public class RenderPanel extends JComponent implements
 			case KeyEvent.VK_S:
 				Keyboard.S = KeyState.RELEASED;
 			break;
-			case KeyEvent.VK_BRACERIGHT:
-				Keyboard.BRACKET_RIGHT = KeyState.RELEASED;
-			break;
-			case KeyEvent.VK_BRACELEFT:
-				Keyboard.BRACKET_LEFT = KeyState.RELEASED;
-			break;
 		}
 	}
 
@@ -735,12 +753,6 @@ public class RenderPanel extends JComponent implements
 			break;
 			case KeyEvent.VK_S:
 				Keyboard.S = KeyState.TYPED;
-			break;
-			case KeyEvent.VK_BRACERIGHT:
-				Keyboard.BRACKET_RIGHT = KeyState.TYPED;
-			break;
-			case KeyEvent.VK_BRACELEFT:
-				Keyboard.BRACKET_LEFT = KeyState.TYPED;
 			break;
 		}
 	}

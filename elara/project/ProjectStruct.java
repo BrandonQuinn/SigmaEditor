@@ -10,7 +10,7 @@ package elara.project;
  *
  * Description:
  */
-public class ProjectStructure
+public class ProjectStruct
 {
 	/**
 	 * Configuration file, this must exist for every project.

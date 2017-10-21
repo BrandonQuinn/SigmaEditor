@@ -28,6 +28,7 @@ import elara.assets.Layer;
 import elara.assets.Sound;
 import elara.assets.SpawnPoint;
 import elara.assets.Texture;
+import elara.editor.Conf;
 import elara.editor.debug.LogType;
 import elara.editor.debug.SigmaException;
 import elara.editor.debug.StaticLogs;
@@ -91,14 +92,14 @@ public class ProjectManager
 		
 		// create the directory structure
 		File tempDir;
-		for (String directory : ProjectStructure.directoryList) {
+		for (String directory : ProjectStruct.directoryList) {
 			tempDir = new File(projectLocation + "/" + projectName + "/" + directory);
 			tempDir.mkdirs();
 		}
 
 		// create files
 		File tempFile;
-		for (String fileStr : ProjectStructure.fileList) {
+		for (String fileStr : ProjectStruct.fileList) {
 			tempFile = new File(projectLocation + "/" + projectName + "/" + fileStr);
 			try {
 				tempFile.createNewFile();
@@ -110,14 +111,14 @@ public class ProjectManager
 
 		// write JSON template configuration
 		File configFile = new File(projectLocation + "/" + projectName + "/"
-				+ ProjectStructure.CONFIG_FILE);
+				+ ProjectStruct.CONFIG_FILE);
 		StaticLogs.debug.log(LogType.INFO,
 				"Creating project configuration: " + configFile.getAbsolutePath());
 
 		PrintWriter writer = null;
 		try {
 			writer = new PrintWriter(configFile);
-			writer.println(ProjectStructure.CONFIG_JSON_TEMPLATE);
+			writer.println(ProjectStruct.CONFIG_JSON_TEMPLATE);
 			writer.close();
 		} catch (IOException e) {
 			StaticLogs.debug.log(LogType.CRITICAL,
@@ -161,13 +162,13 @@ public class ProjectManager
 		
 		// add the project to the recents list
 		try {
-			JSONObject editorConf = JSON.read("conf/editor.config");
+			JSONObject editorConf = JSON.read(Conf.DIR + Conf.EDITOR);
 			JSONArray recentsList = (JSONArray) editorConf.get("recentProjects");
 			JSONObject newRecent = new JSONObject();
 			newRecent.put("name", projectName);
 			newRecent.put("path", projectLocation + "/" + projectName);
 			recentsList.add(newRecent);
-			JSON.write(editorConf, "conf/editor.config");
+			JSON.write(editorConf, Conf.DIR + Conf.EDITOR);
 		} catch (ParseException | IOException e) {
 			StaticLogs.debug.log(LogType.ERROR,
 					"createNewProject: Failed to open editor configuration");
@@ -198,7 +199,7 @@ public class ProjectManager
 		StaticLogs.debug.log(LogType.INFO, "Opening project at: " + projectLocation);
 
 		// create the parser and read the file
-		JSONObject jsonObject = JSON.read(projectLocation + "/" + ProjectStructure.CONFIG_FILE);
+		JSONObject jsonObject = JSON.read(projectLocation + "/" + ProjectStruct.CONFIG_FILE);
 
 		String projectName = (String) jsonObject.get("projectName");
 		int worldWidth = ((Long) jsonObject.get("worldWidth")).intValue();
@@ -409,7 +410,7 @@ public class ProjectManager
 			
 			// read the configuration json file
 			JSONObject jsonObject = JSON.read(projectContext.projectPath() 
-					+ "/" + ProjectStructure.CONFIG_FILE);
+					+ "/" + ProjectStruct.CONFIG_FILE);
 			
 			/*==========================================*
 			 * Save Ground Texture Layers               *
@@ -512,7 +513,7 @@ public class ProjectManager
 		}
 		
 		String projectLoc = projectContext.projectPath();
-		File configFile = new File(projectLoc + "/"+ ProjectStructure.CONFIG_FILE);
+		File configFile = new File(projectLoc + "/"+ ProjectStruct.CONFIG_FILE);
 
 		// copy the texture to the assets directory
 		File newFile = new File(projectContext.projectPath() + "/assets/images/textures/" 
@@ -575,7 +576,7 @@ public class ProjectManager
 		}
 		
 		String projectLoc = projectContext.projectPath();
-		File configFile = new File(projectLoc + "/"+ ProjectStructure.CONFIG_FILE);
+		File configFile = new File(projectLoc + "/"+ ProjectStruct.CONFIG_FILE);
 
 		// copy the sound to the assets directory
 		File newFile = new File(projectContext.projectPath() + "/assets/sounds/" 
@@ -652,7 +653,7 @@ public class ProjectManager
 			 * Second, add the decal to the project configuration.
 			 */
 			
-			File configFile = new File(projectContext.projectPath() + "/"+ ProjectStructure.CONFIG_FILE);
+			File configFile = new File(projectContext.projectPath() + "/"+ ProjectStruct.CONFIG_FILE);
 			
 			JSONObject jsonConfig = JSON.read(configFile);
 			JSONArray decalArr = (JSONArray) jsonConfig.get("decals");
@@ -728,7 +729,7 @@ public class ProjectManager
 		projectContext.addScript(filename);
 		
 		// add the script to the configuration
-		File configFile = new File(projectContext.projectPath() + "/" + ProjectStructure.CONFIG_FILE);
+		File configFile = new File(projectContext.projectPath() + "/" + ProjectStruct.CONFIG_FILE);
 		JSONObject obj = JSON.read(configFile);
 		JSONArray scriptArr = (JSONArray) obj.get("scripts");
 		JSONObject newScriptObj = new JSONObject();
@@ -747,7 +748,7 @@ public class ProjectManager
 	@SuppressWarnings("unchecked")
 	public void deleteScript(String script) throws IOException, ParseException
 	{
-		File configFile = new File(projectContext.projectPath() + "/" + ProjectStructure.CONFIG_FILE);
+		File configFile = new File(projectContext.projectPath() + "/" + ProjectStruct.CONFIG_FILE);
 		JSONObject obj = JSON.read(configFile);
 		JSONArray scriptArr = (JSONArray) obj.get("scripts");
 		

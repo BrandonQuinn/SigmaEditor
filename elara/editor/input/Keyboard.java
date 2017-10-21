@@ -65,6 +65,11 @@ public class Keyboard
 	
 	public static KeyState SPACE_BAR = KeyState.RELEASED;
 	
+	public static KeyState UP = KeyState.RELEASED;
+	public static KeyState DOWN = KeyState.RELEASED;
+	public static KeyState LEFT = KeyState.RELEASED;
+	public static KeyState RIGHT = KeyState.RELEASED;
+	
 	public static KeyState PERIOD = KeyState.RELEASED;
 	public static KeyState COMMA = KeyState.RELEASED;
 	public static KeyState SEMI_COLON = KeyState.RELEASED;

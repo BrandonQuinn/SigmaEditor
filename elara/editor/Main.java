@@ -79,11 +79,9 @@ public class Main
 			e1.printStackTrace();
 		}*/
 		
-		
-		
 		// load the configuration for the editor
 		try {
-			JSONObject editorConfig = JSON.read("conf/editor.config");
+			JSONObject editorConfig = JSON.read(Conf.DIR + Conf.EDITOR);
 			
 			// load recent projects
 			JSONArray recentProjects = (JSONArray) editorConfig.get("recentProjects");

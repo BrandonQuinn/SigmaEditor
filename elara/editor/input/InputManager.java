@@ -151,6 +151,34 @@ public class InputManager
 				Keyboard.COMMA = KeyState.RELEASED;
 			}
 		}
+		
+		// arrow keys
+		
+		else if (comp.getName().equals("Up")) {
+			if (keyboardEvent.getValue() == 1.0) {
+				Keyboard.UP = KeyState.PRESSED;
+			} else {
+				Keyboard.UP = KeyState.RELEASED;
+			}
+		} else if (comp.getName().equals("Down")) {
+			if (keyboardEvent.getValue() == 1.0) {
+				Keyboard.DOWN = KeyState.PRESSED;
+			} else {
+				Keyboard.DOWN = KeyState.RELEASED;
+			}
+		}		else if (comp.getName().equals("Left")) {
+			if (keyboardEvent.getValue() == 1.0) {
+				Keyboard.LEFT = KeyState.PRESSED;
+			} else {
+				Keyboard.LEFT = KeyState.RELEASED;
+			}
+		} else if (comp.getName().equals("Right")) {
+			if (keyboardEvent.getValue() == 1.0) {
+				Keyboard.RIGHT = KeyState.PRESSED;
+			} else {
+				Keyboard.RIGHT = KeyState.RELEASED;
+			}
+		}
 	}
 
 	
