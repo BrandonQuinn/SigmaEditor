@@ -11,12 +11,12 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -37,11 +37,12 @@ public class NewProjectDialog extends JDialog
 
 	private final JPanel contentPanel = new JPanel();
 	private JTextField projectNameField;
-	private JComboBox<String> widthCBox = new JComboBox<String>();
 	private JComboBox<String> heightCBox = new JComboBox<String>();
 	private JTextField locationField;
 
 	private boolean confirmed = false;
+	private JTextField widthField;
+	private JTextField heightField;
 
 	/**
 	 * Create the dialog.
@@ -84,17 +85,6 @@ public class NewProjectDialog extends JDialog
 			lblHeight.setBounds(149, 85, 31, 14);
 			contentPanel.add(lblHeight);
 		}
-		widthCBox.setBounds(48, 82, 86, 20);
-		widthCBox.setModel(new DefaultComboBoxModel<String>(new String[] { "50", "100", "200", "500",
-				"1000" }));
-		contentPanel.add(widthCBox);
-		{
-			heightCBox = new JComboBox<String>();
-			heightCBox.setBounds(190, 82, 86, 20);
-			heightCBox.setModel(new DefaultComboBoxModel<String>(new String[] { "50", "100", "200", "500",
-					"1000" }));
-			contentPanel.add(heightCBox);
-		}
 
 		JLabel lblProjectLocation = new JLabel("Project Location");
 		lblProjectLocation.setBounds(10, 119, 86, 14);
@@ -127,6 +117,16 @@ public class NewProjectDialog extends JDialog
 		});
 		changeLocBtn.setBounds(10, 169, 148, 23);
 		contentPanel.add(changeLocBtn);
+		
+		widthField = new JTextField();
+		widthField.setBounds(48, 82, 86, 20);
+		contentPanel.add(widthField);
+		widthField.setColumns(10);
+		
+		heightField = new JTextField();
+		heightField.setColumns(10);
+		heightField.setBounds(190, 82, 86, 20);
+		contentPanel.add(heightField);
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setBackground(new Color(220, 220, 220));
@@ -142,8 +142,14 @@ public class NewProjectDialog extends JDialog
 					public void actionPerformed(ActionEvent arg0)
 					{
 						projectName = projectNameField.getText();
-						worldWidth = Integer.valueOf((String) widthCBox.getSelectedItem());
-						worldHeight = Integer.valueOf((String) heightCBox.getSelectedItem());
+						try {
+							worldWidth = Integer.valueOf(widthField.getText());
+							worldHeight = Integer.valueOf(heightField.getText());
+						} catch(NumberFormatException e) {
+							JOptionPane.showMessageDialog(null, "Not a correct value.", "Bad Input", 
+									JOptionPane.ERROR_MESSAGE);
+							return;
+						}
 						confirmed = true;
 						setVisible(false);
 					}

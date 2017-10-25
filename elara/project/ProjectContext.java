@@ -26,7 +26,7 @@ import elara.assets.Texture;
 public class ProjectContext
 {
 	private static ProjectContext instance = new ProjectContext();
-
+	
 	private boolean projectLoaded = false;
 	
 	private String projectName = "";
@@ -55,7 +55,7 @@ public class ProjectContext
 	private ProjectContext()
 	{
 	}
-
+	
 	public static ProjectContext projectContext()
 	{
 		return instance;

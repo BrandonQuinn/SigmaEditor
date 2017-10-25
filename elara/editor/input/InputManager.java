@@ -95,6 +95,7 @@ public class InputManager
 	{
 		if (mouse != null) {
 			mouse.poll();
+			Mouse.assignMouseMoved(false);
 		}
 		
 		if (keyboard != null) {
@@ -191,13 +192,18 @@ public class InputManager
 	private void interpretMouseEvent(Event mouseEvent)
 	{
 		Component comp = mouseEvent.getComponent();
+		int value = (int) mouseEvent.getValue();
 		
 		if (comp.getName().equals("x")) {
-			Mouse.incrementX((int) mouseEvent.getValue());
+			Mouse.incrementX(value);
 		}
 		
 		if (comp.getName().equals("y")) {
-			Mouse.incrementY((int) mouseEvent.getValue());
+			Mouse.incrementY(value);
+		}
+		
+		if (value != 0)  {
+			Mouse.assignMouseMoved(true);
 		}
 	}
 

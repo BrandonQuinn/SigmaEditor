@@ -10,10 +10,9 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import elara.assets.Layer;
 import elara.editor.ui.MainWindow;
 import elara.project.EditingContext;
-import elara.project.GameModel;
+import elara.scene.SceneLayer;
 
 /**
  * LayerJList
@@ -23,15 +22,14 @@ import elara.project.GameModel;
  * appear in the game.
  * 
  */
-public class LayerJList extends JList<Layer> 
+public class LayerJList extends JList<SceneLayer> 
 	implements ListSelectionListener
 {
 	private static final long serialVersionUID = 1L;
 
-	private EditingContext editingContext = EditingContext.editingContext();
-	private GameModel gameModel = GameModel.gameModel();
+	private EditingContext editCon = EditingContext.editingContext();
 	
-	private DefaultListModel<Layer> layerModel = new DefaultListModel<Layer>();
+	private DefaultListModel<SceneLayer> layerModel = new DefaultListModel<SceneLayer>();
 	
 	private MainWindow mainWindow;
 	
@@ -42,15 +40,15 @@ public class LayerJList extends JList<Layer>
 		addListSelectionListener(this);
 		setModel(layerModel);
 		
-		ArrayList<Layer> layers = gameModel.assetLayers();
+		ArrayList<SceneLayer> layers = editCon.scene().layers();
 		
-		for (Layer layer : layers) {
+		for (SceneLayer layer : layers) {
 			layerModel.addElement(layer);
 		}
 		
 		if (!layerModel.isEmpty()) {
 			setSelectedIndex(0);
-			editingContext.setSelectedAssetLayer(layers.get(0));
+			editCon.setSelectedLayer(layers.get(0).id());
 		}
 	}
 	
@@ -63,15 +61,16 @@ public class LayerJList extends JList<Layer>
 		int selectedIndex = getSelectedIndex();
 		
 		if (selectedIndex > -1) {
-			editingContext.setSelectedAssetLayer(gameModel.assetLayers().get(selectedIndex));
+			editCon.setSelectedLayer(editCon.scene().layers().get(selectedIndex).id());
 			mainWindow.evaluateState();
 		}
 	}
+	
 	/**
 	 * Adds a layer to the list.
 	 * @param layer
 	 */
-	public void addLayer(Layer layer)
+	public void addLayer(SceneLayer layer)
 	{
 		layerModel.addElement(layer);
 	}

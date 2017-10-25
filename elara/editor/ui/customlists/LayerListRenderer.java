@@ -12,7 +12,7 @@ import java.awt.FlowLayout;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import elara.assets.Layer;
+import elara.scene.SceneLayer;
 
 /**
  * LayerListRenderer
@@ -20,11 +20,11 @@ import elara.assets.Layer;
  * Description:
  */
 public class LayerListRenderer extends JLabel 
-	implements ListCellRenderer<Layer>
+	implements ListCellRenderer<SceneLayer>
 {
 	private static final long serialVersionUID = 1L;
 	
-	private Layer layer;
+	private SceneLayer layer;
 	
 	public LayerListRenderer()
 	{
@@ -35,8 +35,8 @@ public class LayerListRenderer extends JLabel
 	 * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
 	 */
 	@Override
-	public Component getListCellRendererComponent(JList<? extends Layer> list,
-			Layer layer,
+	public Component getListCellRendererComponent(JList<? extends SceneLayer> list,
+			SceneLayer layer,
 			int index,
 			boolean isSelected,
 			boolean cellHasFocus)

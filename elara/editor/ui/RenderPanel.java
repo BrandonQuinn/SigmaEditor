@@ -24,7 +24,6 @@ import elara.assets.AssetSelector;
 import elara.assets.DefaultIcons;
 import elara.assets.Entity;
 import elara.assets.Sound;
-import elara.assets.SpawnPoint;
 import elara.assets.Texture;
 import elara.editor.imageprocessing.ImageProcessor;
 import elara.editor.input.InputManager;
@@ -35,7 +34,7 @@ import elara.editor.input.MouseState;
 import elara.editor.rendering.RenderStats;
 import elara.project.EditingContext;
 import elara.project.EditingContext.EditingState;
-import elara.project.GameModel;
+import elara.scene.Scene;
 
 /**
  * Component which actually holds the level being rendered and everything
@@ -55,7 +54,6 @@ public class RenderPanel extends JComponent implements
 	private static final long serialVersionUID = 1L;
 
 	private EditingContext editCon = EditingContext.editingContext();
-	private GameModel gameModel = GameModel.gameModel();
 	private InputManager inMan = InputManager.inputManager();
 
 	private MainWindow mainWindow;
@@ -103,7 +101,7 @@ public class RenderPanel extends JComponent implements
 		
 		drawDefaultBackground(g2d);
 		setup(g2d);
-		gameModel.draw(editCon.xOffset(), editCon.yOffset(), g2d);
+		editCon.scene().draw(editCon.xOffset(), editCon.yOffset(), g2d);
 		handleInput();
 		drawMouseCursor(g2d);
 		handleEditingState(g2d);
@@ -190,9 +188,6 @@ public class RenderPanel extends JComponent implements
 			case ADD_SOUND:
 			break;
 
-			case ADD_SPAWN_POINT:
-			break;
-			
 			default:
 			break;
 			
@@ -216,7 +211,7 @@ public class RenderPanel extends JComponent implements
 	private int painty = 0;
 	
 	private BufferedImage placeDecalImage = null;
-	
+	private boolean doPaint = true;
 	private boolean selectionMoved = false;
 	
 	/**
@@ -302,12 +297,12 @@ public class RenderPanel extends JComponent implements
 					editCon.assignBrushSize(editCon.brushSize() + 0.01f);
 				}
 				
-				if (Mouse.isLeftButtonDown() && editCon.getSelectedGroundLayerIndex() != -1) {
+				if (Mouse.isLeftButtonDown() && editCon.getSelectedGroundLayerIndex() != -1 && doPaint) {
 					paintTexture = editCon.selectedTexture().image();
 					
 					// only change the buffered image if a different one has been selected
-					if (buffIm != gameModel.groundTextureLayers().get(editCon.getSelectedGroundLayerIndex())) {
-						buffIm = gameModel.groundTextureLayers().get(editCon.getSelectedGroundLayerIndex());
+					if (buffIm != editCon.groundTextures().get(editCon.getSelectedGroundLayerIndex())) {
+						buffIm = editCon.groundTextures().get(editCon.getSelectedGroundLayerIndex());
 						buffG = buffIm.createGraphics();
 					}
 					
@@ -387,8 +382,13 @@ public class RenderPanel extends JComponent implements
 					
 					newImage = ImageProcessor.setOpacity(newImage, editCon.textureBrushOpacity());
 					buffG.drawImage(newImage, paintx, painty, null);
+					doPaint = false;
 				}
 				
+				if (!doPaint && Mouse.mouseMoved()) {
+					doPaint = true;
+				}
+
 			break;
 	
 			case MOVE_WORLD:
@@ -411,24 +411,24 @@ public class RenderPanel extends JComponent implements
 				
 				if (Mouse.x() - moveStartX != 0 
 						&& editCon.xOffset() <= (getWidth() >> 1) &&
-						editCon.xOffset() >= -1 * gameModel.worldWidthPixels() + (getWidth() >> 1)) {
+						editCon.xOffset() >= -1 * editCon.scene().widthPixels() + (getWidth() >> 1)) {
 					editCon.addToXOffset(Mouse.x() - moveStartX);
 					moveStartX = Mouse.x();
 				} else if (editCon.xOffset() >= (getWidth() >> 1)) {
 					editCon.addToXOffset(-editCon.xOffset() + (getWidth() >> 1));
-				} else if (editCon.xOffset() <= -1 * gameModel.worldWidthPixels() + (getWidth() >> 1)) {
-					editCon.addToXOffset(-editCon.xOffset() + -1 * gameModel.worldWidthPixels() + (getWidth() >> 1));
+				} else if (editCon.xOffset() <= -1 * editCon.scene().widthPixels() + (getWidth() >> 1)) {
+					editCon.addToXOffset(-editCon.xOffset() + -1 * editCon.scene().widthPixels() + (getWidth() >> 1));
 				}
 				
 				if (Mouse.y() - moveStartY != 0 
 						&& editCon.xOffset() <= (getHeight()) &&
-						editCon.yOffset() >= -1 * gameModel.worldHeightPixels() + (getHeight() >> 1)) {
+						editCon.yOffset() >= -1 * editCon.scene().heightPixels() + (getHeight() >> 1)) {
 					editCon.addToYOffset(Mouse.y() - moveStartY);
 					moveStartY = Mouse.y();
 				} else if (editCon.yOffset() >= (getHeight() >> 1)) {
 					editCon.addToYOffset(-editCon.yOffset() + (getHeight() >> 1));
-				} else if (editCon.yOffset() <= -1 * gameModel.worldHeightPixels() + (getHeight() >> 1)) {
-					editCon.addToYOffset(-editCon.yOffset() + -1 * gameModel.worldHeightPixels() + (getHeight() >> 1));
+				} else if (editCon.yOffset() <= -1 * editCon.scene().heightPixels() + (getHeight() >> 1)) {
+					editCon.addToYOffset(-editCon.yOffset() + -1 * editCon.scene().heightPixels() + (getHeight() >> 1));
 				}
 				
 				if (Keyboard.SPACE_BAR == KeyState.RELEASED) {
@@ -443,27 +443,14 @@ public class RenderPanel extends JComponent implements
 			case ADD_SOUND:
 				
 				// check if clicked and then add a new sound the curretly selected layer
-				if (Mouse.isLeftButtonClicked() && gameModel.assetLayers().size() != 0) {
+				if (Mouse.isLeftButtonClicked() && editCon.scene().numLayers() != 0) {
 					Sound s = new Sound(editCon.selectedSound());
 					s.setPosition(new Vector2f(Mouse.x() - editCon.xOffset(), 
 							Mouse.y() - editCon.yOffset()));
-					editCon.selectedAssetLayer().addSound(s);
+					editCon.selectedLayer().addSound(s);
 					mainWindow.evaluateState();
 				}
 					
-			break;
-			
-			case ADD_SPAWN_POINT:
-				
-				// check if clicked and then add a new spawn point to the currently selected layer
-				if (Mouse.isLeftButtonClicked() && gameModel.assetLayers().size() != 0) {
-					SpawnPoint sp = new SpawnPoint(editCon.selectedSpawnPoint());
-					sp.setPosition(new Vector2f(Mouse.x() - editCon.xOffset(), 
-							Mouse.y() - editCon.yOffset()));
-					editCon.selectedAssetLayer().addSpawnPoint(sp);
-					mainWindow.evaluateState();
-				}
-				
 			break;
 			
 			case DECAL_PLACEMENT:
@@ -479,8 +466,7 @@ public class RenderPanel extends JComponent implements
 					Texture decal = editCon.selectedDecal();
 					int groundLayerIndex = editCon.getSelectedGroundLayerIndex();
 					if (groundLayerIndex != -1) {
-						BufferedImage texLayer 
-							= gameModel.groundTextureLayers().get(groundLayerIndex);
+						BufferedImage texLayer = editCon.groundTextures().get(groundLayerIndex);
 						
 						// get the positon to place the decal.
 						paintx = (Mouse.x() - (decal.image().getWidth() >> 1)) + editCon.xOffset() * -1;
@@ -534,19 +520,19 @@ public class RenderPanel extends JComponent implements
 		g2d.setColor(new Color(10, 10, 10));
 		g2d.fillRect(editCon.xOffset(),
 				editCon.yOffset(),
-				gameModel.worldWidthPixels(),
-				gameModel.worldHeightPixels());
+				editCon.scene().widthPixels(),
+				editCon.scene().heightPixels());
 
 		g2d.setColor(new Color(50, 50, 50));
 
 		// draw a simple grid
-		for (int x = 0; x < gameModel.worldWidthPixels() + 1; x += GameModel.GRID_SIZE) {
-			for (int y = 0; y < gameModel.worldHeightPixels() + 1; y += GameModel.GRID_SIZE) {
+		for (int x = 0; x < editCon.scene().widthPixels() + 1; x += Scene.GRID_SIZE) {
+			for (int y = 0; y < editCon.scene().heightPixels() + 1; y += Scene.GRID_SIZE) {
 				g2d.drawLine(x + editCon.xOffset(), 0 + editCon.yOffset(),
-					x + editCon.xOffset(), gameModel.worldHeightPixels() + editCon.yOffset());
+					x + editCon.xOffset(), editCon.scene().heightPixels() + editCon.yOffset());
 
 				g2d.drawLine(0 + editCon.xOffset(), y + editCon.yOffset(), 
-					gameModel.worldWidthPixels() + editCon.xOffset(), y + editCon.yOffset());
+						editCon.scene().widthPixels() + editCon.xOffset(), y + editCon.yOffset());
 			}
 		}
 	}
@@ -588,33 +574,6 @@ public class RenderPanel extends JComponent implements
 					Mouse.x()  - (DefaultIcons.soundIcon.getIconWidth() >> 1), 
 					Mouse.y() - (DefaultIcons.soundIcon.getIconHeight() >> 1), null);
 				
-			break;
-			
-			case ADD_SPAWN_POINT:
-				
-				SpawnPoint sp = editCon.selectedSpawnPoint();
-				ImageIcon chosenIcon = DefaultIcons.spawnIcon;
-				
-				if (sp != null) {
-					switch (sp.team()) {
-						case 1:
-							chosenIcon = DefaultIcons.spawnIcon1;
-						break;
-						
-						case 2:
-							chosenIcon = DefaultIcons.spawnIcon2;
-						break;
-						
-						case 3:
-							chosenIcon = DefaultIcons.spawnIcon3;
-						break;
-					}
-					
-					g2d.drawImage(chosenIcon.getImage(),
-							Mouse.x() - (chosenIcon.getIconWidth() >> 1), 
-							Mouse.y() - (chosenIcon.getIconHeight() >> 1), null);
-				}
-
 			break;
 	
 			case DECAL_PLACEMENT:

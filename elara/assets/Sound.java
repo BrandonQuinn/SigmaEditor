@@ -26,6 +26,7 @@ public class Sound extends Entity
 	 */
 	public Sound(String name, String filename)
 	{
+		super(name);
 		this.name = name;
 		this.filename = filename;
 	}
@@ -36,6 +37,7 @@ public class Sound extends Entity
 	 */
 	public Sound(Sound copySrc)
 	{
+		super(copySrc.name());
 		this.name = copySrc.name;
 		this.filename = copySrc.filename;
 	}
@@ -60,20 +62,11 @@ public class Sound extends Entity
 			selectionBox.assignPosition(tmp.set(xpos, ypos));
 			selectionBox.assignSize(DefaultIcons.soundIcon.getIconWidth(), 
 					DefaultIcons.soundIcon.getIconHeight());
+			
 			if (isSelected) {
 				selectionBox.draw(xOffset, yOffset, g2d);
 			}
 		}
-	}
-
-	public void assignName(String name)
-	{
-		this.name = name;
-	}
-	
-	public String name()
-	{
-		return name;
 	}
 
 	/**

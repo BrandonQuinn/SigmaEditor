@@ -23,7 +23,7 @@ import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import elara.assets.Sound;
 import elara.editor.debug.LogType;
-import elara.editor.debug.SigmaException;
+import elara.editor.debug.ElaraException;
 import elara.editor.debug.StaticLogs;
 import elara.project.ProjectContext;
 
@@ -53,16 +53,16 @@ public class SoundPreviewDialog extends JDialog
 	
 	/**
 	 * Create the dialog.
-	 * @throws SigmaException 
+	 * @throws ElaraException 
 	 */
-	public SoundPreviewDialog(Sound sound) throws SigmaException
+	public SoundPreviewDialog(Sound sound) throws ElaraException
 	{
 		try {
 			playableSound = new Music(projectContext.projectPath() + "/assets/sounds/" + sound.filename());
 		} catch (SlickException e) {
 			StaticLogs.debug.log(LogType.ERROR, "Failed to load audio file in preview dialog: " 
 					+ projectContext.projectPath() + "/assets/sounds/" + sound.filename());
-			throw new SigmaException("Failed to load audio file in preview dialog: " 
+			throw new ElaraException("Failed to load audio file in preview dialog: " 
 					+ projectContext.projectPath() + "/assets/sounds/" + sound.filename());
 		}
 		

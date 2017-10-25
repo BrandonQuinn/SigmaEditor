@@ -12,6 +12,7 @@ import java.util.HashMap;
 import elara.editor.input.Mouse;
 import elara.editor.ui.SelectionRectangle;
 import elara.project.EditingContext;
+import elara.scene.SceneLayer;
 
 /**
  * AssetSelector
@@ -21,8 +22,8 @@ import elara.project.EditingContext;
  */
 public class AssetSelector
 {
-	private static EditingContext editingContext = EditingContext.editingContext();
-	private static Layer selectedLayer;
+	private static EditingContext editCon = EditingContext.editingContext();
+	private static SceneLayer selectedLayer;
 	private static Point point;
 	private static Integer startX = null;
 	private static Integer startY = null;
@@ -36,7 +37,7 @@ public class AssetSelector
 	 */
 	public static void checkSelections(SelectionRectangle rectangle)
 	{
-		selectedLayer = editingContext.selectedAssetLayer();
+		selectedLayer = editCon.selectedLayer();
 		
 		if (selectedLayer != null) {
 			for (Entity entity : selectedLayer.entities()) {
@@ -64,7 +65,7 @@ public class AssetSelector
 	 */
 	public static void checkSelections(int x, int y)
 	{
-		selectedLayer = editingContext.selectedAssetLayer();
+		selectedLayer = editCon.selectedLayer();
 		point = new Point(x, y);
 		Entity topmost = null;
 		
@@ -102,7 +103,7 @@ public class AssetSelector
 	 */
 	public static void deselectAll()
 	{
-		selectedLayer = editingContext.selectedAssetLayer();
+		selectedLayer = editCon.selectedLayer();
 		
 		if (selectedLayer != null) {
 			for (Entity entity : selEnt.values()) {
@@ -130,7 +131,7 @@ public class AssetSelector
 	 */
 	public static boolean isMouseOnSelection()
 	{
-		selectedLayer = editingContext.selectedAssetLayer();
+		selectedLayer = editCon.selectedLayer();
 		
 		for (Entity entity : selEnt.values()) {
 			Rectangle rect = entity.selectionBox.rectangle();

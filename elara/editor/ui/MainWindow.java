@@ -6,7 +6,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -23,16 +22,14 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.json.simple.parser.ParseException;
 import elara.assets.AssetSelector;
 import elara.assets.DefaultIcons;
 import elara.assets.Entity;
-import elara.assets.Layer;
 import elara.assets.Sound;
 import elara.assets.Texture;
 import elara.editor.Constants;
+import elara.editor.debug.ElaraException;
 import elara.editor.debug.LogType;
-import elara.editor.debug.SigmaException;
 import elara.editor.debug.StaticLogs;
 import elara.editor.rendering.RenderUpdateThread;
 import elara.editor.ui.codeeditor.CodeEditor;
@@ -40,7 +37,6 @@ import elara.editor.ui.customlists.AssetsJList;
 import elara.editor.ui.customlists.DecalJList;
 import elara.editor.ui.customlists.LayerJList;
 import elara.editor.ui.customlists.SoundJList;
-import elara.editor.ui.customlists.SpawnPointJList;
 import elara.editor.ui.customlists.TextureJList;
 import elara.editor.ui.dialogs.AboutDialog;
 import elara.editor.ui.dialogs.NewProjectDialog;
@@ -51,9 +47,9 @@ import elara.editor.ui.propertiespanels.SoundPropsPanel;
 import elara.editor.ui.propertiespanels.TexturePropsPanel;
 import elara.project.AssetLoader;
 import elara.project.EditingContext;
-import elara.project.GameModel;
 import elara.project.ProjectContext;
 import elara.project.ProjectManager;
+import elara.scene.SceneLayer;
 
 /**
  * The main window which holds everything.
@@ -68,10 +64,9 @@ public class MainWindow extends JFrame implements
 {
 	private static final long serialVersionUID = 1L;
 
-	private ProjectContext projectContext = ProjectContext.projectContext();
-	private EditingContext editingContext = EditingContext.editingContext();
-	private ProjectManager projectManager = ProjectManager.manager();
-	private GameModel gameModel = GameModel.gameModel();
+	private ProjectContext projCon = ProjectContext.projectContext();
+	private EditingContext editCon = EditingContext.editingContext();
+	private ProjectManager projMan = ProjectManager.manager();
 
 	private JPanel contentPane;
 	private JComboBox<String> comboBox;
@@ -102,7 +97,6 @@ public class MainWindow extends JFrame implements
 	private TextureJList textureList;
 	private SoundJList soundList;
 	private LayerJList layerList;
-	private SpawnPointJList spawnPointList;
 	private DecalJList decalList;
 
 	/**
@@ -241,7 +235,6 @@ public class MainWindow extends JFrame implements
 		
 		soundList = new SoundJList(this);
 		layerList = new LayerJList(this);
-		spawnPointList = new SpawnPointJList();
 		decalList = new DecalJList(this);
 		
 		JPanel leftSideSouthPanel = new JPanel();
@@ -371,7 +364,7 @@ public class MainWindow extends JFrame implements
 			
 				statusLabel.setText(npd.projectName() + " | " + npd.worldWidth() + "x" 
 						+ npd.worldHeight());
-			} catch (SigmaException | IOException | ParseException e1) {
+			} catch (ElaraException e1) {
 				waitingDialog.setVisible(false);
 				
 				JOptionPane.showMessageDialog(null,
@@ -400,10 +393,10 @@ public class MainWindow extends JFrame implements
 
 				try {
 					waitingDialog.setVisible(true);
-					projectManager.open(projectDirectory.getAbsolutePath());
+					projMan.open(projectDirectory.getAbsolutePath());
 					textureList.loadFromContext();
 					soundList.loadFromContext();
-				} catch (SigmaException | IOException | ParseException e1) {
+				} catch (ElaraException  e1) {
 					waitingDialog.setVisible(false);
 					
 					StaticLogs.debug.log(LogType.CRITICAL,
@@ -415,8 +408,7 @@ public class MainWindow extends JFrame implements
 							JOptionPane.ERROR_MESSAGE);
 				}
 				
-				statusLabel.setText(ProjectContext.projectContext().projectName() + " | " + GameModel
-						.gameModel().worldWidth() + "x" + GameModel.gameModel().worldHeight());
+				statusLabel.setText(ProjectContext.projectContext().projectName());
 			}
 			
 			waitingDialog.setVisible(false);
@@ -431,8 +423,8 @@ public class MainWindow extends JFrame implements
 			waitingDialog.setVisible(true);
 			
 			try {
-				projectManager.save();
-			} catch (SigmaException | IOException | ParseException | NullPointerException ex) {
+				projMan.save();
+			} catch (ElaraException | NullPointerException ex) {
 				waitingDialog.setVisible(false);
 				StaticLogs.debug.log(LogType.CRITICAL,
 						"Failed to save project: " + ex.getMessage());
@@ -451,7 +443,7 @@ public class MainWindow extends JFrame implements
 		 *==============================================*/
 		
 		else if (source == loadTextureItem) {
-			if (projectContext.isProjectLoaded()) {
+			if (projCon.isProjectLoaded()) {
 				JFileChooser fc = new JFileChooser();
 				fc.setDialogTitle("Import Texture");
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -472,8 +464,8 @@ public class MainWindow extends JFrame implements
 						// add the texture to the project and to the texture list in the GUI
 						Texture loadedTexture = AssetLoader.loadTexture(texName, selectedImage);
 						textureList.addTexture(loadedTexture);
-						projectManager.importTexture(texName, selectedImage);
-					} catch (IOException | SigmaException e2) {
+						projMan.importTexture(texName, selectedImage);
+					} catch (ElaraException e2) {
 						JOptionPane.showMessageDialog(null,
 								"Failed to load texture",
 								"IOException | SigmaException",
@@ -484,7 +476,7 @@ public class MainWindow extends JFrame implements
 					}
 				}
 				
-				setTitle(Constants.EDITOR_TITLE + " | " + projectContext.projectName());
+				setTitle(Constants.EDITOR_TITLE + " | " + projCon.projectName());
 			} else { 
 				// no project is loaded, show a warning
 				JOptionPane.showMessageDialog(null,
@@ -499,7 +491,7 @@ public class MainWindow extends JFrame implements
 		 *==============================================*/
 		
 		else if (source == loadDecalItem) {
-			if (projectContext.isProjectLoaded()) {
+			if (projCon.isProjectLoaded()) {
 				JFileChooser fc = new JFileChooser();
 				fc.setDialogTitle("Import dECAL");
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -516,22 +508,12 @@ public class MainWindow extends JFrame implements
 							"Decal name",
 							JOptionPane.PLAIN_MESSAGE);
 
-					try {
-						// add the texture to the project and to the texture list in the GUI
-						Texture decal = projectManager.importDecal(decalName, selectedImage);
-						decalList.addDecal(decal);
-					} catch (IOException | ParseException e2) {
-						JOptionPane.showMessageDialog(null,
-								"Failed to load decal",
-								"IOException | ParseException",
-								JOptionPane.ERROR_MESSAGE);
-						StaticLogs.debug.log(LogType.ERROR,
-								"Failed to load decal, " + e2.getMessage());
-						return;
-					}
+					// add the texture to the project and to the texture list in the GUI
+					Texture decal = projMan.importDecal(decalName, selectedImage);
+					decalList.addDecal(decal);
 				}
 				
-				setTitle(Constants.EDITOR_TITLE + " | " + projectContext.projectName());
+				setTitle(Constants.EDITOR_TITLE + " | " + projCon.projectName());
 			} else { 
 				// no project is loaded, show a warning
 				JOptionPane.showMessageDialog(null,
@@ -546,7 +528,7 @@ public class MainWindow extends JFrame implements
 		 *==============================================*/
 		
 		else if (source == loadSoundItem) {
-			if (projectContext.isProjectLoaded()) {
+			if (projCon.isProjectLoaded()) {
 				JFileChooser fc = new JFileChooser();
 				fc.setDialogTitle("Import Sound");
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -568,8 +550,8 @@ public class MainWindow extends JFrame implements
 					soundList.addSound(sound);
 					
 					try {
-						projectManager.importSound(soundName, sourceSoundFile);
-					} catch (SigmaException e1) {
+						projMan.importSound(soundName, sourceSoundFile);
+					} catch (ElaraException e1) {
 						JOptionPane.showMessageDialog(null,
 								e1,
 								"Exception",
@@ -595,8 +577,6 @@ public class MainWindow extends JFrame implements
 			if (leftScrollPane != null) {
 				if (selectedItem.equals("Texture Painting")) {
 					leftScrollPane.setViewportView(textureList);
-				} else if (selectedItem.equals("Spawn Points")) {
-					leftScrollPane.setViewportView(spawnPointList);
 				} else if (selectedItem.equals("Sounds")) {
 					leftScrollPane.setViewportView(soundList);
 				} else if (selectedItem.equals("Decals")) {
@@ -615,13 +595,13 @@ public class MainWindow extends JFrame implements
 		} 
 		
 		else if (source == newLayerBtn) {
-			if (projectContext.isProjectLoaded()) {
+			if (projCon.isProjectLoaded()) {
 				String name = JOptionPane.showInputDialog(this, "Enter layer name.");
-				Layer newLayer = new Layer(name);
-				gameModel.addAssetLayer(newLayer);
+				SceneLayer newLayer = new SceneLayer(editCon.scene(), name);
+				editCon.scene().addLayer(newLayer);
 				layerList.addLayer(newLayer);
 				layerList.setSelectedIndex(layerList.getModel().getSize() - 1);
-				editingContext.setSelectedAssetLayer(newLayer);
+				editCon.setSelectedLayer(newLayer.id());
 			} else {
 				JOptionPane.showMessageDialog(this, "No project loaded", "No project",
 						JOptionPane.INFORMATION_MESSAGE);
@@ -629,8 +609,8 @@ public class MainWindow extends JFrame implements
 		}
 		
 		else if (source == deleteLayerBtn) {
-			if (gameModel.assetLayers().size() > 0 && layerList.getSelectedIndex() != -1) {
-				gameModel.assetLayers().remove(layerList.getSelectedIndex());
+			if (editCon.scene().numLayers() > 0 && layerList.getSelectedIndex() != -1) {
+				editCon.scene().deleteLayer(layerList.getSelectedValue());
 				layerList.removeLayer(layerList.getSelectedIndex());
 				layerList.setSelectedIndex(layerList.getModel().getSize() - 1);
 			}
@@ -641,7 +621,7 @@ public class MainWindow extends JFrame implements
 		 *==============================================*/
 		
 		else if (source == selectionToolBtn) {
-			editingContext.assignState(EditingContext.EditingState.SELECT);
+			editCon.assignState(EditingContext.EditingState.SELECT);
 			textureList.setSelectedIndices(new int[] {});
 		} 
 		
@@ -674,7 +654,7 @@ public class MainWindow extends JFrame implements
 	 */
 	public void evaluateState()
 	{
-		switch(editingContext.state()) {
+		switch(editCon.state()) {
 			case SELECT:
 				
 				/*
@@ -697,7 +677,7 @@ public class MainWindow extends JFrame implements
 						propertiesPanel.removeAll();
 						propertiesPanel.add(soundPropertiesPanel, BorderLayout.CENTER);
 						propertiesPanel.updateUI();
-						editingContext.setSelectedSound((Sound)entity);
+						editCon.setSelectedSound((Sound)entity);
 					} else {
 						propertiesPanel.removeAll();
 						propertiesPanel.add(new JPanel(), BorderLayout.CENTER);
@@ -725,10 +705,7 @@ public class MainWindow extends JFrame implements
 				propertiesPanel.add(soundPropertiesPanel, BorderLayout.CENTER);
 				propertiesPanel.updateUI();
 			break;
-			
-			case ADD_SPAWN_POINT:
-			break;
-			
+
 			case DECAL_PLACEMENT:
 				propertiesPanel.removeAll();
 				propertiesPanel.add(decalPropertiesPanel, BorderLayout.CENTER);
@@ -740,7 +717,7 @@ public class MainWindow extends JFrame implements
 		}
 
 		assetsList.loadFromContext();
-		texturePropertiesPanel.assignOpacity((int)(editingContext.textureBrushOpacity() * 100.0f));
-		decalPropertiesPanel.assignRotation(editingContext.decalRotation());
+		texturePropertiesPanel.assignOpacity((int)(editCon.textureBrushOpacity() * 100.0f));
+		decalPropertiesPanel.assignRotation(editCon.decalRotation());
 	}
 }

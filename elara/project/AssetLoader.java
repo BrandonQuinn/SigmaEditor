@@ -7,7 +7,9 @@ import java.nio.file.Files;
 import java.util.List;
 import javax.imageio.ImageIO;
 import elara.assets.Texture;
-import elara.editor.debug.SigmaException;
+import elara.editor.debug.ElaraException;
+import elara.editor.debug.LogType;
+import elara.editor.debug.StaticLogs;
 
 /*============================================================*
 	Author: brq
@@ -29,14 +31,23 @@ public class AssetLoader
 	 * @param selectedImage
 	 * @return
 	 * @throws IOException
-	 * @throws SigmaException 
+	 * @throws ElaraException 
 	 */
 	public static Texture loadTexture(String name, File imageToLoad) 
-			throws IOException, SigmaException
+			throws ElaraException
 	{
 		// load the texture
-		BufferedImage bufferedImage = ImageIO.read(imageToLoad);
-		Texture texture = new Texture(name, imageToLoad, bufferedImage);
+		Texture texture = null;
+		try {
+			BufferedImage bufferedImage = ImageIO.read(imageToLoad);
+			texture = new Texture(name, imageToLoad, bufferedImage);
+		} catch (IOException e) {
+			StaticLogs.debug.log(LogType.ERROR, "Failed to load texture: " 
+					+ imageToLoad.getAbsolutePath());
+			throw new ElaraException("Failed to load texture: " 
+					+ imageToLoad.getAbsolutePath());
+		}
+		
 		return texture;
 	}
 	
@@ -47,9 +58,16 @@ public class AssetLoader
 	 * @return
 	 * @throws IOException
 	 */
-	public static String loadScript(String scriptFile) throws IOException {
+	public static String loadScript(String scriptFile) throws ElaraException {
 		File file = new File(projCon.projectPath() + "/assets/scripts/" + scriptFile);
-		List<String> lines = Files.readAllLines(file.toPath());
+		List<String> lines = null;
+		
+		try {
+			lines = Files.readAllLines(file.toPath());
+		} catch (IOException e) {
+			StaticLogs.debug.log(LogType.ERROR, "Failed to load script: " + scriptFile);
+			throw new ElaraException("Failed to load script: " + scriptFile);
+		}
 		
 		String output = "";
 		for (String str : lines) {
@@ -65,14 +83,24 @@ public class AssetLoader
 	 * @param elementAt
 	 * @throws IOException 
 	 */
-	public static void saveScript(String script, String code) throws IOException
+	public static void saveScript(String script, String code) throws ElaraException
 	{
 		File file = new File(projCon.projectPath() + "/assets/scripts/" + script);
-		Files.write(file.toPath(), code.getBytes());
+		try {
+			Files.write(file.toPath(), code.getBytes());
+		} catch (IOException e) {
+			StaticLogs.debug.log(LogType.ERROR, "Failed to save script: " + script);
+			throw new ElaraException("Failed to save script: " + script);
+		}
 	}
 	
-	public static void deleteScript(String script) throws IOException {
+	public static void deleteScript(String script) throws ElaraException {
 		File file = new File(projCon.projectPath() + "/assets/scripts/" + script);
-		Files.delete(file.toPath());
+		try {
+			Files.delete(file.toPath());
+		} catch (IOException e) {
+			StaticLogs.debug.log(LogType.ERROR, "Failed to deleted script: " + script);
+			throw new ElaraException("Failed to deleted script: " + script);
+		}
 	}
 }

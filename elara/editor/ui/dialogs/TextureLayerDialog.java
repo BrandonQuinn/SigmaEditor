@@ -24,9 +24,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import elara.assets.DefaultIcons;
-import elara.editor.debug.SigmaException;
 import elara.project.EditingContext;
-import elara.project.GameModel;
 import elara.project.ProjectContext;
 
 /**
@@ -40,8 +38,7 @@ public class TextureLayerDialog extends JFrame
 {
 	private static final long serialVersionUID = 1L;
 	
-	private GameModel model = GameModel.gameModel();
-	private EditingContext editingContext = EditingContext.editingContext();
+	private EditingContext editCon = EditingContext.editingContext();
 	private ProjectContext projectContext = ProjectContext.projectContext();
 			
 	private final JPanel contentPanel = new JPanel();
@@ -98,7 +95,7 @@ public class TextureLayerDialog extends JFrame
 		toolBar.add(selectedLayerLabel);
 		
 		// setup defaults
-		Integer selectedIndex = editingContext.getSelectedGroundLayerIndex();
+		Integer selectedIndex = editCon.getSelectedGroundLayerIndex();
 		if (selectedIndex != null && selectedIndex  > -1) {
 			list.setSelectedIndex(selectedIndex);
 			selectedLayerLabel.setText("Selected Layer: Layer " + (selectedIndex + 1));
@@ -109,7 +106,7 @@ public class TextureLayerDialog extends JFrame
 	{
 		listModel.clear();
 		// load up the layers
-		ArrayList<BufferedImage> imageList = model.groundTextureLayers();
+		ArrayList<BufferedImage> imageList = editCon.groundTextures();
 		for (int i = 0; i < imageList.size(); i++) {
 			listModel.addElement("Layer " + (i + 1));
 		}
@@ -121,7 +118,7 @@ public class TextureLayerDialog extends JFrame
 	@Override
 	public void valueChanged(ListSelectionEvent e)
 	{
-		editingContext.setSelectedGroundTextureLayer(list.getSelectedIndex());
+		editCon.setSelectedGroundTextureLayer(list.getSelectedIndex());
 		if (list.getSelectedIndex() == -1) {
 			selectedLayerLabel.setText("Selected Layer: none");
 			return;
@@ -138,24 +135,18 @@ public class TextureLayerDialog extends JFrame
 	{
 		Object source = e.getSource();
 		if (source == newLayerBtn) {
+			
 			if (!projectContext.isProjectLoaded()) {
 				JOptionPane.showMessageDialog(this, "No project loaded.", "No project loaded", 
 						JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 			
-			try {
-				model.addGoundTextureLayer();
-			} catch (SigmaException e1) {
-				JOptionPane.showMessageDialog(this, e1.message(), "Max layers reached!", 
-						JOptionPane.INFORMATION_MESSAGE);
-				return;
-			}
-			
+			editCon.addGoundTextureLayer();
 			loadListModel();
 			
 			// ensure one is always selected to we don't have the user needed to keep reselecting
-			list.setSelectedIndex(model.groundTextureLayers().size() - 1);
+			list.setSelectedIndex(editCon.groundTextures().size() - 1);
 		} else if (source == deleteLayerBtn) {
 			if (!projectContext.isProjectLoaded()) {
 				JOptionPane.showMessageDialog(this, "No project loaded.", "No project loaded", 
@@ -171,15 +162,15 @@ public class TextureLayerDialog extends JFrame
 				return;
 			}
 			
-			model.deleteGroundTextureLayer(selectedIndex);
+			editCon.deleteGroundLayer(selectedIndex);
 			loadListModel();
 			
-			if (model.groundTextureLayers().size() == 0) {
+			if (editCon.groundTextures().size() == 0) {
 				selectedLayerLabel.setText("Selected Layer: none");
 			}
 			
 			// ensure one is always selected to we don't have the user needed to keep reselecting
-			list.setSelectedIndex(model.groundTextureLayers().size() - 1);
+			list.setSelectedIndex(editCon.groundTextures().size() - 1);
 		}
 	}
 }

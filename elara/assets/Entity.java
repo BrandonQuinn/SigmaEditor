@@ -12,12 +12,21 @@ import org.joml.Vector2f;
  *
  * Description: Represents an entity in the game world.
  */
-public abstract class Entity 
+public abstract class Entity
 	implements Drawable
 {
-	protected Vector2f position = new Vector2f(0.0f, 0.0f);
-	protected AssetSelectionBox selectionBox = new AssetSelectionBox();
-	protected boolean isSelected = false;
+	static int idCounter = 0;
+	int id;
+	String name;
+	
+	Vector2f position = new Vector2f(0.0f, 0.0f);
+	AssetSelectionBox selectionBox = new AssetSelectionBox();
+	boolean isSelected = false;
+	
+	public Entity(String name) {
+		this.name = name;
+		id = idCounter++;
+	}
 	
 	public Vector2f position()
 	{
@@ -31,6 +40,24 @@ public abstract class Entity
 	public void setPosition(Vector2f pos)
 	{
 		this.position = pos;
+	}
+	
+	/**
+	 * Get the name of the entity.
+	 * @return
+	 */
+	public String name()
+	{
+		return name;
+	}
+	
+	/**
+	 * Assign the entities name.
+	 * @param name
+	 */
+	public void assignName(String name)
+	{
+		this.name = name;
 	}
 	
 	/**

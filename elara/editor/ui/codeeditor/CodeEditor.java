@@ -12,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
@@ -27,9 +26,8 @@ import javax.swing.event.ListSelectionListener;
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
-import org.json.simple.parser.ParseException;
 import elara.assets.DefaultIcons;
-import elara.editor.debug.SigmaException;
+import elara.editor.debug.ElaraException;
 import elara.project.AssetLoader;
 import elara.project.ProjectContext;
 import elara.project.ProjectManager;
@@ -123,7 +121,7 @@ public class CodeEditor extends JFrame
 			try {
 				String scriptCode = AssetLoader.loadScript(str);
 				scriptBuffer.add(i, scriptCode);
-			} catch (IOException e) {
+			} catch (ElaraException e) {
 				// not really much we can do...
 			}
 		}
@@ -166,7 +164,7 @@ public class CodeEditor extends JFrame
 					
 					scriptBuffer.add("");
 					break;
-				} catch (IOException | SigmaException | ParseException e) {
+				} catch ( ElaraException  e) {
 					JOptionPane.showMessageDialog(this, e.getMessage(), e.toString(), 
 							JOptionPane.ERROR_MESSAGE);
 					scriptName = "";
@@ -178,7 +176,7 @@ public class CodeEditor extends JFrame
 				try {
 					AssetLoader.saveScript(scriptListModel.getElementAt(index), 
 							syntaxTextArea.getText());
-				} catch (IOException e) {
+				} catch (ElaraException e) {
 					JOptionPane.showMessageDialog(this, "Could not save: " + e.getMessage(), "Failed to save", 
 							JOptionPane.ERROR_MESSAGE);
 					e.printStackTrace();
@@ -193,7 +191,7 @@ public class CodeEditor extends JFrame
 					projCon.deleteScript(script);
 					projMan.deleteScript(script);
 					scriptListModel.remove(index);
-				} catch (IOException | ParseException e) {
+				} catch (ElaraException e) {
 					JOptionPane.showMessageDialog(this, "Failed to delete script: " 
 							+ e.getMessage(), "Exception", 
 							JOptionPane.ERROR_MESSAGE);

@@ -25,7 +25,11 @@ public class Mouse
 	private static MouseState leftButton = MouseState.NOT_PRESSED;
 	private static MouseState middleButton = MouseState.NOT_PRESSED;
 	private static MouseState rightButton = MouseState.NOT_PRESSED;
-
+	
+	/**
+	 * Tells us if the mouse has moved.
+	 */
+	private static boolean mouseMoved = false;
 	
 	/**
 	 * Returns the x position of the mouse.
@@ -178,5 +182,23 @@ public class Mouse
 			exitedX = me.getX();
 			exitedY = me.getY();
 		}
+	}
+	
+	/**
+	 * Let's the mouse structure know when the mouse has actually moved.
+	 * @param mouseMoved
+	 */
+	public static void assignMouseMoved(boolean mouseMoved)
+	{
+		Mouse.mouseMoved = mouseMoved;
+	}
+	
+	/**
+	 * Has the mouse moved.
+	 * @return
+	 */
+	public static boolean mouseMoved()
+	{
+		return Mouse.mouseMoved;
 	}
 }

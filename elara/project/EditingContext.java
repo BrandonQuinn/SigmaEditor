@@ -6,13 +6,15 @@
 
 package elara.project;
 
-import elara.assets.Layer;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import elara.assets.Sound;
-import elara.assets.SpawnPoint;
 import elara.assets.Texture;
 import elara.editor.imageprocessing.BlendMode;
 import elara.editor.imageprocessing.BrushFilter;
 import elara.editor.util.MathUtil;
+import elara.scene.Scene;
+import elara.scene.SceneLayer;
 
 /**
  * World
@@ -68,11 +70,6 @@ public class EditingContext
 		ADD_SOUND,
 		
 		/**
-		 * Adding spawn points to the game world.
-		 */
-		ADD_SPAWN_POINT,
-		
-		/**
 		 * Add in decals, or single images which certain tools
 		 * to creates certain effects like randomisation of grass blades,
 		 * things of that nature.
@@ -87,6 +84,16 @@ public class EditingContext
 	 * which tool is being used.
 	 */
 	private EditingState state = EditingState.SELECT;
+	
+	/**
+	 * The currently loaded scene.
+	 */
+	private Scene currentScene = null;
+	
+	/**
+	 * Selected layer on currently selected scene.
+	 */
+	private int selectedLayerID = 0;
 	
 	/*===========================*
 	 * SELECT state fields        *
@@ -135,12 +142,6 @@ public class EditingContext
 	private Sound selectedSound;
 	
 	/*========================================*
-	 * ADD_SPAWN_POINT state fields           *
-	 *========================================*/
-	
-	private SpawnPoint selectedSpawnPoint;
-	
-	/*========================================*
 	 * DECAL PLACEMENT state fields           *
 	 *========================================*/
 	
@@ -158,8 +159,6 @@ public class EditingContext
 	 */
 	private double rotationSpeed = 0.01;
 	
-	private Layer selectedAssetLayer;
-	
 	/**
 	 * This changes weather or not a texture being painting 
 	 * will automatically tiled next to itself or otherwise
@@ -172,10 +171,14 @@ public class EditingContext
 	 */
 	private boolean gizmoRenderingEnabled = true;
 	
-	// can not instantiate, do not want to
-	private EditingContext()
-	{
-	}
+	/**
+	 * Ground texture as layers. Allows for editing and deleting
+	 * edits. Once the game is compiled these will all be 
+	 * merged together in to one image.
+	 */
+	private ArrayList<BufferedImage> groundTextures = new ArrayList<BufferedImage>();
+	
+	private EditingContext() {}
 	
 	/*================================================*
 	 * Getters and Setters                            *
@@ -365,25 +368,7 @@ public class EditingContext
 	{
 		return gizmoRenderingEnabled;
 	}
-
-	/**
-	 * Set the currently selected asset layer.
-	 * @param selectedIndex
-	 */
-	public void setSelectedAssetLayer(Layer selectedLayer)
-	{
-		selectedAssetLayer = selectedLayer;
-	}
 	
-	/**
-	 * Returns the selected asset layer.
-	 * @return
-	 */
-	public Layer selectedAssetLayer()
-	{
-		return selectedAssetLayer;
-	}
-
 	/**
 	 * Return selected blend mode.
 	 * @return
@@ -426,23 +411,6 @@ public class EditingContext
 	public void reset()
 	{
 		context = new EditingContext();
-	}
-
-	/**
-	 * @param spawnPoint
-	 */
-	public void assignSelectedSpawnPoint(SpawnPoint spawnPoint)
-	{
-		selectedSpawnPoint = spawnPoint;
-	}
-	
-	/**
-	 * Returns the currently selected spawn point.
-	 * @return
-	 */
-	public SpawnPoint selectedSpawnPoint()
-	{
-		return selectedSpawnPoint;
 	}
 	
 	/**
@@ -523,5 +491,66 @@ public class EditingContext
 	public void assignRotationSpeed(double rotSpeed)
 	{
 		rotationSpeed = rotSpeed;
+	}
+	
+	/**
+	 * Set the currently selected layer on the currently
+	 * selected scene.
+	 * 
+	 * @param layerID
+	 */
+	public void setSelectedLayer(int layerID)
+	{
+		selectedLayerID = layerID;
+	}
+	
+	/**
+	 * Return the currently selected layer on the currently
+	 * selected scene.
+	 * 
+	 * @return
+	 */
+	public SceneLayer selectedLayer()
+	{
+		return currentScene.layerById(selectedLayerID);
+	}
+	
+	/**
+	 * Returns the ground textures.
+	 * 
+	 * @return
+	 */
+	public ArrayList<BufferedImage> groundTextures()
+	{
+		return groundTextures;
+	}
+	
+	/**
+	 * Returns the currently loaded scene.
+	 * @return
+	 */
+	public Scene scene()
+	{
+		return currentScene;
+	}
+
+	/**
+	 * Adds a new layer to the ground textures.
+	 */
+	public void addGoundTextureLayer()
+	{
+		groundTextures.add(new BufferedImage(
+				currentScene.widthPixels(),
+				currentScene.heightPixels(),
+				BufferedImage.TYPE_INT_ARGB));
+	}
+
+	/**
+	 * Deletes the ground texture at the given index.
+	 * @param selectedIndex
+	 */
+	public void deleteGroundLayer(int i)
+	{
+		groundTextures.remove(i);
 	}
 }

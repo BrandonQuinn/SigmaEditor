@@ -10,7 +10,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -21,9 +20,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
-import org.json.simple.parser.ParseException;
 import elara.assets.DefaultIcons;
-import elara.editor.debug.SigmaException;
+import elara.editor.debug.ElaraException;
 import elara.project.ProjectManager;
 import elara.project.ProjectManager.RecentProject;
 
@@ -103,7 +101,7 @@ public class RecentProjectsDialog extends JDialog
 						setVisible(false);
 						try {
 							pc.open(recentProjects.get(list.getSelectedIndex()).projectPath);
-						} catch (SigmaException | IOException | ParseException e1) {
+						} catch (ElaraException ex) {
 							JOptionPane.showMessageDialog(null, "Failed to open project", "Failure", 
 									JOptionPane.ERROR_MESSAGE);
 						}

@@ -13,7 +13,6 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import elara.assets.Entity;
 import elara.assets.Sound;
-import elara.assets.SpawnPoint;
 
 /**
  * AssetsListRenderer
@@ -42,8 +41,8 @@ implements ListCellRenderer<Entity>
 	{
 		if (entity instanceof Sound) {
 			setText("Sound: " + ((Sound)entity).toString());
-		} else if (entity instanceof SpawnPoint) {
-			setText("SpawnPoint: " + ((SpawnPoint)entity).toString());
+		} if (entity instanceof Entity) {
+			setText("Entity: " + entity.name());
 		}
 		
 		if (isSelected) {

@@ -8,14 +8,14 @@ package elara.editor.debug;
  * @since 11 Jun 2017
  */
 
-public class SigmaException extends Exception
+public class ElaraException extends Exception
 {
 	private static final long serialVersionUID = 1L;
 
 	private String message = "No message set.";
 	private String stackTraceMessage = "No stack trace output set.";
 	
-	public SigmaException(String message)
+	public ElaraException(String message)
 	{
 		super(message);
 		this.message = message;

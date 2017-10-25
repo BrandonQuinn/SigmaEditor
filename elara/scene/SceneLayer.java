@@ -3,64 +3,65 @@
  * Date Created: 6 Oct. 2017
  * File : Layer.java
  */
-package elara.assets;
+package elara.scene;
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import elara.assets.Drawable;
+import elara.assets.Entity;
+import elara.assets.Sound;
+import elara.physics.Collider;
 
 /**
  * Layer
  *
  * Description: Layer of assets
  */
-public class Layer implements Drawable
+public class SceneLayer
+	implements Drawable
 {
+	/**
+	 * An ID for the layer
+	 */
+	private int id = -1;
+	
+	/**
+	 * The scene this layer is contained in
+	 */
+	private Scene parentScene;
+	
 	/**
 	 * Name of layer.
 	 */
 	private String name = "Untitled";
 	
 	/**
-	 * A list of every entity that appears in this layer.
+	 * A list of every entity that appears in this layer
 	 */
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
 	
+	private ArrayList<Collider> colliders = new ArrayList<Collider>();
+	
 	/**
-	 * List of sounds on this layer.
+	 * List of sounds on this layer
 	 */
 	private ArrayList<Sound> sounds = new ArrayList<Sound>();
 	
 	/**
-	 * List of spawn points on this later.
-	 */
-	private ArrayList<SpawnPoint> spawnPoints = new ArrayList<SpawnPoint>();
-
-	/**
 	 * Should we render this layer?
 	 */
-	private boolean isRendered = true;
+	boolean isRendered = true;
 	
-	public Layer(String name)
+	public SceneLayer(Scene parentScene, String name)
 	{
 		this.name = name;
+		this.parentScene = parentScene;
 	}
-
-	/**
-	 * Draws the layer.
-	 * 
-	 * @param xOffset
-	 * @param yOffset
-	 * @param g2d
-	 */
+	
 	@Override
 	public void draw(int xOffset, int yOffset, Graphics2D g2d)
 	{
-		if (isRendered) {
-			// render sound gizmo
-			for (Entity entity: entities) {
-				entity.draw(xOffset, yOffset, g2d);
-			}
-		}
+		
 	}
 	
 	/**
@@ -101,27 +102,6 @@ public class Layer implements Drawable
 	{
 		return sounds;
 	}
-	
-	/**
-	 * Add a spawn point to this layer.
-	 * @param new spawn point 
-	 */
-	public void addSpawnPoint(SpawnPoint sp)
-	{
-		if (sp != null) {
-			spawnPoints.add(sp);
-			entities.add(sp);
-		}
-	}
-	
-	/**
-	 * Get all the spawn point on this layer.
-	 * @return
-	 */
-	public ArrayList<SpawnPoint> spawnPoints()
-	{
-		return spawnPoints;
-	}
 
 	/**
 	 * Returns a list of ALL entities!
@@ -149,5 +129,23 @@ public class Layer implements Drawable
 	public void setRendered(boolean rendered)
 	{
 		isRendered = rendered;
+	}
+
+	/**
+	 * Get the layer id.
+	 * @return
+	 */
+	public int id()
+	{
+		return id;
+	}
+
+	/**
+	 * Set the ID.
+	 * @param size
+	 */
+	public void setID(int id)
+	{
+		this.id = id;
 	}
 }
