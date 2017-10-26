@@ -98,6 +98,12 @@ public class RecentProjectsDialog extends JDialog
 					@Override
 					public void actionPerformed(ActionEvent e)
 					{
+						if (list.getSelectedIndex() == -1) {
+							JOptionPane.showMessageDialog(null, "No project selected", "No project selected", 
+									JOptionPane.INFORMATION_MESSAGE);
+							return;
+						}
+						
 						setVisible(false);
 						try {
 							pc.open(recentProjects.get(list.getSelectedIndex()).projectPath);

@@ -9,7 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import elara.editor.debug.LogType;
-import elara.editor.debug.StaticLogs;
+import elara.editor.debug.Debug;
 import elara.editor.util.MathUtil;
 
 /**
@@ -72,7 +72,7 @@ public class ImageProcessor
 		WritableRaster srcRaster = src.getRaster();
 		
 		if (dest.getWidth() != src.getWidth() || dest.getHeight() != src.getHeight()) {
-			StaticLogs.debug.log(LogType.ERROR, "Failed image multiply operation, "
+			Debug.debug.log(LogType.ERROR, "Failed image multiply operation, "
 					+ "images not the same size");
 			return dest;
 		}
@@ -125,7 +125,7 @@ public class ImageProcessor
 		WritableRaster srcRaster = src.getRaster();
 		
 		if (dest.getWidth() != src.getWidth() || dest.getHeight() != src.getHeight()) {
-			StaticLogs.debug.log(LogType.ERROR, "Failed image multiply operation, "
+			Debug.debug.log(LogType.ERROR, "Failed image multiply operation, "
 					+ "images not the same size");
 			return dest;
 		}

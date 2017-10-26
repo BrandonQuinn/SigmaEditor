@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import elara.assets.Sound;
 import elara.assets.Texture;
+import elara.scene.SceneManager;
 
 /**
  * ProjectContext
@@ -33,6 +34,14 @@ public class ProjectContext
 	private String projectDirectory = "";
 	private File projectDirFile;
 	
+	/**
+	 * List of all scenes.
+	 */
+	private ArrayList<String> scenes = new ArrayList<String>(SceneManager.MAX_SCENES);
+	
+	/**
+	 * List of all scripts.
+	 */
 	private HashMap<String, String> scriptList = new HashMap<String, String>(100);
 	
 	/**
@@ -83,12 +92,12 @@ public class ProjectContext
 	/**
 	 * @param projectName
 	 */
-	public void assignProjectName(String projectName)
+	public void setProjectName(String projectName)
 	{
 		this.projectName = projectName;
 	}
 	
-	public void assignProjectDirectory(String projectDirectory)
+	public void setProjectDirectory(String projectDirectory)
 	{
 		this.projectDirectory = projectDirectory;
 	}
@@ -206,5 +215,23 @@ public class ProjectContext
 	public ArrayList<Texture> loadedDecals()
 	{
 		return decals;
+	}
+	
+	/**
+	 * Returns the names of all scenes that are in the loaded project.
+	 * @return
+	 */
+	public ArrayList<String> scenes()
+	{
+		return scenes;
+	}
+	
+	/**
+	 * Add a scene to the project context by name.
+	 * @param sceneName
+	 */
+	public void addScene(String sceneName)
+	{
+		scenes.add(sceneName);
 	}
 }

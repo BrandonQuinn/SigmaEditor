@@ -16,7 +16,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.border.EmptyBorder;
 import elara.assets.Texture;
 import elara.editor.debug.LogType;
-import elara.editor.debug.StaticLogs;
+import elara.editor.debug.Debug;
 
 /**
  * TextureListRenderer
@@ -52,7 +52,7 @@ public class TextureListRenderer extends JLabel
 		BufferedImage scaledImage = texture.scaledTo(TEXTURE_WIDTH, TEXTURE_HEIGHT);
 		
 		if (scaledImage == null) {
-			StaticLogs.debug.log(LogType.ERROR, "Failed to scale texture: " + texture.name() + ", it's null");
+			Debug.debug.log(LogType.ERROR, "Failed to scale texture: " + texture.name() + ", it's null");
 		} else {
 			setIcon(new ImageIcon(scaledImage));
 		}

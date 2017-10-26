@@ -5,6 +5,11 @@
  */
 package elara.project;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 /**
  * ProjectModel
  *
@@ -21,6 +26,7 @@ public class ProjectStruct
 	public static final String TEXTURE_DIR = "assets/textures";
 	public static final String SOUND_DIR = "assets/sounds";
 	public static final String SCRIPT_DIR = "assets/scripts";
+	public static final String SCENE_DIR = "scenes";
 	public static final String LOG_DIR = "logs";
 	
 	/**
@@ -30,6 +36,7 @@ public class ProjectStruct
 			"{\n" +
 				"\t\"projectName\": \"Untitled\",\n" +
 				"\t\"creationDate\": \"\",\n" +
+				"\t\"scenes\": [],\n" +
 				"\t\"textures\": [],\n" +
 				"\t\"sounds\": []" +
 				"\t\"scripts\": []," +
@@ -55,4 +62,25 @@ public class ProjectStruct
 	public static String[] fileList = {
 			CONFIG
 	};
+	
+	/**
+	 * Returns a JSON object with the initial structure for a project configuration.
+	 * @param name
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static JSONObject initialJSONObj(String name)
+	{
+		JSONObject object = new JSONObject();
+		object.put("name", name);
+		object.put("creationDate", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")));
+		object.put("scenes", new JSONArray());
+		object.put("textures", new JSONArray());
+		object.put("sounds", new JSONArray());
+		object.put("scripts", new JSONArray());
+		object.put("decals", new JSONArray());
+		return object;
+	}
 }

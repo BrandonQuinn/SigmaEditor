@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 import elara.assets.Texture;
 import elara.editor.debug.ElaraException;
 import elara.editor.debug.LogType;
-import elara.editor.debug.StaticLogs;
+import elara.editor.debug.Debug;
 
 /*============================================================*
 	Author: brq
@@ -42,7 +42,7 @@ public class AssetLoader
 			BufferedImage bufferedImage = ImageIO.read(imageToLoad);
 			texture = new Texture(name, imageToLoad, bufferedImage);
 		} catch (IOException e) {
-			StaticLogs.debug.log(LogType.ERROR, "Failed to load texture: " 
+			Debug.debug.log(LogType.ERROR, "Failed to load texture: " 
 					+ imageToLoad.getAbsolutePath());
 			throw new ElaraException("Failed to load texture: " 
 					+ imageToLoad.getAbsolutePath());
@@ -65,7 +65,7 @@ public class AssetLoader
 		try {
 			lines = Files.readAllLines(file.toPath());
 		} catch (IOException e) {
-			StaticLogs.debug.log(LogType.ERROR, "Failed to load script: " + scriptFile);
+			Debug.debug.log(LogType.ERROR, "Failed to load script: " + scriptFile);
 			throw new ElaraException("Failed to load script: " + scriptFile);
 		}
 		
@@ -89,7 +89,7 @@ public class AssetLoader
 		try {
 			Files.write(file.toPath(), code.getBytes());
 		} catch (IOException e) {
-			StaticLogs.debug.log(LogType.ERROR, "Failed to save script: " + script);
+			Debug.debug.log(LogType.ERROR, "Failed to save script: " + script);
 			throw new ElaraException("Failed to save script: " + script);
 		}
 	}
@@ -99,7 +99,7 @@ public class AssetLoader
 		try {
 			Files.delete(file.toPath());
 		} catch (IOException e) {
-			StaticLogs.debug.log(LogType.ERROR, "Failed to deleted script: " + script);
+			Debug.debug.log(LogType.ERROR, "Failed to deleted script: " + script);
 			throw new ElaraException("Failed to deleted script: " + script);
 		}
 	}

@@ -20,42 +20,22 @@ import elara.physics.Collider;
 public class SceneLayer
 	implements Drawable
 {
-	/**
-	 * An ID for the layer
-	 */
 	private int id = -1;
-	
-	/**
-	 * The scene this layer is contained in
-	 */
 	private Scene parentScene;
-	
-	/**
-	 * Name of layer.
-	 */
 	private String name = "Untitled";
 	
-	/**
-	 * A list of every entity that appears in this layer
-	 */
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
-	
 	private ArrayList<Collider> colliders = new ArrayList<Collider>();
-	
-	/**
-	 * List of sounds on this layer
-	 */
 	private ArrayList<Sound> sounds = new ArrayList<Sound>();
-	
-	/**
-	 * Should we render this layer?
-	 */
+
 	boolean isRendered = true;
 	
 	public SceneLayer(Scene parentScene, String name)
 	{
 		this.name = name;
 		this.parentScene = parentScene;
+		this.parentScene.addLayer(this);
+		this.id = parentScene.numLayers() - 1;
 	}
 	
 	@Override

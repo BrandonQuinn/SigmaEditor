@@ -13,6 +13,10 @@ import java.nio.file.Files;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 /**
  * ConfigReader
@@ -49,6 +53,19 @@ public class JSON
 	 */
 	public static void write(JSONObject object, String path) throws IOException
 	{
-		Files.write(new File(path).toPath(), JSONFormatter.makePretty(object.toJSONString()).getBytes());
+		Files.write(new File(path).toPath(), makePretty(object.toJSONString()).getBytes());
+	}
+	
+	/**
+	 * Take in some json and make it pretty.
+	 * @param json
+	 * @return
+	 */
+	public static String makePretty(String json)
+	{
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(json);
+		return gson.toJson(element);
 	}
 }

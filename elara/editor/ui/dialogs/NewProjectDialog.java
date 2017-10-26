@@ -12,11 +12,9 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -31,18 +29,13 @@ public class NewProjectDialog extends JDialog
 	private static final long serialVersionUID = 1L;
 
 	private String projectName;
-	private int worldWidth = -1;
-	private int worldHeight = -1;
 	private String projectLocation;
 
 	private final JPanel contentPanel = new JPanel();
 	private JTextField projectNameField;
-	private JComboBox<String> heightCBox = new JComboBox<String>();
 	private JTextField locationField;
 
 	private boolean confirmed = false;
-	private JTextField widthField;
-	private JTextField heightField;
 
 	/**
 	 * Create the dialog.
@@ -51,7 +44,7 @@ public class NewProjectDialog extends JDialog
 	{
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setTitle("New Project");
-		setBounds(100, 100, 417, 280);
+		setBounds(100, 100, 236, 217);
 		setLocationRelativeTo(null);
 		setModal(true);
 		getContentPane().setLayout(new BorderLayout());
@@ -66,33 +59,18 @@ public class NewProjectDialog extends JDialog
 		}
 		{
 			projectNameField = new JTextField();
-			projectNameField.setBounds(10, 29, 266, 20);
+			projectNameField.setBounds(10, 29, 148, 20);
 			contentPanel.add(projectNameField);
 			projectNameField.setColumns(10);
 		}
-		{
-			JLabel lblWorldSize = new JLabel("World Size");
-			lblWorldSize.setBounds(10, 60, 50, 14);
-			contentPanel.add(lblWorldSize);
-		}
-		{
-			JLabel lblNewLabel = new JLabel("Width");
-			lblNewLabel.setBounds(10, 85, 28, 14);
-			contentPanel.add(lblNewLabel);
-		}
-		{
-			JLabel lblHeight = new JLabel("Height");
-			lblHeight.setBounds(149, 85, 31, 14);
-			contentPanel.add(lblHeight);
-		}
 
 		JLabel lblProjectLocation = new JLabel("Project Location");
-		lblProjectLocation.setBounds(10, 119, 86, 14);
+		lblProjectLocation.setBounds(10, 60, 86, 14);
 		contentPanel.add(lblProjectLocation);
 
 		locationField = new JTextField();
 		locationField.setEditable(false);
-		locationField.setBounds(10, 138, 384, 20);
+		locationField.setBounds(10, 79, 201, 20);
 		contentPanel.add(locationField);
 		locationField.setColumns(10);
 
@@ -115,18 +93,8 @@ public class NewProjectDialog extends JDialog
 				}
 			}
 		});
-		changeLocBtn.setBounds(10, 169, 148, 23);
+		changeLocBtn.setBounds(10, 110, 148, 23);
 		contentPanel.add(changeLocBtn);
-		
-		widthField = new JTextField();
-		widthField.setBounds(48, 82, 86, 20);
-		contentPanel.add(widthField);
-		widthField.setColumns(10);
-		
-		heightField = new JTextField();
-		heightField.setColumns(10);
-		heightField.setBounds(190, 82, 86, 20);
-		contentPanel.add(heightField);
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setBackground(new Color(220, 220, 220));
@@ -142,14 +110,6 @@ public class NewProjectDialog extends JDialog
 					public void actionPerformed(ActionEvent arg0)
 					{
 						projectName = projectNameField.getText();
-						try {
-							worldWidth = Integer.valueOf(widthField.getText());
-							worldHeight = Integer.valueOf(heightField.getText());
-						} catch(NumberFormatException e) {
-							JOptionPane.showMessageDialog(null, "Not a correct value.", "Bad Input", 
-									JOptionPane.ERROR_MESSAGE);
-							return;
-						}
 						confirmed = true;
 						setVisible(false);
 					}
@@ -183,10 +143,7 @@ public class NewProjectDialog extends JDialog
 	
 	public boolean isComplete()
 	{
-		if (projectName == null ||
-				worldWidth == -1 ||
-				worldHeight == -1 ||
-				projectLocation == null) {
+		if (projectName == null || projectLocation == null) {
 			return false;
 		}
 		return true;
@@ -195,16 +152,6 @@ public class NewProjectDialog extends JDialog
 	public String projectName()
 	{
 		return projectName;
-	}
-
-	public int worldWidth()
-	{
-		return worldWidth;
-	}
-
-	public int worldHeight()
-	{
-		return worldHeight;
 	}
 
 	public String projectLocation()

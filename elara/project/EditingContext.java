@@ -88,7 +88,7 @@ public class EditingContext
 	/**
 	 * The currently loaded scene.
 	 */
-	private Scene currentScene = null;
+	private Scene currentScene = new Scene("Default", 50, 50);
 	
 	/**
 	 * Selected layer on currently selected scene.
@@ -178,7 +178,9 @@ public class EditingContext
 	 */
 	private ArrayList<BufferedImage> groundTextures = new ArrayList<BufferedImage>();
 	
-	private EditingContext() {}
+	private EditingContext() {
+		new SceneLayer(currentScene, "Default");
+	}
 	
 	/*================================================*
 	 * Getters and Setters                            *
@@ -552,5 +554,14 @@ public class EditingContext
 	public void deleteGroundLayer(int i)
 	{
 		groundTextures.remove(i);
+	}
+
+	/**
+	 * Set the currently selected scene.
+	 * @param newScene
+	 */
+	public void setSelectedScene(Scene scene)
+	{
+		currentScene = scene;
 	}
 }

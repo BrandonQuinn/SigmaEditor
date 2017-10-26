@@ -24,7 +24,7 @@ import org.newdawn.slick.SlickException;
 import elara.assets.Sound;
 import elara.editor.debug.LogType;
 import elara.editor.debug.ElaraException;
-import elara.editor.debug.StaticLogs;
+import elara.editor.debug.Debug;
 import elara.project.ProjectContext;
 
 /**
@@ -60,7 +60,7 @@ public class SoundPreviewDialog extends JDialog
 		try {
 			playableSound = new Music(projectContext.projectPath() + "/assets/sounds/" + sound.filename());
 		} catch (SlickException e) {
-			StaticLogs.debug.log(LogType.ERROR, "Failed to load audio file in preview dialog: " 
+			Debug.debug.log(LogType.ERROR, "Failed to load audio file in preview dialog: " 
 					+ projectContext.projectPath() + "/assets/sounds/" + sound.filename());
 			throw new ElaraException("Failed to load audio file in preview dialog: " 
 					+ projectContext.projectPath() + "/assets/sounds/" + sound.filename());

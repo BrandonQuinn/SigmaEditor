@@ -28,9 +28,9 @@ import elara.assets.Entity;
 import elara.assets.Sound;
 import elara.assets.Texture;
 import elara.editor.Constants;
+import elara.editor.debug.Debug;
 import elara.editor.debug.ElaraException;
 import elara.editor.debug.LogType;
-import elara.editor.debug.StaticLogs;
 import elara.editor.rendering.RenderUpdateThread;
 import elara.editor.ui.codeeditor.CodeEditor;
 import elara.editor.ui.customlists.AssetsJList;
@@ -40,6 +40,7 @@ import elara.editor.ui.customlists.SoundJList;
 import elara.editor.ui.customlists.TextureJList;
 import elara.editor.ui.dialogs.AboutDialog;
 import elara.editor.ui.dialogs.NewProjectDialog;
+import elara.editor.ui.dialogs.SceneDialog;
 import elara.editor.ui.dialogs.TextureLayerDialog;
 import elara.editor.ui.dialogs.WaitingDialog;
 import elara.editor.ui.propertiespanels.DecalPropsPanel;
@@ -109,6 +110,7 @@ public class MainWindow extends JFrame implements
 	private JMenuItem loadDecalItem;
 	private JMenuItem loadSoundItem;
 	private JMenuItem openCodeEditorItem;
+	private JMenuItem sceneMenuItem;
 	private JMenuItem aboutItem;
 	
 	/**
@@ -167,6 +169,14 @@ public class MainWindow extends JFrame implements
 		openCodeEditorItem.addActionListener(this);
 		codeMenu.add(openCodeEditorItem);
 		menuBar.add(codeMenu);
+		
+		JMenu sceneMenu = new JMenu("Scenes");
+		sceneMenu.addActionListener(this);
+		
+		sceneMenuItem = new JMenuItem("Edit Scenes");
+		sceneMenuItem.addActionListener(this);
+		sceneMenu.add(sceneMenuItem);
+		menuBar.add(sceneMenu);
 		
 		JMenu mnHelp = new JMenu("Help");
 		
@@ -308,8 +318,8 @@ public class MainWindow extends JFrame implements
 
 		thread.start();
 
-		StaticLogs.debug.log(LogType.INFO, "Update thread started");
-		StaticLogs.debug.log(LogType.INFO, "Main Window created");
+		Debug.debug.log(LogType.INFO, "Update thread started");
+		Debug.debug.log(LogType.INFO, "Main Window created");
 	}
 
 	/*
@@ -353,17 +363,14 @@ public class MainWindow extends JFrame implements
 			ProjectManager manager = ProjectManager.manager();
 			try {
 				manager.createNewProject(npd.projectName(),
-						npd.projectLocation(),
-						npd.worldWidth(),
-						npd.worldHeight());
+						npd.projectLocation());
 
 				waitingDialog.changeMessageTo("Opening project...");
 				manager.open(npd.projectLocation() + "/" + npd.projectName());
 				textureList.loadFromContext();
 				waitingDialog.setVisible(false);
 			
-				statusLabel.setText(npd.projectName() + " | " + npd.worldWidth() + "x" 
-						+ npd.worldHeight());
+				statusLabel.setText(npd.projectName());
 			} catch (ElaraException e1) {
 				waitingDialog.setVisible(false);
 				
@@ -399,7 +406,7 @@ public class MainWindow extends JFrame implements
 				} catch (ElaraException  e1) {
 					waitingDialog.setVisible(false);
 					
-					StaticLogs.debug.log(LogType.CRITICAL,
+					Debug.debug.log(LogType.CRITICAL,
 							"Failed to open project: " + e1.getMessage());
 					JOptionPane.showMessageDialog(null,
 							"Failed to load project: " + e1.getMessage()
@@ -426,7 +433,7 @@ public class MainWindow extends JFrame implements
 				projMan.save();
 			} catch (ElaraException | NullPointerException ex) {
 				waitingDialog.setVisible(false);
-				StaticLogs.debug.log(LogType.CRITICAL,
+				Debug.debug.log(LogType.CRITICAL,
 						"Failed to save project: " + ex.getMessage());
 				JOptionPane.showMessageDialog(null,
 						"Failed to save project: " + ex.getMessage()
@@ -470,7 +477,7 @@ public class MainWindow extends JFrame implements
 								"Failed to load texture",
 								"IOException | SigmaException",
 								JOptionPane.ERROR_MESSAGE);
-						StaticLogs.debug.log(LogType.ERROR,
+						Debug.debug.log(LogType.ERROR,
 								"Failed to load texture, " + e2.getMessage());
 						return;
 					}
@@ -613,6 +620,20 @@ public class MainWindow extends JFrame implements
 				editCon.scene().deleteLayer(layerList.getSelectedValue());
 				layerList.removeLayer(layerList.getSelectedIndex());
 				layerList.setSelectedIndex(layerList.getModel().getSize() - 1);
+			}
+		} 
+		
+		/*==============================================*
+		 * SCENE MENU
+		 *==============================================*/
+		
+		else if (source == sceneMenuItem) {
+			if (projCon.isProjectLoaded()) {
+				SceneDialog sd = new SceneDialog();
+				sd.setVisible(true);
+			} else {
+				JOptionPane.showMessageDialog(null, "No project loaded.", "No Project", 
+						JOptionPane.INFORMATION_MESSAGE);
 			}
 		} 
 		

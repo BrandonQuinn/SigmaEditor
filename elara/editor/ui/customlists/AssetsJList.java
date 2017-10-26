@@ -56,12 +56,12 @@ public class AssetsJList extends JList<Entity>
 	 */
 	public void loadFromContext()
 	{
-		if (editingContext.selectedLayer() != null) {
+		if (editingContext.scene().numLayers() != 0) {
 			model.clear();
 			
-			for (Entity entity : editingContext.selectedLayer().entities()) {
+			/*for (Entity entity : editingContext.selectedLayer().entities()) {
 				model.addElement(entity);
-			}
+			}*/
 		}
 	}
 }

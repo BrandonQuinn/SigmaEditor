@@ -30,6 +30,11 @@ public class Scene
 	implements Drawable
 {
 	public static final int GRID_SIZE = 25;
+	public static final int MAX_WIDTH = 500;
+	public static final int MAX_HEIGHT = 500;
+	public static final int MIN_WIDTH = 5;
+	public static final int MIN_HEIGHT = 5;
+	
 	private static int idCounter = 0;
 	private int id;
 	private String name;
@@ -39,9 +44,11 @@ public class Scene
 	private int width, height;
 	// private BufferedImage groundTexture;
 	
-	public Scene(String name)
+	public Scene(String name, int width, int height)
 	{
 		this.name = name;
+		this.width = width;
+		this.height = height;
 		id = idCounter++;
 	}
 
@@ -164,7 +171,7 @@ public class Scene
 	 */
 	public void addLayer(SceneLayer layer, int layerIndex)
 	{
-		layers.set(layerIndex, layer);
+		layers.add(layerIndex, layer);
 	}
 
 	/**

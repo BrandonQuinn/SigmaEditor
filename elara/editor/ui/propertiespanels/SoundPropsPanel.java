@@ -25,7 +25,7 @@ import javax.swing.event.ChangeListener;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import elara.editor.debug.LogType;
-import elara.editor.debug.StaticLogs;
+import elara.editor.debug.Debug;
 import elara.project.EditingContext;
 import elara.project.ProjectContext;
 
@@ -131,7 +131,7 @@ public class SoundPropsPanel extends JPanel
 					music = new Music(projectContext.projectPath() + "/assets/sounds/" 
 							+ editingContext.selectedSound().filename());
 				} catch (SlickException e) {
-					StaticLogs.debug.log(LogType.ERROR, "Could not load sound on play: " + projectContext.projectPath() + "/assets/sounds/" 
+					Debug.debug.log(LogType.ERROR, "Could not load sound on play: " + projectContext.projectPath() + "/assets/sounds/" 
 							+ editingContext.selectedSound().filename());
 					JOptionPane.showMessageDialog(null, projectContext.projectPath() + "/assets/sounds/" 
 							+ editingContext.selectedSound().filename(), "Failed to load sound", JOptionPane.ERROR_MESSAGE);

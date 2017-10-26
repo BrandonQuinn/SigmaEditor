@@ -13,6 +13,10 @@
 
 package elara.scene;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import org.json.simple.JSONObject;
+
 /*****************************************************************
  *
  * SceneStruct
@@ -24,6 +28,7 @@ package elara.scene;
 public class SceneStruct
 {
 	public static final String CONFIG = "scene.config";
+	public static final String SCENE_DIR = "scenes";
 	public static final String IMAGE_DIR = "images";
 	
 	/**
@@ -50,4 +55,22 @@ public class SceneStruct
 	public static String[] fileList = {
 			CONFIG
 	};
+	
+	/**
+	 * Returns a JSON object with the initial structure for a scene configuration.
+	 * @param name
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static JSONObject initialJSONObj(String name, int width, int height)
+	{
+		JSONObject object = new JSONObject();
+		object.put("name", name);
+		object.put("creationDate", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")));
+		object.put("width", width);
+		object.put("height", height);
+		return object;
+	}
 }

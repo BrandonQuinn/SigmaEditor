@@ -5,11 +5,6 @@
  */
 package elara.editor.util;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-
 /**
  * JSONFormatter
  *
@@ -17,11 +12,5 @@ import com.google.gson.JsonParser;
  */
 public class JSONFormatter
 {
-	public static String makePretty(String json)
-	{
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		JsonParser parser = new JsonParser();
-		JsonElement element = parser.parse(json);
-		return gson.toJson(element);
-	}
+
 }

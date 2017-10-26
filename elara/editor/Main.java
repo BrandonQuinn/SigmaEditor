@@ -10,7 +10,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import elara.editor.debug.LogType;
 import elara.editor.debug.StackTraceUtil;
-import elara.editor.debug.StaticLogs;
+import elara.editor.debug.Debug;
 import elara.editor.input.InputManager;
 import elara.editor.ui.MainWindow;
 import elara.editor.ui.dialogs.ErrorDialog;
@@ -94,13 +94,13 @@ public class Main
 			}
 					
 		} catch (ParseException | IOException e) {
-			StaticLogs.debug.log(LogType.CRITICAL, "Failed to parse project configration JSON");
+			Debug.debug.log(LogType.CRITICAL, "Failed to parse project configration JSON");
 			JOptionPane.showMessageDialog(null, "Failed to load editor configuration.", 
 					"ParseException", JOptionPane.ERROR_MESSAGE);
 		}
 		
 		// create and setup input
 		InputManager inMan = InputManager.inputManager();
-		inMan.logControllerInfo(StaticLogs.debug);
+		inMan.logControllerInfo(Debug.debug);
 	}
 }

@@ -10,7 +10,7 @@ package elara.editor.input;
 
 import elara.editor.debug.LogType;
 import elara.editor.debug.QLogger;
-import elara.editor.debug.StaticLogs;
+import elara.editor.debug.Debug;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
@@ -60,14 +60,14 @@ public class InputManager
 		for (Controller controller : controllers) {
 			if (controller.getType() == Controller.Type.MOUSE) {
 				mouse = controller;
-				StaticLogs.debug.log(LogType.INFO, "Mouse detected for use: " + mouse.getName());
+				Debug.debug.log(LogType.INFO, "Mouse detected for use: " + mouse.getName());
 				break;
 			}
 		}
 		
 		// log an error if no mouse if found
 		if (mouse == null) {
-			StaticLogs.debug.log(LogType.ERROR, "No mouse detected");
+			Debug.debug.log(LogType.ERROR, "No mouse detected");
 		}
 		
 		mouseEventQueue = mouse.getEventQueue();
@@ -76,13 +76,13 @@ public class InputManager
 		for (Controller controller : controllers) {
 			if (controller.getType() == Controller.Type.KEYBOARD) {
 				keyboard = controller;
-				StaticLogs.debug.log(LogType.INFO, "Keyboard detected for use: " + keyboard.getName());
+				Debug.debug.log(LogType.INFO, "Keyboard detected for use: " + keyboard.getName());
 				break;
 			}
 		}
 		// log an error if no keyboard if found
 		if (keyboard == null) {
-			StaticLogs.debug.log(LogType.ERROR, "No keyboard detected");
+			Debug.debug.log(LogType.ERROR, "No keyboard detected");
 		}
 		
 		keyboardEventQueue = keyboard.getEventQueue();
