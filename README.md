@@ -21,9 +21,7 @@
 	- This is really cool, it's a text area which handles syntax highlighting completely for you.
 - [RSyntaxTextArea - AutoComplete](https://github.com/bobbylight/AutoComplete)
 	- Another really cool tool which attaches to RSyntaxTextArea which allows for auto-completion
-- [Jinput] (https://github.com/jinput/jinput)
-	- Lower level input polling library for java, used instead of Java's in-built listener interfaces which have proven to be problematic
-	
+
 ## Screenshot of Current Progress (13/10/2017)
 
 ![Oops the image broke](https://i.imgur.com/SNLysy8.jpg "Elara Editor")

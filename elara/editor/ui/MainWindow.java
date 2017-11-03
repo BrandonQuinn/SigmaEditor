@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.Iterator;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -112,6 +113,8 @@ public class MainWindow extends JFrame implements
 	private JMenuItem sceneMenuItem;
 	private JMenuItem aboutItem;
 	
+	private JMenuItem graphTest; // TODO delete this
+	
 	/**
 	 * Get the default toolkit to resize the application.
 	 */
@@ -183,6 +186,20 @@ public class MainWindow extends JFrame implements
 		aboutItem.addActionListener(this);
 		mnHelp.add(aboutItem);
 		menuBar.add(mnHelp);
+		
+		graphTest = new JMenuItem("Graph (TEST)");
+		graphTest.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				JDialog test = new JDialog();
+				test.setLayout(new BorderLayout());
+				test.add(new FalloffGraph(), BorderLayout.CENTER);
+				test.setVisible(true);
+			}
+		});
+		mnHelp.add(graphTest);
 
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

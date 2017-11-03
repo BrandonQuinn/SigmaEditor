@@ -16,9 +16,9 @@ public class Mouse
 	private static volatile int x = 0;
 	private static volatile int y = 0;
 	
-	private static MouseState leftButton = MouseState.NOT_PRESSED;
-	private static MouseState middleButton = MouseState.NOT_PRESSED;
-	private static MouseState rightButton = MouseState.NOT_PRESSED;
+	private static volatile MouseState leftButton = MouseState.NOT_PRESSED;
+	private static volatile MouseState middleButton = MouseState.NOT_PRESSED;
+	private static volatile MouseState rightButton = MouseState.NOT_PRESSED;
 	
 	/**
 	 * Tells us if the mouse has moved.
@@ -106,17 +106,17 @@ public class Mouse
 		return false;
 	}
 	
-	public static void setLeftButtonState(MouseState state)
+	public static synchronized void setLeftButtonState(MouseState state)
 	{
 		Mouse.leftButton = state;
 	}
 	
-	public static void setMiddleButtonState(MouseState state)
+	public static synchronized void setMiddleButtonState(MouseState state)
 	{
 		Mouse.middleButton = state;
 	}
 	
-	public static void setRightButtonState(MouseState state)
+	public static synchronized void setRightButtonState(MouseState state)
 	{
 		Mouse.rightButton = state;
 	}
@@ -155,7 +155,7 @@ public class Mouse
 	 * Let's the mouse structure know when the mouse has actually moved.
 	 * @param mouseMoved
 	 */
-	public static void assignMouseMoved(boolean mouseMoved)
+	public static synchronized void assignMouseMoved(boolean mouseMoved)
 	{
 		Mouse.mouseMoved = mouseMoved;
 	}

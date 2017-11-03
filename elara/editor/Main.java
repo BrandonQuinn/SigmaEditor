@@ -20,13 +20,14 @@ import elara.editor.util.JSON;
 
 import elara.project.ProjectManager;
 
+
 /*
  * The big TODO LIST
  * 
  * NOTE(brandon) Texture modifiers like blur, dodge, burn
  * NOTE(brandon) Entity parenting
  * NOTE(brandon) Entity deletion
- * 
+ * NOTE(brandon) Falloff graph (linear to start, then Quad Curves) 
  */
 
 /**

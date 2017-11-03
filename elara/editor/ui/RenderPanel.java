@@ -1,3 +1,8 @@
+/**
+ * Author: Brandon
+ * Date Created: 7 Oct. 2017
+ * File : Keyboard.java
+ */
 
 package elara.editor.ui;
 
@@ -6,6 +11,7 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
@@ -60,7 +66,8 @@ public class RenderPanel extends JComponent implements
 	 * Mouse cursor.
 	 */
 	private ImageIcon cursorImage;
-	
+	private ImageIcon cursorImageDown;
+
 	/*
 	 * Selection rectangle
 	 */
@@ -77,6 +84,7 @@ public class RenderPanel extends JComponent implements
 
 		// load mouse cursor
 		cursorImage = new ImageIcon("res\\icons\\cursor.png");
+		cursorImageDown = new ImageIcon("res\\icons\\cursorDown.png");
 
 		// transparent image to replace mouse
 		BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -476,7 +484,8 @@ public class RenderPanel extends JComponent implements
 						 * the length of the diagnal.
 						 */
 						
-						int hypotenuse = (int) Math.sqrt((decal.image().getWidth() << 1) * (decal.image().getHeight() << 1));
+						int hypotenuse = (int) Math.sqrt((decal.image().getWidth() << 1) 
+								* (decal.image().getHeight() << 1));
 						
 						placeDecalImage = new BufferedImage(hypotenuse, 
 								hypotenuse, 
@@ -484,13 +493,19 @@ public class RenderPanel extends JComponent implements
 						
 						// create the new image we are going to place and rotate it
 						Graphics2D pgi = placeDecalImage.createGraphics();
-						pgi.rotate(Math.toRadians(editCon.decalRotation()), placeDecalImage.getWidth() >> 1, placeDecalImage.getHeight() >> 1);
-						pgi.drawImage(decal.image(), (placeDecalImage.getWidth() >> 1) - (decal.image().getWidth() >> 1), 
-								(placeDecalImage.getHeight() >> 1) - (decal.image().getHeight() >> 1), null);
+						pgi.rotate(Math.toRadians(editCon.decalRotation()), 
+								placeDecalImage.getWidth() >> 1, 
+								placeDecalImage.getHeight() >> 1);
+						pgi.drawImage(decal.image(), 
+								(placeDecalImage.getWidth() >> 1) - (decal.image().getWidth() >> 1), 
+								(placeDecalImage.getHeight() >> 1) - (decal.image().getHeight() >> 1), 
+								null);
 						
 						Graphics2D dest = texLayer.createGraphics();
-						dest.drawImage(placeDecalImage, (paintx + (decal.image().getHeight() >> 1)) - (placeDecalImage.getWidth() >> 1), 
-								(painty + (decal.image().getWidth() >> 1)) - (placeDecalImage.getHeight() >> 1), null);
+						dest.drawImage(placeDecalImage, 
+								(paintx + (decal.image().getHeight() >> 1)) - (placeDecalImage.getWidth() >> 1), 
+								(painty + (decal.image().getWidth() >> 1)) - (placeDecalImage.getHeight() >> 1), 
+								null);
 					}
 				}
 				
@@ -540,8 +555,10 @@ public class RenderPanel extends JComponent implements
 	{
 		switch (editCon.state()) {
 			case SELECT:
-				
-				g2d.drawImage(cursorImage.getImage(), Mouse.x() - 8, Mouse.y() - 8, null);
+				Image cur = cursorImage.getImage();
+				if (Mouse.isLeftButtonDown())
+					cur = cursorImageDown.getImage();
+				g2d.drawImage(cur, Mouse.x() - 8, Mouse.y() - 8, null);
 				
 			break;
 	
