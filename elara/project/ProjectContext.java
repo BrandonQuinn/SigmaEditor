@@ -17,19 +17,20 @@ import elara.scene.SceneManager;
 /**
  * ProjectContext
  *
- * Description: Static project context. This data structure is essentially
- * the main data structure which models the game data.
- * 
- * All the data here represents a project on disk that can then be
- * send to the game engine and executed.
+ * Description: Static project context. 
+ * Represents all the assets that are available to each scene,
+ * so it's all the assets the user/developer has to selected from
+ * which are added to the game.
+ *
+ * Before anything can be added to a scene it first
+ * has to exist here.
  * 
  */
 public class ProjectContext
 {
 	private static ProjectContext instance = new ProjectContext();
 	
-	private boolean projectLoaded = false;
-	
+	private boolean projectLoaded = false;	
 	private String projectName = "";
 	private String projectDirectory = "";
 	private File projectDirFile;
@@ -42,7 +43,7 @@ public class ProjectContext
 	/**
 	 * List of all scripts.
 	 */
-	private HashMap<String, String> scriptList = new HashMap<String, String>(100);
+	private HashMap<String, String> scriptList = new HashMap<String, String>(1000);
 	
 	/**
 	 * List of loaded textures which can be used.
@@ -227,10 +228,11 @@ public class ProjectContext
 	}
 	
 	/**
-	 * Add a scene to the project context by name.
+	 * Let's the project context know that there is a new scene so it can
+	 * be accessed.
 	 * @param sceneName
 	 */
-	public void addScene(String sceneName)
+	public void registerScene(String sceneName)
 	{
 		scenes.add(sceneName);
 	}

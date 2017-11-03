@@ -76,8 +76,8 @@ public class TextureJList extends JList<Texture> implements ListSelectionListene
 	 */
 	public void loadFromContext()
 	{
-		ProjectContext context = ProjectContext.projectContext();
-		for (Texture texture : context.loadedTextures()) {
+		model.clear();
+		for (Texture texture : projectContext.loadedTextures()) {
 			addTexture(texture);
 		}
 	}

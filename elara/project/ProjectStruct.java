@@ -21,6 +21,10 @@ public class ProjectStruct
 	 * Configuration file, this must exist for every project.
 	 */
 	public static final String CONFIG = "project.config";
+
+	/*
+	 * All directories needed for the project.
+	 */
 	public static final String ASSET_DIR = "assets";
 	public static final String DECAL_DIR = "assets/decals";
 	public static final String TEXTURE_DIR = "assets/textures";

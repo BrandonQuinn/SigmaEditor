@@ -29,7 +29,7 @@ import elara.assets.Drawable;
 public class Scene 
 	implements Drawable
 {
-	public static final int GRID_SIZE = 25;
+	public static int GRID_SIZE = 50;
 	public static final int MAX_WIDTH = 500;
 	public static final int MAX_HEIGHT = 500;
 	public static final int MIN_WIDTH = 5;

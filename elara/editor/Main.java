@@ -1,29 +1,31 @@
 
 package elara.editor;
 
+import java.io.File;
 import java.io.IOException;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.synth.SynthLookAndFeel;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import elara.editor.debug.Debug;
 import elara.editor.debug.LogType;
 import elara.editor.debug.StackTraceUtil;
-import elara.editor.debug.Debug;
-import elara.editor.input.InputManager;
 import elara.editor.ui.MainWindow;
 import elara.editor.ui.dialogs.ErrorDialog;
 import elara.editor.ui.dialogs.RecentProjectsDialog;
 import elara.editor.util.JSON;
+
 import elara.project.ProjectManager;
 
 /*
  * The big TODO LIST
  * 
- * TODO Texture modifiers like blur, dodge, burn
- * TODO Entity parenting
- * TODO Entity deletion
+ * NOTE(brandon) Texture modifiers like blur, dodge, burn
+ * NOTE(brandon) Entity parenting
+ * NOTE(brandon) Entity deletion
  * 
  */
 
@@ -38,8 +40,7 @@ import elara.project.ProjectManager;
 public class Main
 {
 	private static ProjectManager pc = ProjectManager.manager();
-	
-	// private static final String SYNTH_STYLE_FILE = "res/synth/synthStyle.xml";
+	private static final String SYNTH_STYLE_FILE = "res/synth/synthStyle.xml";
 	
 	public static void main(String args[])
 	{
@@ -50,7 +51,7 @@ public class Main
 		rpg.setVisible(true);
 		
 		MainWindow mainWindow = new MainWindow();		
-		mainWindow.setVisible(true); // GO!
+		mainWindow.setVisible(true);
 	}
 
 	/**
@@ -60,24 +61,7 @@ public class Main
 	private static void initialise()
 	{
 		System.setProperty("-Dsun.java2d.opengl", "true");
-		
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | InstantiationException | 
-				IllegalAccessException | UnsupportedLookAndFeelException e) {
-			ErrorDialog eDialog = new ErrorDialog("Could not load the system look and feel.",
-					StackTraceUtil.stackTraceToString(e));
-			eDialog.setVisible(true); // error dialog probably not needed
-			return;
-		}
-		
-		/*try {
-			SynthLookAndFeel lookAndFeel = new SynthLookAndFeel();
-			lookAndFeel.load(new File(SYNTH_STYLE_FILE).toURL());
-			UIManager.setLookAndFeel(lookAndFeel);
-		} catch (UnsupportedLookAndFeelException | java.text.ParseException | IOException e1) {
-			e1.printStackTrace();
-		}*/
+		setLookAndFeel(false);
 		
 		// load the configuration for the editor
 		try {
@@ -85,22 +69,43 @@ public class Main
 			
 			// load recent projects
 			JSONArray recentProjects = (JSONArray) editorConfig.get("recentProjects");
-			
 			for (Object rpObj : recentProjects) {
 				JSONObject recentProject = (JSONObject) rpObj;
 				String name = (String) recentProject.get("name");
 				String path = (String) recentProject.get("path");
 				pc.addRecentProject(name, path);
 			}
-					
 		} catch (ParseException | IOException e) {
 			Debug.debug.log(LogType.CRITICAL, "Failed to parse project configration JSON");
 			JOptionPane.showMessageDialog(null, "Failed to load editor configuration.", 
 					"ParseException", JOptionPane.ERROR_MESSAGE);
 		}
-		
-		// create and setup input
-		InputManager inMan = InputManager.inputManager();
-		inMan.logControllerInfo(Debug.debug);
+	}
+	
+	/**
+	 * Set the look and feel.
+	 */
+	private static void setLookAndFeel(boolean useCustom)
+	{
+		// NOTE(brandon) Custom look and feel needs work
+		if (useCustom) { // custom loaded from images loaded from synthStyle.xml
+			try {
+				SynthLookAndFeel lookAndFeel = new SynthLookAndFeel();
+				lookAndFeel.load(new File(SYNTH_STYLE_FILE).toURL());
+				UIManager.setLookAndFeel(lookAndFeel);
+			} catch (UnsupportedLookAndFeelException | java.text.ParseException | IOException e1) {
+				e1.printStackTrace();
+			}
+		} else { // system look and feel
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (ClassNotFoundException | InstantiationException | 
+				IllegalAccessException | UnsupportedLookAndFeelException e) {
+				ErrorDialog eDialog = new ErrorDialog("Could not load the system look and feel.",
+					StackTraceUtil.stackTraceToString(e));
+				eDialog.setVisible(true); // error dialog probably not needed
+				return;
+			}
+		}
 	}
 }

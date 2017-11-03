@@ -1,7 +1,5 @@
 package elara.editor.input;
 
-import java.awt.event.MouseEvent;
-
 /**
  * Author: Brandon
  * Date Created: 4 Oct. 2017
@@ -14,13 +12,9 @@ import java.awt.event.MouseEvent;
  * Description: Just mouse inputs...
  */
 public class Mouse
-{
-	private static boolean entered = false;
-	private static int exitedX = 0;
-	private static int exitedY = 0;
-	
-	private static int x = 0;
-	private static int y = 0;
+{	
+	private static volatile int x = 0;
+	private static volatile int y = 0;
 	
 	private static MouseState leftButton = MouseState.NOT_PRESSED;
 	private static MouseState middleButton = MouseState.NOT_PRESSED;
@@ -37,10 +31,6 @@ public class Mouse
 	 */
 	public static synchronized int x() 
 	{
-		if (!entered) {
-			return exitedX;
-		}
-		
 		return x;
 	}
 	
@@ -51,10 +41,6 @@ public class Mouse
 	 */
 	public static synchronized int y()
 	{
-		if (!entered) {
-			return exitedY;
-		}
-		
 		return y;
 	}
 	
@@ -163,25 +149,6 @@ public class Mouse
 		}
 		
 		return false;
-	}
-
-	/**
-	 * Set's whether or not the mouse cursor is inside the render
-	 * frame.
-	 * 
-	 * @param b
-	 */
-	public static synchronized void setEntered(boolean b, MouseEvent me)
-	{
-		entered = b;
-		
-		Mouse.x = me.getX();
-		Mouse.y = me.getY();
-		
-		if (!b) {
-			exitedX = me.getX();
-			exitedY = me.getY();
-		}
 	}
 	
 	/**

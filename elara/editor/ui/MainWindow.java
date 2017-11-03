@@ -46,7 +46,6 @@ import elara.editor.ui.dialogs.WaitingDialog;
 import elara.editor.ui.propertiespanels.DecalPropsPanel;
 import elara.editor.ui.propertiespanels.SoundPropsPanel;
 import elara.editor.ui.propertiespanels.TexturePropsPanel;
-import elara.project.AssetLoader;
 import elara.project.EditingContext;
 import elara.project.ProjectContext;
 import elara.project.ProjectManager;
@@ -230,7 +229,6 @@ public class MainWindow extends JFrame implements
 
 		// init combo box
 		comboBox.addItem("Texture Painting");
-		comboBox.addItem("Spawn Points");
 		comboBox.addItem("Sounds");
 		comboBox.addItem("Decals");
 		
@@ -455,30 +453,30 @@ public class MainWindow extends JFrame implements
 				fc.setDialogTitle("Import Texture");
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				fc.setAcceptAllFileFilterUsed(false);
-
-				FileNameExtensionFilter textureFilter = new FileNameExtensionFilter("Textures", "jpg", "jpeg", "png");
+				
+				// filter to only jpegs
+				FileNameExtensionFilter textureFilter 
+					= new FileNameExtensionFilter("Textures", "jpg", "jpeg", "png", "bmp");
 				fc.addChoosableFileFilter(textureFilter);
 
 				int fcResponse = fc.showOpenDialog(null);
 				if (fcResponse == JFileChooser.APPROVE_OPTION) {
-					File selectedImage = fc.getSelectedFile();
+					File selectedImageFile = fc.getSelectedFile();
 					String texName = JOptionPane.showInputDialog(null,
-							"Enter the name of the texture",
+							"Enter the name of the texture:",
 							"Texture name",
 							JOptionPane.PLAIN_MESSAGE);
 
 					try {
 						// add the texture to the project and to the texture list in the GUI
-						Texture loadedTexture = AssetLoader.loadTexture(texName, selectedImage);
-						textureList.addTexture(loadedTexture);
-						projMan.importTexture(texName, selectedImage);
+						projMan.importTexture(texName, selectedImageFile);
+						textureList.loadFromContext();
 					} catch (ElaraException e2) {
 						JOptionPane.showMessageDialog(null,
-								"Failed to load texture",
-								"IOException | SigmaException",
+								"Failed to load texture: " + e2.getMessage(), "Elara Exception",
 								JOptionPane.ERROR_MESSAGE);
 						Debug.debug.log(LogType.ERROR,
-								"Failed to load texture, " + e2.getMessage());
+								"Failed to load texture: " + e2.getMessage());
 						return;
 					}
 				}
@@ -504,7 +502,7 @@ public class MainWindow extends JFrame implements
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				fc.setAcceptAllFileFilterUsed(false);
 
-				FileNameExtensionFilter decalFilter = new FileNameExtensionFilter("Decals", "jpg", "jpeg", "png");
+				FileNameExtensionFilter decalFilter = new FileNameExtensionFilter("Decals", "jpg", "jpeg", "png", "bmp");
 				fc.addChoosableFileFilter(decalFilter);
 
 				int fcResponse = fc.showOpenDialog(null);
@@ -559,9 +557,7 @@ public class MainWindow extends JFrame implements
 					try {
 						projMan.importSound(soundName, sourceSoundFile);
 					} catch (ElaraException e1) {
-						JOptionPane.showMessageDialog(null,
-								e1,
-								"Exception",
+						JOptionPane.showMessageDialog(null, e1, "Exception",
 								JOptionPane.ERROR_MESSAGE);
 					}
 				}

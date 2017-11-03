@@ -26,7 +26,6 @@ import elara.assets.Entity;
 import elara.assets.Sound;
 import elara.assets.Texture;
 import elara.editor.imageprocessing.ImageProcessor;
-import elara.editor.input.InputManager;
 import elara.editor.input.KeyState;
 import elara.editor.input.Keyboard;
 import elara.editor.input.Mouse;
@@ -54,7 +53,6 @@ public class RenderPanel extends JComponent implements
 	private static final long serialVersionUID = 1L;
 
 	private EditingContext editCon = EditingContext.editingContext();
-	private InputManager inMan = InputManager.inputManager();
 
 	private MainWindow mainWindow;
 
@@ -152,8 +150,6 @@ public class RenderPanel extends JComponent implements
 	 */
 	private void handleInput()
 	{
-		inMan.pollInput();
-		
 		// handle space bar pressed and change state only when we are just enterting this state
 		if ((Keyboard.SPACE_BAR == KeyState.PRESSED)
 				&& editCon.state() != EditingState.MOVE_WORLD) {
@@ -617,8 +613,6 @@ public class RenderPanel extends JComponent implements
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
 			Mouse.setRightButtonState(MouseState.NOT_PRESSED);
 		}
-		
-		Mouse.setEntered(true, e);
 	}
 
 	@Override
@@ -631,8 +625,6 @@ public class RenderPanel extends JComponent implements
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
 			Mouse.setRightButtonState(MouseState.NOT_PRESSED);
 		}
-		
-		Mouse.setEntered(false, e);
 	}
 
 	@Override
@@ -683,6 +675,12 @@ public class RenderPanel extends JComponent implements
 			case KeyEvent.VK_S:
 				Keyboard.S = KeyState.PRESSED;
 			break;
+			case KeyEvent.VK_OPEN_BRACKET:
+				Keyboard.BRACKET_LEFT = KeyState.PRESSED;
+			break;
+			case KeyEvent.VK_CLOSE_BRACKET:
+				Keyboard.BRACKET_RIGHT = KeyState.PRESSED;
+			break;
 		}
 	}
 
@@ -697,6 +695,12 @@ public class RenderPanel extends JComponent implements
 			break;
 			case KeyEvent.VK_S:
 				Keyboard.S = KeyState.RELEASED;
+			break;
+			case KeyEvent.VK_OPEN_BRACKET:
+				Keyboard.BRACKET_LEFT = KeyState.RELEASED;
+			break;
+			case KeyEvent.VK_CLOSE_BRACKET:
+				Keyboard.BRACKET_RIGHT = KeyState.RELEASED;
 			break;
 		}
 	}
@@ -713,19 +717,27 @@ public class RenderPanel extends JComponent implements
 			case KeyEvent.VK_S:
 				Keyboard.S = KeyState.TYPED;
 			break;
+			case KeyEvent.VK_OPEN_BRACKET:
+				Keyboard.BRACKET_LEFT = KeyState.TYPED;
+			break;
+			case KeyEvent.VK_CLOSE_BRACKET:
+				Keyboard.BRACKET_RIGHT = KeyState.TYPED;
+			break;
 		}
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e)
 	{
-
+		Mouse.assignX(e.getX());
+		Mouse.assignY(e.getY());
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e)
 	{
-
+		Mouse.assignX(e.getX());
+		Mouse.assignY(e.getY());
 	}
 
 	@Override
