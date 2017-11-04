@@ -88,7 +88,7 @@ public class SelectionRectangle
 			g2d.setStroke(new BasicStroke(1.0f));
 			
 			// draw center
-			g2d.setColor(new Color(90, 181, 234, 100));
+			g2d.setColor(new Color(90, 181, 234, 40));
 			g2d.fillRect(topLeftX + 1, topLeftY + 1, width - 1, height - 1);
 
 			g2d.setColor(Color.WHITE);

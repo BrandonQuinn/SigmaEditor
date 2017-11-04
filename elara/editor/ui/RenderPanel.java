@@ -230,16 +230,16 @@ public class RenderPanel extends JComponent implements
 			case SELECT:
 
 				// click and hold down on non-selection
-				if (Mouse.isLeftButtonDown() && !selectionRectangle.isDrawn() && !AssetSelector.isMouseOnSelection()) {
-					// deselect all
+				if (Mouse.isLeftButtonDown() 
+						&& !selectionRectangle.isDrawn() 
+						&& !AssetSelector.isMouseOnSelection()) {
 					AssetSelector.deselectAll();
-					
-					// check selection at this point
 					AssetSelector.checkSelections(Mouse.x(), Mouse.y());
 				}
 				
 				// click and hold on selection
-				if (Mouse.isLeftButtonDown() && !selectionRectangle.isDrawn() && AssetSelector.isMouseOnSelection()) {
+				if (Mouse.isLeftButtonDown() 
+						&& !selectionRectangle.isDrawn() && AssetSelector.isMouseOnSelection()) {
 					AssetSelector.moveSelection();
 				} else {
 					// we are not moving our selection, so draw the selection rectangle
@@ -256,7 +256,6 @@ public class RenderPanel extends JComponent implements
 				}
 				
 				// allow the user to move the selection a single pixel at a time using the arrow keys
-				
 				if (Keyboard.UP == KeyState.PRESSED) {
 					if (!selectionMoved) {
 						for (Entity entity : AssetSelector.selectedEntities()) {
@@ -411,6 +410,8 @@ public class RenderPanel extends JComponent implements
 				 * too for left, right, above or bellow the game world. It's limited
 				 * to half the width or high, so at least half of the size of the editor
 				 * window will always have the actual game or level visible. Can't go farther.
+				 * 
+				 * NOTE(brandon) Change world bounds checking to use mouse change direction
 				 */
 				
 				if (Mouse.x() - moveStartX != 0 
@@ -436,8 +437,7 @@ public class RenderPanel extends JComponent implements
 				}
 				
 				if (Keyboard.SPACE_BAR == KeyState.RELEASED) {
-					moveStartX = null;
-					moveStartY = null;
+					moveStartX = null; moveStartY = null;
 					Keyboard.SPACE_BAR = KeyState.NOT_PRESSED;	
 					editCon.assignState(editCon.previousState());
 				}

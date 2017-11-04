@@ -187,7 +187,7 @@ public class MainWindow extends JFrame implements
 		mnHelp.add(aboutItem);
 		menuBar.add(mnHelp);
 		
-		graphTest = new JMenuItem("Graph (TEST)");
+		graphTest = new JMenuItem("Graph (Beta)");
 		graphTest.addActionListener(new ActionListener()
 		{
 			@Override
@@ -196,6 +196,7 @@ public class MainWindow extends JFrame implements
 				JDialog test = new JDialog();
 				test.setLayout(new BorderLayout());
 				test.add(new FalloffGraph(), BorderLayout.CENTER);
+				test.setSize(200, 200);
 				test.setVisible(true);
 			}
 		});

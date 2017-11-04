@@ -42,9 +42,9 @@ public class ProjectStruct
 				"\t\"creationDate\": \"\",\n" +
 				"\t\"scenes\": [],\n" +
 				"\t\"textures\": [],\n" +
-				"\t\"sounds\": []" +
-				"\t\"scripts\": []," +
-				"\t\"decals\": []," +
+				"\t\"sounds\": [],\n" +
+				"\t\"scripts\": [],\n" +
+				"\t\"decals\": []" +
 			"}";
 	
 	/**
