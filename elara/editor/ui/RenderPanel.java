@@ -23,6 +23,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
+import java.text.DecimalFormat;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import org.joml.Vector2f;
@@ -57,9 +58,7 @@ public class RenderPanel extends JComponent implements
 		MouseWheelListener
 {
 	private static final long serialVersionUID = 1L;
-
 	private EditingContext editCon = EditingContext.editingContext();
-
 	private MainWindow mainWindow;
 
 	/*
@@ -101,9 +100,8 @@ public class RenderPanel extends JComponent implements
 	@Override
 	public void paint(Graphics g)
 	{
+		RenderStats.startClock();
 		Graphics2D g2d = (Graphics2D) g;
-		
-		long time = System.currentTimeMillis();
 		
 		drawDefaultBackground(g2d);
 		setup(g2d);
@@ -113,7 +111,13 @@ public class RenderPanel extends JComponent implements
 		handleEditingState(g2d);
 		drawDebugInfo(g2d);
 
-		RenderStats.frameTime = System.currentTimeMillis() - time;
+		try {
+			Thread.sleep(100);
+		} catch (Exception e) {
+			
+		}
+		RenderStats.finaliseClock();
+		// RenderStats.lockFrameRate();
 	}
 	
 	/**
@@ -150,7 +154,8 @@ public class RenderPanel extends JComponent implements
 				+ " | Memory Usage: " + Runtime.getRuntime().totalMemory()/1000000 + "MB/" 
 				+ Runtime.getRuntime().maxMemory()/1000000 + "MB", 5, 15);
 		
-		g2d.drawString("Frame Time: " + RenderStats.frameTime + "ms", 5, 30);
+		g2d.drawString("Frame Rate: " + new DecimalFormat("00.00").format(RenderStats.FPS())
+				+ "|" + RenderStats.frameRateTarget(), 5, 30);
 	}
 
 	/**
@@ -410,8 +415,6 @@ public class RenderPanel extends JComponent implements
 				 * too for left, right, above or bellow the game world. It's limited
 				 * to half the width or high, so at least half of the size of the editor
 				 * window will always have the actual game or level visible. Can't go farther.
-				 * 
-				 * NOTE(brandon) Change world bounds checking to use mouse change direction
 				 */
 				
 				if (Mouse.x() - moveStartX != 0 
@@ -437,7 +440,8 @@ public class RenderPanel extends JComponent implements
 				}
 				
 				if (Keyboard.SPACE_BAR == KeyState.RELEASED) {
-					moveStartX = null; moveStartY = null;
+					moveStartX = null;
+					moveStartY = null;
 					Keyboard.SPACE_BAR = KeyState.NOT_PRESSED;	
 					editCon.assignState(editCon.previousState());
 				}
