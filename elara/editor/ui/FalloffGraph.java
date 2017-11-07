@@ -15,6 +15,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -54,8 +55,14 @@ public class FalloffGraph extends JPanel
 	private int gridSizeWidth = 0;
 	private int gridSizeHeight = 0;
 	
+	private int mousedx = 0;
+	private int mousedy = 0;
 	private int mousex = 0;
 	private int mousey = 0;
+	
+	private boolean insideStart = false;
+	private boolean insideEnd = false;
+	private boolean leftMouseDown = false;
 	
 	enum Type
 	{
@@ -67,6 +74,7 @@ public class FalloffGraph extends JPanel
 	public FalloffGraph()
 	{
 		addMouseMotionListener(this);
+		addMouseListener(this);
 	}
 
 	@Override
@@ -104,17 +112,43 @@ public class FalloffGraph extends JPanel
 		
 		switch (type) {
 			case LINEAR:
-				lineStart.x = 0;
-				lineStart.y = 0;
 				lineEnd.x = getWidth();
 				lineEnd.y = getHeight();
 				
 				line.setLine(lineStart, lineEnd);
 				
-				g2d.fillRect(lineStart.x - HANDLE_SIZE/2, lineStart.y - HANDLE_SIZE/2, 
+				Rectangle startRect = new Rectangle(lineStart.x - HANDLE_SIZE / 2, 
+						lineStart.y - HANDLE_SIZE / 2,
 						HANDLE_SIZE, HANDLE_SIZE);
-				g2d.fillRect(lineEnd.x - HANDLE_SIZE/2, lineEnd.y - HANDLE_SIZE/2, 
+				g2d.fillRect(startRect.x, startRect.y, startRect.width, startRect.height);
+				
+				Rectangle endRect = new Rectangle(lineEnd.x - HANDLE_SIZE / 2, 
+						lineEnd.y - HANDLE_SIZE / 2,
 						HANDLE_SIZE, HANDLE_SIZE);
+				g2d.fillRect(endRect.x, endRect.y, endRect.width, endRect.height);
+				
+				if ((startRect.contains(new Point(mousex, mousey)) && leftMouseDown) 
+						|| (leftMouseDown && insideStart)) {
+					insideStart = true;
+					if (mousex != 0 || mousey != 0) {
+						lineStart.x = mousex;
+						lineStart.y = mousey;
+						mousedx = 0;
+						mousedy = 0;
+					}
+				}
+				
+				if ((endRect.contains(new Point(mousex, mousey)) && leftMouseDown) 
+						|| (leftMouseDown && insideEnd)) {
+					insideEnd = true;
+					if (mousex != 0 || mousey != 0) {
+						lineEnd.x = mousex;
+						lineEnd.y = mousey;
+						mousedx = 0;
+						mousedy = 0;
+					}
+				}
+				
 				g2d.draw(line);
 			break;
 			case QUAD:
@@ -124,13 +158,19 @@ public class FalloffGraph extends JPanel
 				
 			break;
 		}
+		
+		repaint();
 	}
 
+	int sx = 0, sy = 0;
 	@Override
 	public void mouseDragged(MouseEvent me)
 	{
 		mousex = me.getX();
 		mousey = me.getY();
+		
+		mousedx = me.getX() - sx;
+		mousedy = me.getY() - sy;
 	}
 
 	@Override
@@ -143,7 +183,7 @@ public class FalloffGraph extends JPanel
 	@Override
 	public void mouseClicked(MouseEvent e)
 	{
-
+		leftMouseDown = false;
 	}
 
 	@Override
@@ -155,18 +195,24 @@ public class FalloffGraph extends JPanel
 	@Override
 	public void mouseExited(MouseEvent e)
 	{
-		
+		leftMouseDown = false;
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e)
 	{
-		
+		mousedx = 0;
+		mousedy = 0;
+		sx = e.getX();
+		sy = e.getY();
+		leftMouseDown = true;
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e)
 	{
-
+		sx = 0; sy = 0;
+		leftMouseDown = false;
+		insideStart = false; insideEnd = false;
 	}
 }
