@@ -93,6 +93,11 @@ public class MainWindow extends JFrame implements
 	private JButton textureLayersBtn;
 	
 	/**
+	 * Toolbar buttons
+	 */
+	private JButton playBtn;
+
+	/**
 	 * Asset JLists
 	 */
 	private TextureJList textureList;
@@ -224,8 +229,9 @@ public class MainWindow extends JFrame implements
 		rotateToolBtn.setIcon(DefaultIcons.rotateToolIcon);
 		toolBar.add(rotateToolBtn);
 
-		JButton playBtn = new JButton();
+		playBtn = new JButton();
 		playBtn.setIcon(DefaultIcons.playIcon);
+		playBtn.addActionListener(this);
 		toolBar.add(playBtn);
 
 		JSplitPane splitPane = new JSplitPane();
@@ -658,7 +664,25 @@ public class MainWindow extends JFrame implements
 		else if (source == selectionToolBtn) {
 			editCon.assignState(EditingContext.EditingState.SELECT);
 			textureList.setSelectedIndices(new int[] {});
-		} 
+		}
+
+		else if (source == playBtn) {
+			JFileChooser chooser = new JFileChooser();
+			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			
+			if (chooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
+				return;
+			}
+
+			// NOTE(brandon) get build directory from editor settings
+			try {
+				File chosenFile = chooser.getSelectedFile();
+				ProjectBuilder.build(projCon.projectDirectoryFile(), chosenFile);
+			} catch (ElaraException e) {
+				JOptionPane.showMessageDialog(null, e.message(), "Build stopped", 
+						JOptionPane.INFORMATIONAL_MESSAGE);
+			}
+		}
 		
 		/*==============================================*
 		 * CODE/SCRIPTS MENU
