@@ -1,14 +1,14 @@
 ### About
-- Despite it's ugly interface, I assure you, it's still not worth using
-- There's plenty of obtuse, tiny bugs that don't break anything, just make it less usable, stop being obtuse
-- Other than those points, on the plus side, it's completely free and new features are hard to add because the code makes no sense
-- If that doesn't make you love it, it's also written in Java, notoriously not-as-slow-as-it-used-to-be, and I still use Swing which is deprecated. I also use Java2D which I'm pretty sure is older than me
+- A sad and reasonable effort at a 2D game editor thing
 
 ### Version 0.0 Build 3 Release Notes
 
-- Mouse position now done with jinput
-- Input event handling done after polling, as opposed to in a separate thread
 - Decal properties panel with rotation and rotation speed
+- Working on graph editing for sound and light fall off
+- Settings dialog to be built
+- Updated structure to allow multiple scenes
+- Rudimentary script editor
+- Start of build and run process
 
 ### Dependencies
 - [JSON.Simple](https://github.com/fangyidong/json-simpl)

@@ -42,8 +42,8 @@ public class Builder
 	// reading files.
 	private static Semaphore buildSem = new Semaphore(1);
 	
-	private static File projectDirectory;
-	private static File outputDirectory;
+	private static File projectDirectory = new File("");
+	private static File outputDirectory = new File("");
 	
 	private Builder() {}
 
@@ -76,10 +76,9 @@ public class Builder
 	@Override
 	public void run()
 	{
-		ProjectBuilder projectBuilder = new ProjectBuilder();
-		projectBuilder.setProjectDir(projectDirectory.getAbsolutePath());
-		projectBuilder.setOutputDirectory(outputDirectory.getAbsolutePath());
-		projectBuilder.build();
+		ProjectBuilder.setProjectDir(Builder.projectDirectory.getAbsolutePath());
+		ProjectBuilder.setOutputDirectory(Builder.outputDirectory.getAbsolutePath());
+		ProjectBuilder.build();
 		Builder.buildSem.release();
 	}
 }

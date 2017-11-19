@@ -28,6 +28,7 @@ import elara.assets.DefaultIcons;
 import elara.assets.Entity;
 import elara.assets.Sound;
 import elara.assets.Texture;
+import elara.build.Builder;
 import elara.editor.Constants;
 import elara.editor.debug.Debug;
 import elara.editor.debug.ElaraException;
@@ -61,7 +62,7 @@ import elara.scene.SceneLayer;
  */
 
 public class MainWindow extends JFrame implements
-		ActionListener
+ActionListener
 {
 	private static final long serialVersionUID = 1L;
 
@@ -289,10 +290,9 @@ public class MainWindow extends JFrame implements
 
 		JSplitPane rightSplitPane = new JSplitPane();
 		rightSplitPane.setContinuousLayout(true);
-
 		rightSplitPane.setResizeWeight(0.5);
 		rightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-
+		
 		renderPanel = new RenderPanel(this);
 
 		/*
@@ -674,13 +674,15 @@ public class MainWindow extends JFrame implements
 				return;
 			}
 
-			// NOTE(brandon) get build directory from editor settings
 			try {
+				// NOTE(brandon) get build directory from editor settings
 				File chosenFile = chooser.getSelectedFile();
-				ProjectBuilder.build(projCon.projectDirectoryFile(), chosenFile);
-			} catch (ElaraException e) {
-				JOptionPane.showMessageDialog(null, e.message(), "Build stopped", 
-						JOptionPane.INFORMATIONAL_MESSAGE);
+				Builder.build(projCon.projectDirectoryFile(), chosenFile);
+			} catch (ElaraException e1) {
+				Debug.error("Build failed or stopped: " + e1.message());
+				JOptionPane.showMessageDialog(null, "Build failed or stopped:\n" + e1.message(), 
+						"Build failed or stopped", 
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		

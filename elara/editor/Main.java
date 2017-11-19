@@ -17,7 +17,6 @@ import elara.editor.ui.MainWindow;
 import elara.editor.ui.dialogs.ErrorDialog;
 import elara.editor.ui.dialogs.RecentProjectsDialog;
 import elara.editor.util.JSON;
-
 import elara.project.ProjectManager;
 
 
@@ -86,6 +85,7 @@ public class Main
 	/**
 	 * Set the look and feel.
 	 */
+	@SuppressWarnings("deprecation")
 	private static void setLookAndFeel(boolean useCustom)
 	{
 		// NOTE(brandon) Custom look and feel needs work

@@ -8,6 +8,7 @@ package elara.project;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 import elara.assets.Sound;
 import elara.assets.Texture;
 import elara.editor.debug.Debug;
@@ -122,10 +124,48 @@ public class ProjectManager
 		createScene("Default", 50, 50);
 	}
 
+	/**
+	 * Open a project by first loading the configurations and then
+	 * adding all the assets and the data required to access them
+	 * through the editor to the editor and the various contexts.
+	 */
 	public void open(String projectLocation) 
 			throws ElaraException
 	{
-		// TODO open project
+		// read the configuration file
+		try {
+			projectConfig = JSON.read(projectLocation + "/" + ProjectStruct.CONFIG);
+		} catch (ParseException e) {
+			Debug.error("Could not parse configuration file");
+			throw new ElaraException("Could not parse configuration file");
+		} catch (FileNotFoundException e) {
+			Debug.error("Could not find configuration file");
+			throw new ElaraException("Could not find configuration file");
+		} catch (IOException e) {
+			Debug.error("Could not perform IO operation on configruration file");
+			throw new ElaraException("Could not perform IO operation on configuration file");
+		}
+		
+		// get list of textures and load them
+		try {
+			JSONArray textureList = (JSONArray) projectConfig.get("textures");
+			for (int i = 0; i < textureList.size(); i++) {
+				JSONObject textureData = (JSONObject) textureList.get(i);
+				String name = (String) textureData.get("name");
+				String filename = (String) textureData.get("filename");
+				Texture newTexture = new Texture(name, new File(projectLocation + "/" 
+						+ ProjectStruct.TEXTURE_DIR + "/" + filename));
+				// NOTE(brandon) Change to load only meta data for textures when opening projects
+				BufferedImage newImage = ImageIO.read(newTexture.file());
+				newTexture.assignImage(newImage);
+				projCon.addTexture(newTexture);
+			}
+		} catch (IOException e) {
+			Debug.error("Failed to load texture list from configuration file");
+			throw new ElaraException("Failed to load texture list from configuration file");
+		}
+		
+		
 	}
 	
 	public void save()
