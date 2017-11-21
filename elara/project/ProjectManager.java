@@ -146,28 +146,23 @@ public class ProjectManager
 			throw new ElaraException("Could not perform IO operation on configuration file");
 		}
 		
-		// get list of textures and load them
-		try {
-			JSONArray textureList = (JSONArray) projectConfig.get("textures");
-			for (int i = 0; i < textureList.size(); i++) {
-				JSONObject textureData = (JSONObject) textureList.get(i);
-				String name = (String) textureData.get("name");
-				String filename = (String) textureData.get("filename");
-				Texture newTexture = new Texture(name, new File(projectLocation + "/" 
-						+ ProjectStruct.TEXTURE_DIR + "/" + filename));
-				// NOTE(brandon) Change to load only meta data for textures when opening projects
-				BufferedImage newImage = ImageIO.read(newTexture.file());
-				newTexture.assignImage(newImage);
-				projCon.addTexture(newTexture);
-			}
-		} catch (IOException e) {
-			Debug.error("Failed to load texture list from configuration file");
-			throw new ElaraException("Failed to load texture list from configuration file");
-		}
-		
-		
+		Texture[] textures = Assets.readTextures();
+		for (Texture texture : textures)
+			projCon.addTexture(texture);
+
+		Decal[] decals = Assets.readDecals();
+		for (Decal decal : decals) 
+			projCon.addDecal(decal);
+
+		Sound[] sounds = Assets.readSounds();
+		for (Sound sound : sounds)
+			projCon.addSound(sound);
+
+		Script[] scripts = Assets.readScripts();
+		for (Script script : scripts)
+			projCon.addScript(script);
 	}
-	
+
 	public void save()
 			throws ElaraException
 	{

@@ -29,6 +29,7 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import elara.assets.DefaultIcons;
 import elara.editor.debug.ElaraException;
 import elara.project.AssetLoader;
+import elara.project.Assets;
 import elara.project.ProjectContext;
 import elara.project.ProjectManager;
 
@@ -117,13 +118,8 @@ public class CodeEditor extends JFrame
 			String str = (String) projCon.scriptList().toArray()[i];
 			scriptListModel.addElement(str);
 			
-			// load buffer
-			try {
-				String scriptCode = AssetLoader.loadScript(str);
-				scriptBuffer.add(i, scriptCode);
-			} catch (ElaraException e) {
-				// not really much we can do...
-			}
+			String scriptCode = Assets.loadScript(str);
+			scriptBuffer.add(i, scriptCode);
 		}
 	}
 
