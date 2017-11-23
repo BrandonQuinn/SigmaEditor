@@ -17,6 +17,7 @@ import javax.imageio.ImageIO;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import elara.assets.Script;
 import elara.assets.Sound;
 import elara.assets.Texture;
 import elara.editor.debug.Debug;
@@ -150,8 +151,8 @@ public class ProjectManager
 		for (Texture texture : textures)
 			projCon.addTexture(texture);
 
-		Decal[] decals = Assets.readDecals();
-		for (Decal decal : decals) 
+		Texture[] decals = Assets.readDecals();
+		for (Texture decal : decals) 
 			projCon.addDecal(decal);
 
 		Sound[] sounds = Assets.readSounds();

@@ -27,8 +27,8 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import elara.assets.DefaultIcons;
+import elara.assets.Script;
 import elara.editor.debug.ElaraException;
-import elara.project.AssetLoader;
 import elara.project.Assets;
 import elara.project.ProjectContext;
 import elara.project.ProjectManager;
@@ -118,8 +118,8 @@ public class CodeEditor extends JFrame
 			String str = (String) projCon.scriptList().toArray()[i];
 			scriptListModel.addElement(str);
 			
-			String scriptCode = Assets.loadScript(str);
-			scriptBuffer.add(i, scriptCode);
+			Script script = Assets.readScript(str);
+			scriptBuffer.add(i, script.getContent());
 		}
 	}
 
@@ -169,21 +169,15 @@ public class CodeEditor extends JFrame
 		} else if (source == saveScript) {
 			int index = scriptList.getSelectedIndex();
 			if (index != -1) {
-				try {
-					AssetLoader.saveScript(scriptListModel.getElementAt(index), 
-							syntaxTextArea.getText());
-				} catch (ElaraException e) {
-					JOptionPane.showMessageDialog(this, "Could not save: " + e.getMessage(), "Failed to save", 
-							JOptionPane.ERROR_MESSAGE);
-					e.printStackTrace();
-				}
+					//Assets.saveScript(scriptListModel.getElementAt(index), 
+					//		syntaxTextArea.getText());
 			}
 		} else if (source == deleteScript) {
 			int index = scriptList.getSelectedIndex();
 			if (index != -1) {
 				try {
 					String script = scriptListModel.get(index);
-					AssetLoader.deleteScript(script);
+					//Assets.deleteScript(script);
 					projCon.deleteScript(script);
 					projMan.deleteScript(script);
 					scriptListModel.remove(index);
