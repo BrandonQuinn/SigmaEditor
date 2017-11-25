@@ -10,8 +10,6 @@
 
 package elara.assets;
 
-import java.io.File;
-
 /*****************************************************************
  *
  * Script
@@ -23,28 +21,36 @@ import java.io.File;
 
 public class Script {
 	private String name;
-	private File file;
+	private String filename;
 	private ScriptLang lang;
 	private String content = "";
+
+	public Script() {}
+
+	public Script(String name, String filename)
+	{
+		this.name = name;
+		this.filename = filename;
+	}
 
 	public void setName(String name)
 	{
 		this.name = name;
 	}
 
-	public String getName()
+	public String name()
 	{
 		return name;
 	}
 
-	public void setFile(File path)
+	public void setFilename(String filename)
 	{
-		this.file = path;
+		this.filename = filename;
 	}
 
-	public File getFile()
+	public String filename()
 	{
-		return file;
+		return filename;
 	}
 
 	public void setLang(ScriptLang scriptLang)
@@ -52,7 +58,7 @@ public class Script {
 		this.lang = scriptLang;
 	}
 
-	public ScriptLang getLang()
+	public ScriptLang lang()
 	{
 		return lang;
 	}
@@ -62,7 +68,7 @@ public class Script {
 		this.content = content;
 	}
 
-	public String getContent() 
+	public String content()
 	{
 		return content;
 	}

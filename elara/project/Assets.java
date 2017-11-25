@@ -21,12 +21,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.newdawn.slick.SlickException;
+import elara.assets.DefaultIcons;
 import elara.assets.Script;
 import elara.assets.ScriptLang;
 import elara.assets.Sound;
 import elara.assets.Texture;
 import elara.editor.debug.Debug;
-import elara.editor.util.JSON;
 
 /*****************************************************************
  *
@@ -42,6 +42,7 @@ import elara.editor.util.JSON;
 public class Assets
 {
 	private static ProjectContext projCon = ProjectContext.projectContext();
+	private static ProjectManager projMan = ProjectManager.manager();
 
 	/* =================================== *
 	 * TEXTURES
@@ -79,7 +80,7 @@ public class Assets
 
 				if (name.equals(texName)) {
 					texture = new Texture(name, new File(projCon.projectDirectoryFile().getAbsolutePath()
-								+ "/" + ProjectStruct.TEXTURE_DIR + "/" + filename));
+						+ "/" + ProjectStruct.TEXTURE_DIR + "/" + filename));
 					return texture;
 				}
 			}
@@ -90,7 +91,6 @@ public class Assets
 			return (Texture) failedToRead("Failed to parse configuration while "
 				+ "reading texture meta data");
 		}
-
 		return texture;
 	}
 
@@ -98,7 +98,8 @@ public class Assets
 	 * Read all the information regarding textures that are part of the current
 	 * project. Do not load the image itself in to memory.
 	 */
-	public static Texture[] readTexturesMetaData()
+	@SuppressWarnings("unchecked")
+	public static ArrayList<Texture> readTexturesMetaData()
 	{
 		ArrayList<Texture> textures = new ArrayList<Texture>();
 
@@ -111,18 +112,17 @@ public class Assets
 				String filename = (String) textureData.get("filename");
 
 				Texture newTexture = new Texture(name, new File(projCon.projectPath() + "/"
-						+ ProjectStruct.TEXTURE_DIR + "/" + filename));
+					+ ProjectStruct.TEXTURE_DIR + "/" + filename));
 				textures.add(newTexture);
 			}
 		} catch (IOException e) {
-			return (Texture[]) failedToRead("Failed to load texture list from "
+			return (ArrayList<Texture>) failedToRead("Failed to load texture list from "
 				+ "configuration file");
 		} catch (ParseException e) {
-			return (Texture[]) failedToRead("Failed to parse configuration file "
+			return (ArrayList<Texture>) failedToRead("Failed to parse configuration file "
 				+ "while reading textures meta data");
 		}
-
-		return (Texture[]) textures.toArray();
+		return textures;
 	}
 
 	/**
@@ -131,9 +131,9 @@ public class Assets
 	 * a lot of memory usage, depending on how many images there are
 	 * and their size.
 	 */
-	public static Texture[] readTextures()
+	public static ArrayList<Texture> readTextures()
 	{
-		Texture[] textures = readTexturesMetaData();
+		ArrayList<Texture> textures = readTexturesMetaData();
 
 		// add all the actual image content
 		for (Texture texture : textures) {
@@ -145,7 +145,6 @@ public class Assets
 				continue;
 			}
 		}
-
 		return textures;
 	}
 
@@ -162,9 +161,11 @@ public class Assets
 		// read the content of the script file and set it as the content
 		String content = "ERROR while reading content";
 		try {
-			content = new String(Files.readAllBytes(script.getFile().toPath()));
+			content = new String(Files.readAllBytes(new File(
+				projCon.projectDirectoryFile().getAbsolutePath()
+				+ "/" + ProjectStruct.SCRIPT_DIR + "/" + script.filename()).toPath()));
 		} catch (IOException e) {
-			Debug.error("IO Error reading script file: " + script.getFile());
+			Debug.error("IO Error reading script file: " + script.filename());
 		}
 		script.setContent(content);
 		return script;
@@ -196,9 +197,7 @@ public class Assets
 					}
 
 					// assign the values of the new script including the contents of the script
-					File scriptFile = new File(projCon.projectDirectoryFile() + "/"
-							+ ProjectStruct.SCRIPT_DIR + "/" + filename);
-					script.setFile(scriptFile);
+					script.setFilename(filename);
 					script.setName(name);
 					return script;
 				}
@@ -210,8 +209,49 @@ public class Assets
 			return (Script) failedToRead("IO Error while reading configuration "
 				+ "file when finding script");
 		}
-
 		return script;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static ArrayList<Script> readScriptsMetaData()
+	{
+		ArrayList<Script> scripts = new ArrayList<Script>();
+
+		try {
+			JSONArray scriptsArray = readArrayFromConfig("scripts");
+			for (int i = 0; i < scriptsArray.size(); i++) {
+				JSONObject scriptData = (JSONObject) scriptsArray.get(i);
+				String name = (String) scriptData.get("name");
+				String filename = (String) scriptData.get("filename");
+				Script script = new Script(name, filename);
+				scripts.add(script);
+			}
+		} catch (ParseException e) {
+			return (ArrayList<Script>) failedToRead("Failed to parse configuration while "
+				+ "reading scripts meta data");
+		} catch (IOException e) {
+			return (ArrayList<Script>) failedToRead("IO Error while trying to read "
+				+ "scripts meta data");
+		}
+		return scripts;
+	}
+
+	public static ArrayList<Script> readScripts()
+	{
+		ArrayList<Script> scripts = readScriptsMetaData();
+		for (Script script : scripts) {
+			String content = "";
+			try {
+				content = new String(Files.readAllBytes(new File(
+					projCon.projectDirectoryFile().getAbsolutePath()
+					+ "/" + ProjectStruct.SCRIPT_DIR + "/" + script.filename()).toPath()));
+			} catch (IOException e) {
+				Debug.warning("Failed to read script content: " + script.filename());
+				content = "Error: failed to read script content";
+			}
+			script.setContent(content);
+		}
+		return scripts;
 	}
 
 	/* =================================== *
@@ -247,7 +287,6 @@ public class Assets
 			return (Texture) failedToRead("IO Error while reading configuration "
 				+ "file when loading a decal");
 		}
-
 		return decal;
 	}
 
@@ -264,15 +303,11 @@ public class Assets
 		} catch (IOException e) {
 			return (Texture) failedToRead("IO Error while reading decal image: " + name);
 		}
-
 		return decal;
 	}
 
-	/**
-	 * Return an array of all decals read from the disk
-	 * from the current project.
-	 */
-	public static Texture[] readDecals()
+	@SuppressWarnings("unchecked")
+	public static ArrayList<Texture> readDecalsMetaData()
 	{
 		ArrayList<Texture> decals = new ArrayList<Texture>();
 
@@ -289,13 +324,33 @@ public class Assets
 				decals.add(texture);
 			}
 		} catch (IOException e) {
-			return (Texture[]) failedToRead("IO Error while reading decals");
+			return (ArrayList<Texture>) failedToRead("IO Error while reading decals meta data");
 		} catch (ParseException e) {
-			return (Texture[]) failedToRead("Failed to parse configuration "
-				+ "while reading decals");
+			return (ArrayList<Texture>) failedToRead("Failed to parse configuration "
+				+ "while reading decals meta data");
 		}
+		return decals;
+	}
 
-		return (Texture[]) decals.toArray();
+	/**
+	 * Return an array of all decals read from the disk
+	 * from the current project.
+	 */
+	public static ArrayList<Texture> readDecals()
+	{
+		ArrayList<Texture> decals = readDecalsMetaData();
+		for (Texture decal : decals) {
+			File decalFile = new File(projCon.projectDirectoryFile().getAbsolutePath()
+				+ "/" + ProjectStruct.DECAL_DIR + "/" + decal.file().getName());
+			try {
+				BufferedImage image = ImageIO.read(decalFile);
+				decal.assignImage(image);
+			} catch (IOException e) {
+				Debug.warning("Failed to load decal: " + decal.file().getName());
+				decal.assignImage(DefaultIcons.BLANK_ICON_32);
+			}
+		}
+		return decals;
 	}
 
 	/* =================================== *
@@ -328,7 +383,6 @@ public class Assets
 			return (Sound) failedToRead("IO Error could not open configuration "
 				+ "file while trying to load sound meta data");
 		}
-
 		return sound;
 	}
 
@@ -351,14 +405,14 @@ public class Assets
 		} catch (MalformedURLException e) {
 			return (Sound) failedToRead("MalformedURLException while loading sound");
 		}
-
 		return sound;
 	}
 
 	/**
 	 * Loads sounds meta data.
 	 */
-	public static Sound[] readSoundsMetaData()
+	@SuppressWarnings("unchecked")
+	public static ArrayList<Sound> readSoundsMetaData()
 	{
 		ArrayList<Sound> sounds = new ArrayList<Sound>();
 
@@ -372,14 +426,13 @@ public class Assets
 				sounds.add(sound);
 			}
 		} catch (IOException e) {
-			return (Sound[]) failedToRead("IO Error while trying to read sounds "
+			return (ArrayList<Sound>) failedToRead("IO Error while trying to read sounds "
 				+ "from configuration");
 		} catch (ParseException e) {
-			return (Sound[]) failedToRead("Failed to parse configuration file while "
+			return (ArrayList<Sound>) failedToRead("Failed to parse configuration file while "
 				+ "reading sounds meta data");
 		}
-
-		return (Sound[]) sounds.toArray();
+		return sounds;
 	}
 
 	/**
@@ -388,9 +441,10 @@ public class Assets
 	 * Warning: could use up a lot of memory if there's a lot of sounds
 	 * and/or their file sizes are large.
 	 */
-	public static Sound[] readSounds()
+	@SuppressWarnings("unchecked")
+	public static ArrayList<Sound> readSounds()
 	{
-		Sound[] sounds = readSoundsMetaData();
+		ArrayList<Sound> sounds = readSoundsMetaData();
 		try {
 			for (Sound sound : sounds) {
 				File soundFile = new File(projCon.projectDirectoryFile().getAbsolutePath()
@@ -400,12 +454,11 @@ public class Assets
 				sound.setSound(slickSound);
 			}
 		} catch (MalformedURLException e) {
-			return (Sound[]) failedToRead("MalformedURLException while trying to "
+			return (ArrayList<Sound>) failedToRead("MalformedURLException while trying to "
 				+ "load sounds");
 		} catch (SlickException e) {
-			return (Sound[]) failedToRead("Failed to load sounds");
+			return (ArrayList<Sound>) failedToRead("Failed to load sounds");
 		}
-
 		return sounds;
 	}
 
@@ -413,9 +466,7 @@ public class Assets
 		throws IOException,
 		ParseException
 	{
-		JSONObject jsonConfig = JSON.read(new File(projCon.projectDirectoryFile()
-					+ "/" + ProjectStruct.CONFIG));
-		return (JSONArray) jsonConfig.get(arrayName);
+		return (JSONArray) projMan.projectConfig().get(arrayName);
 	}
 
 	private static Object failedToRead(String message)

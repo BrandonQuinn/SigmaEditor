@@ -27,6 +27,8 @@ import elara.project.ProjectManager;
  * NOTE(brandon) Entity parenting
  * NOTE(brandon) Entity deletion
  * NOTE(brandon) Falloff graph (linear to start, then Quad Curves) 
+ * NOTE(brandon) Fixed recent projects 
+ * NOTE(brandon) Test asset loading and importing
  */
 
 /**
@@ -73,7 +75,7 @@ public class Main
 				JSONObject recentProject = (JSONObject) rpObj;
 				String name = (String) recentProject.get("name");
 				String path = (String) recentProject.get("path");
-				pc.addRecentProject(name, path);
+				// pc.addRecentProject(name, path);
 			}
 		} catch (ParseException | IOException e) {
 			Debug.debug.log(LogType.CRITICAL, "Failed to parse project configration JSON");

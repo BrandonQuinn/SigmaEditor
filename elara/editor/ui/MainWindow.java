@@ -538,7 +538,7 @@ ActionListener
 							JOptionPane.PLAIN_MESSAGE);
 
 					// add the texture to the project and to the texture list in the GUI
-					Texture decal = projMan.importDecal(decalName, selectedImage);
+					Texture decal = ImportAsset.decal(selectedImage, decalName);
 					decalList.addDecal(decal);
 				}
 				

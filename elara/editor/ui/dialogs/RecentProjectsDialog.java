@@ -10,7 +10,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -21,9 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import elara.assets.DefaultIcons;
-import elara.editor.debug.ElaraException;
 import elara.project.ProjectManager;
-import elara.project.ProjectManager.RecentProject;
 
 /**
  * RecentProjectsDialog
@@ -57,11 +54,11 @@ public class RecentProjectsDialog extends JDialog
 		
 		DefaultListModel<String> model = new DefaultListModel<String>(); 
 		ProjectManager pc = ProjectManager.manager();
-		ArrayList<RecentProject> recentProjects = pc.recentProjects();
+		//ArrayList<RecentProject> recentProjects = pc.recentProjects();
 		
-		for (RecentProject rp : recentProjects) {
+		/*for (RecentProject rp : recentProjects) {
 			model.addElement(rp.projectName);
-		}
+		}*/
 		
 		
 		list.setModel(model);
@@ -105,12 +102,12 @@ public class RecentProjectsDialog extends JDialog
 						}
 						
 						setVisible(false);
-						try {
+						/*try {
 							pc.open(recentProjects.get(list.getSelectedIndex()).projectPath);
 						} catch (ElaraException ex) {
 							JOptionPane.showMessageDialog(null, "Failed to open project", "Failure", 
 									JOptionPane.ERROR_MESSAGE);
-						}
+						}*/
 					}
 				});
 				

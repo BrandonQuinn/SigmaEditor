@@ -12,8 +12,7 @@ import elara.project.EditingContext;
 /**
  * Sound
  *
- * Description: Represents a sound, yeppie,
- * sure does.
+ * Description: Represents a sound, yeppie, sure does.
  */
 public class Sound extends Entity
 {

@@ -28,7 +28,9 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import elara.assets.DefaultIcons;
 import elara.assets.Script;
+import elara.assets.ScriptLang;
 import elara.editor.debug.ElaraException;
+import elara.editor.ui.ImportAsset;
 import elara.project.Assets;
 import elara.project.ProjectContext;
 import elara.project.ProjectManager;
@@ -119,7 +121,7 @@ public class CodeEditor extends JFrame
 			scriptListModel.addElement(str);
 			
 			Script script = Assets.readScript(str);
-			scriptBuffer.add(i, script.getContent());
+			scriptBuffer.add(i, script.content());
 		}
 	}
 
@@ -148,23 +150,17 @@ public class CodeEditor extends JFrame
 					continue;
 				
 				// TODO Script templates with required methods
-				try {
-					if (source == newJava) {
-						projMan.addScript(scriptName + ".java");
-						scriptListModel.addElement(scriptName + ".java");
-						
-					} else if(source == newKotlin) {
-						projMan.addScript(scriptName + ".kt");
-						scriptListModel.addElement(scriptName + ".kt");
-					}
+				if (source == newJava) {
+					ImportAsset.script(scriptName, ScriptLang.JAVA);
+					scriptListModel.addElement(scriptName + ".java");
 					
-					scriptBuffer.add("");
-					break;
-				} catch ( ElaraException  e) {
-					JOptionPane.showMessageDialog(this, e.getMessage(), e.toString(), 
-							JOptionPane.ERROR_MESSAGE);
-					scriptName = "";
+				} else if(source == newKotlin) {
+					ImportAsset.script(scriptName, ScriptLang.KOTLIN);
+					scriptListModel.addElement(scriptName + ".kt");
 				}
+				
+				scriptBuffer.add("");
+				break;
 			}
 		} else if (source == saveScript) {
 			int index = scriptList.getSelectedIndex();

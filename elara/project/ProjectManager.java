@@ -32,46 +32,31 @@ import elara.scene.SceneManager;
  *
  * Description: Deals with the project and it's context
  * in terms of disk and loading, saving moving, that kind of stuff.
- * 
- * NOTE(brandon) Consider breaking down ProjectManager, it's going to get big and clunky
+ *
+ * NOTE(brandon) Continue breaking down project manager
  */
 public class ProjectManager
 {
 	private static ProjectManager instance = new ProjectManager();
 	private ProjectContext projCon = ProjectContext.projectContext();
 	private SceneManager sceneMan = SceneManager.manager();
+	private ProjectConfiguration configuration = ProjectConfiguration.instance();
 
 	/**
 	 * Store the project configuration in memory and write change to this
 	 * which will eliminate the need to keep reading it every time
-	 * a change is made. 
+	 * a change is made.
 	 */
 	private static JSONObject projectConfig;
 	private static File configFile;
-
-	/**
-	 * Just a simple class to store information to identify a past project.
-	 * RecentProject
-	 *
-	 * Description: Just stores the most basic information to identify a project.
-	 */
-	public class RecentProject {
-		public String projectName;
-		public String projectPath;
-	}
-	
-	/**
-	 * Provide a list of recently opening projects.
-	 */
-	private ArrayList<RecentProject> recentProjects = new ArrayList<RecentProject>();
 
 	private ProjectManager() {}
 
 	/*======================================================================== *
 	 *  PROJECT OPEN, CREATE AND SAVE
 	 * ========================================================================*/
-	
-	public void createNewProject(String projectName, String projectLocation) 
+
+	public void createNewProject(String projectName, String projectLocation)
 			throws ElaraException
 	{
 		// create project directory
@@ -82,14 +67,14 @@ public class ProjectManager
 			throw new ElaraException("Could not create project, "
 					+ "directory already exists");
 		}
-		
+
 		// create project directory structure
 		File newProjDir = null;
 		for (String dirStr : ProjectStruct.directoryList) {
 			newProjDir = new File(projDir.getAbsolutePath() + "/" + dirStr);
 			newProjDir.mkdirs();
 		}
-		
+
 		// create project file structure
 		File newProjFile = null;
 		try {
@@ -103,7 +88,7 @@ public class ProjectManager
 			throw new ElaraException("Could not create project file: "
 					+ newProjFile.getAbsolutePath());
 		}
-		
+
 		// write out the project configuration using the initial structure.
 		try {
 			configFile = new File(projectLocation + "/" + projectName + "/" + ProjectStruct.CONFIG);
@@ -115,12 +100,11 @@ public class ProjectManager
 			throw new ElaraException("Could not write out new project configuration: "
 					+ projectLocation + "/" + projectName + "/" + ProjectStruct.CONFIG);
 		}
-		
-		addRecentProject(projectName, projDir.getAbsolutePath());
+
 		projCon.setProjectLoaded(true);
 		projCon.setProjectDirectory(projDir.getAbsolutePath());
 		projCon.setProjectName(projectName);
-		
+
 		// create an initial scene
 		createScene("Default", 50, 50);
 	}
@@ -130,12 +114,14 @@ public class ProjectManager
 	 * adding all the assets and the data required to access them
 	 * through the editor to the editor and the various contexts.
 	 */
-	public void open(String projectLocation) 
+	public void open(String projectLocation)
 			throws ElaraException
 	{
 		// read the configuration file
 		try {
 			projectConfig = JSON.read(projectLocation + "/" + ProjectStruct.CONFIG);
+			configuration.initFromJSON(new File(projectLocation + "/" + ProjectStruct.CONFIG), 
+					projectConfig);
 		} catch (ParseException e) {
 			Debug.error("Could not parse configuration file");
 			throw new ElaraException("Could not parse configuration file");
@@ -146,22 +132,27 @@ public class ProjectManager
 			Debug.error("Could not perform IO operation on configruration file");
 			throw new ElaraException("Could not perform IO operation on configuration file");
 		}
+
+		projCon.setProjectDirectory(projectLocation);
+		projCon.setProjectName(configuration.name());
 		
-		Texture[] textures = Assets.readTextures();
+		ArrayList<Texture> textures = Assets.readTexturesMetaData();
 		for (Texture texture : textures)
 			projCon.addTexture(texture);
 
-		Texture[] decals = Assets.readDecals();
-		for (Texture decal : decals) 
+		ArrayList<Texture> decals = Assets.readDecalsMetaData();
+		for (Texture decal : decals)
 			projCon.addDecal(decal);
 
-		Sound[] sounds = Assets.readSounds();
+		ArrayList<Sound> sounds = Assets.readSoundsMetaData();
 		for (Sound sound : sounds)
 			projCon.addSound(sound);
 
-		Script[] scripts = Assets.readScripts();
+		ArrayList<Script> scripts = Assets.readScriptsMetaData();
 		for (Script script : scripts)
 			projCon.addScript(script);
+
+		projCon.setProjectLoaded(true);
 	}
 
 	public void save()
@@ -173,7 +164,7 @@ public class ProjectManager
 	/*======================================================================== *
 	 *  ASSET IMPORTS/CREATION
 	 * ========================================================================*/
-	
+
 	/**
 	 * Add a texture to the project. This copies the texture image to
 	 * the texture assets directory and adds it to the
@@ -184,7 +175,7 @@ public class ProjectManager
 	 * should not be separated.
 	 */
 	@SuppressWarnings("unchecked")
-	public void importTexture(String name, File textureFile) 
+	public void importTexture(String name, File textureFile)
 			throws ElaraException
 	{
 		if (!projCon.isProjectLoaded()) {
@@ -198,7 +189,7 @@ public class ProjectManager
 		}
 
 		// copy the file to the assets directory
-		File newtex = new File(projCon.projectPath() + "/" + ProjectStruct.TEXTURE_DIR 
+		File newtex = new File(projCon.projectPath() + "/" + ProjectStruct.TEXTURE_DIR
 				+ "/" + textureFile.getName());
 		try {
 			Files.createFile(newtex.toPath());
@@ -223,7 +214,7 @@ public class ProjectManager
 		textureList.add(newTexJo);
 		projectConfig.replace("textures", textureList);
 		try {
-			JSON.write(projectConfig, configFile.getAbsolutePath());	
+			JSON.write(projectConfig, configFile.getAbsolutePath());
 		} catch(IOException e) {
 			Debug.error("Failed to write out project configuration while importing texture: " + name);
 			throw new ElaraException("Failed to write out project configuration while"
@@ -241,13 +232,13 @@ public class ProjectManager
 			throw new ElaraException("Could not load image as Texture intance: " + newtex.getPath());
 		}
 	}
-	
+
 	/**
 	 * Imports a sound by copying it to the assets directory and adding it to the
 	 * project configuration.
 	 */
 	@SuppressWarnings("unchecked")
-	public void importSound(String name, File soundFile) 
+	public void importSound(String name, File soundFile)
 			throws ElaraException
 	{
 		if (!projCon.isProjectLoaded()) {
@@ -258,19 +249,19 @@ public class ProjectManager
 		if (!soundFile.exists()) {
 			Debug.error("Sound does not exist: "
 					+ soundFile.getAbsolutePath());
-			throw new ElaraException("File does not exist exists: " 
+			throw new ElaraException("File does not exist exists: "
 					+ soundFile.getAbsolutePath());
 		}
 
 		// copy the file to the assets directory
-		File newsound = new File(projCon.projectPath() + "/" + ProjectStruct.SOUND_DIR 
+		File newsound = new File(projCon.projectPath() + "/" + ProjectStruct.SOUND_DIR
 				+ "/" + soundFile.getName());
 		try {
 			Files.createFile(newsound.toPath());
 		} catch (IOException e) {
 			Debug.error("Could not create new file: "
 					+ newsound.getAbsolutePath());
-			throw new ElaraException("Could not create new file: " 
+			throw new ElaraException("Could not create new file: "
 					+ newsound.getAbsolutePath());
 		}
 
@@ -280,7 +271,7 @@ public class ProjectManager
 					StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			Debug.error("Could not copy new sound file to project.");
-			throw new ElaraException("Could not copy new sound file to project: " 
+			throw new ElaraException("Could not copy new sound file to project: "
 					+ newsound.getAbsolutePath());
 		}
 
@@ -292,7 +283,7 @@ public class ProjectManager
 		soundList.add(newSoundJo);
 		projectConfig.replace("sounds", soundList);
 		try {
-			JSON.write(projectConfig, configFile.getAbsolutePath());	
+			JSON.write(projectConfig, configFile.getAbsolutePath());
 		} catch(IOException e) {
 			Debug.error("Failed to write out project configuration while importing sound: " + name);
 			throw new ElaraException("Failed to write out project configuration while"
@@ -302,18 +293,7 @@ public class ProjectManager
 		Sound sound = new Sound(name, newsound.getName());
 		projCon.addSound(sound);
 	}
-	
-	public Texture importDecal(String name, File file) {
-		// TODO import decal
-		return null;
-	}
 
-	public void addScript(String filename) 
-			throws ElaraException
-	{
-		// TODO add script
-	}
-	
 	/**
 	 * Adds the scene to the project configuration and to the project context.
 	 * @param name
@@ -325,10 +305,10 @@ public class ProjectManager
 		Scene newScene = null;
 		if (projCon.isProjectLoaded()) {
 			newScene = sceneMan.createScene(name, width, height);
-			
+
 			try {
 				JSONArray sceneList = (JSONArray) projectConfig.get("scenes");
-				
+
 				// add the scene to the project configuration
 				if (!sceneList.isEmpty() && sceneList != null) {
 					JSONObject newObj = new JSONObject();
@@ -342,42 +322,32 @@ public class ProjectManager
 				throw new ElaraException("Could not write scene to project configuration: " + name);
 			}
 		}
-		
+
 		projCon.registerScene(name);
 		return newScene;
 	}
-	
+
 	/*======================================================================== *
 	 *  ASSET DELETION
 	 * ========================================================================*/
-	
-	public void deleteScript(String script) 
+
+	public void deleteScript(String script)
 			throws ElaraException
 	{
 		// TODO delete script
 	}
-	
+
 	/*======================================================================== *
 	 *  OTHER
 	 * ========================================================================*/
-	
-	public ArrayList<RecentProject> recentProjects()
-	{
-		return recentProjects;
-	}
-
-	public void addRecentProject(String name, String path)
-	{
-		RecentProject rp = new RecentProject();
-		rp.projectName = name;
-		rp.projectPath = path;
-		recentProjects.add(rp);
-		
-		// TODO add recent project to project config
-	}
 
 	public static ProjectManager manager()
 	{
 		return instance;
+	}
+
+	public JSONObject projectConfig()
+	{
+		return projectConfig;
 	}
 }

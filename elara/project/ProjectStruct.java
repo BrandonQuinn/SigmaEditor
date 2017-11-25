@@ -32,21 +32,7 @@ public class ProjectStruct
 	public static final String SCRIPT_DIR = "assets/scripts";
 	public static final String SCENE_DIR = "scenes";
 	public static final String LOG_DIR = "logs";
-	
-	/**
-	 * Default project configuration JSON format.
-	 */
-	public static final String CONFIG_JSON_TEMPLATE =
-			"{\n" +
-				"\t\"projectName\": \"Untitled\",\n" +
-				"\t\"creationDate\": \"\",\n" +
-				"\t\"scenes\": [],\n" +
-				"\t\"textures\": [],\n" +
-				"\t\"sounds\": [],\n" +
-				"\t\"scripts\": [],\n" +
-				"\t\"decals\": []" +
-			"}";
-	
+
 	/**
 	 * List of directories inside a project on disk.
 	 */
@@ -59,32 +45,11 @@ public class ProjectStruct
 			"scenes",
 			"logs"
 	};
-	
+
 	/**
 	 * List of required files inside a project.
 	 */
 	public static String[] fileList = {
 			CONFIG
 	};
-	
-	/**
-	 * Returns a JSON object with the initial structure for a project configuration.
-	 * @param name
-	 * @param width
-	 * @param height
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public static JSONObject initialJSONObj(String name)
-	{
-		JSONObject object = new JSONObject();
-		object.put("name", name);
-		object.put("creationDate", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")));
-		object.put("scenes", new JSONArray());
-		object.put("textures", new JSONArray());
-		object.put("sounds", new JSONArray());
-		object.put("scripts", new JSONArray());
-		object.put("decals", new JSONArray());
-		return object;
-	}
 }
