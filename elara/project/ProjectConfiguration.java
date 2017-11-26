@@ -46,7 +46,7 @@ public class ProjectConfiguration
 				"\t\"scripts\": [],\n" +
 				"\t\"decals\": []" +
 			"}";
-	
+
 	private File configFile;
 
 	private JSONObject jsonObject = null;
@@ -54,10 +54,11 @@ public class ProjectConfiguration
 	private ProjectConfiguration() {}
 
 	@SuppressWarnings("unchecked")
-	public void init(File configFile, String name)
+	public void init(File configFile, String projectName)
+		throws IOException
 	{
 		JSONObject object = new JSONObject();
-		object.put("name", name);
+		object.put("name", projectName);
 		object.put("creationDate", LocalDateTime.now()
 			.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")));
 		object.put("scenes", new JSONArray());
@@ -66,20 +67,25 @@ public class ProjectConfiguration
 		object.put("scripts", new JSONArray());
 		object.put("decals", new JSONArray());
 		jsonObject = object;
+
+		JSON.write(jsonObject, configFile.getAbsolutePath());
 	}
 
 	public void initFromJSON(File configFile, JSONObject object)
+		throws IOException
 	{
 		jsonObject = object;
+		this.configFile = configFile;
+		JSON.write(jsonObject, configFile.getAbsolutePath());
 	}
-	
+
 	/**
 	 * Write the information in the texture to the project configuration.
 	 * @param texture
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
-	public void writeTexture(Texture texture) 
+	public void writeTexture(Texture texture)
 		throws IOException
 	{
 		JSONArray textureArray = (JSONArray) jsonObject.get("textures");
@@ -88,6 +94,24 @@ public class ProjectConfiguration
 		newTextureEntry.put("filename", texture.file().getName());
 		textureArray.add(newTextureEntry);
 		jsonObject.replace("textures", textureArray);
+		JSON.write(jsonObject, configFile.getAbsolutePath());
+	}
+	
+	/**
+	 * Write the information in the texture to the project configuration.
+	 * @param decal
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unchecked")
+	public void writeDecal(Texture texture)
+		throws IOException
+	{
+		JSONArray textureArray = (JSONArray) jsonObject.get("decals");
+		JSONObject newTextureEntry = new JSONObject();
+		newTextureEntry.put("name", texture.name());
+		newTextureEntry.put("filename", texture.file().getName());
+		textureArray.add(newTextureEntry);
+		jsonObject.replace("decals", textureArray);
 		JSON.write(jsonObject, configFile.getAbsolutePath());
 	}
 
@@ -103,13 +127,11 @@ public class ProjectConfiguration
 
 	/**
 	 * Returns the name of the project as read from the configuration file.
-	 * 
+	 *
 	 * @return
 	 */
 	public String name()
 	{
 		return (String) jsonObject.get("name");
 	}
-
-
 }

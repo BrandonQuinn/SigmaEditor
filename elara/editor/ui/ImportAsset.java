@@ -20,7 +20,6 @@ import elara.assets.Sound;
 import elara.assets.Texture;
 import elara.project.ProjectConfiguration;
 import elara.project.ProjectContext;
-import elara.project.ProjectManager;
 import elara.project.ProjectStruct;
 
 /*****************************************************************
@@ -34,7 +33,6 @@ import elara.project.ProjectStruct;
 
 public class ImportAsset
 {
-	private static ProjectManager projMan = ProjectManager.manager();
 	private static ProjectContext projCon = ProjectContext.projectContext();
 	private static ProjectConfiguration configuration = ProjectConfiguration.instance();
 	
@@ -50,9 +48,14 @@ public class ImportAsset
 	}
 	
 	public static Texture decal(File decalLocation, String name)
+			throws IOException
 	{
-		return null;
-		
+		File destination = new File(projCon.projectPath() + File.pathSeparator + ProjectStruct.DECAL_DIR
+				+ File.pathSeparator + decalLocation.getName());
+		Files.copy(decalLocation.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		Texture texture = new Texture(name, destination);
+		configuration.writeDecal(texture);
+		return texture;
 	}
 	
 	public static Sound sound(File soundLocation, String name)

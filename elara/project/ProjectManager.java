@@ -20,6 +20,7 @@ import org.json.simple.parser.ParseException;
 import elara.assets.Script;
 import elara.assets.Sound;
 import elara.assets.Texture;
+import elara.editor.EditorConfiguration;
 import elara.editor.debug.Debug;
 import elara.editor.debug.ElaraException;
 import elara.editor.debug.LogType;
@@ -62,10 +63,8 @@ public class ProjectManager
 		// create project directory
 		File projDir = new File(projectLocation + "/" + projectName);
 		if (projDir.exists()) {
-			Debug.debug.log(LogType.ERROR, "Could not create project, "
-					+ "directory already exists");
-			throw new ElaraException("Could not create project, "
-					+ "directory already exists");
+			Debug.debug.log(LogType.ERROR, "Could not create project, directory already exists");
+			throw new ElaraException("Could not create project, directory already exists");
 		}
 
 		// create project directory structure
@@ -83,30 +82,34 @@ public class ProjectManager
 				newProjFile.createNewFile();
 			}
 		} catch (IOException e) {
-			Debug.debug.log(LogType.ERROR, "Could not create project file: "
-					+ newProjFile.getAbsolutePath());
-			throw new ElaraException("Could not create project file: "
-					+ newProjFile.getAbsolutePath());
+			Debug.error("Could not create project file: " + newProjFile.getAbsolutePath());
+			throw new ElaraException("Could not create project file: " + newProjFile.getAbsolutePath());
 		}
 
-		// write out the project configuration using the initial structure.
+		// initialise configuration
 		try {
-			configFile = new File(projectLocation + "/" + projectName + "/" + ProjectStruct.CONFIG);
-			projectConfig = ProjectStruct.initialJSONObj(projectName);
-			JSON.write(projectConfig, configFile.getPath());
+			configuration.init(
+				new File(projectLocation + File.pathSeparator + ProjectStruct.CONFIG),
+				projectName
+			);
 		} catch (IOException e) {
-			Debug.debug.log(LogType.ERROR, "Could not write out new project configuration: "
-					+ projectLocation + "/" + projectName + "/" + ProjectStruct.CONFIG);
-			throw new ElaraException("Could not write out new project configuration: "
-					+ projectLocation + "/" + projectName + "/" + ProjectStruct.CONFIG);
+			Debug.error("Failed to initialise new project configuration");
+			throw new ElaraException("Failed to initialise new project configuration");
 		}
+
+		// create an initial scene
+		createScene("Default", 50, 50);
 
 		projCon.setProjectLoaded(true);
 		projCon.setProjectDirectory(projDir.getAbsolutePath());
 		projCon.setProjectName(projectName);
 
-		// create an initial scene
-		createScene("Default", 50, 50);
+		try {
+			EditorConfiguration.addRecentProject(projectName, projDir);
+		} catch (IOException e) {
+			// it's not the end of the world if this fails, but we do want to know if it happens
+			Debug.warning("Failed to add new project to recent projects list in editor confguration");
+		}
 	}
 
 	/**
@@ -120,7 +123,7 @@ public class ProjectManager
 		// read the configuration file
 		try {
 			projectConfig = JSON.read(projectLocation + "/" + ProjectStruct.CONFIG);
-			configuration.initFromJSON(new File(projectLocation + "/" + ProjectStruct.CONFIG), 
+			configuration.initFromJSON(new File(projectLocation + "/" + ProjectStruct.CONFIG),
 					projectConfig);
 		} catch (ParseException e) {
 			Debug.error("Could not parse configuration file");
@@ -135,7 +138,7 @@ public class ProjectManager
 
 		projCon.setProjectDirectory(projectLocation);
 		projCon.setProjectName(configuration.name());
-		
+
 		ArrayList<Texture> textures = Assets.readTexturesMetaData();
 		for (Texture texture : textures)
 			projCon.addTexture(texture);

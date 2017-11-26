@@ -22,18 +22,18 @@ import elara.project.ProjectManager;
 
 /*
  * The big TODO LIST
- * 
+ *
  * NOTE(brandon) Texture modifiers like blur, dodge, burn
  * NOTE(brandon) Entity parenting
  * NOTE(brandon) Entity deletion
- * NOTE(brandon) Falloff graph (linear to start, then Quad Curves) 
- * NOTE(brandon) Fixed recent projects 
+ * NOTE(brandon) Falloff graph (linear to start, then Quad Curves)
+ * NOTE(brandon) Fixed recent projects
  * NOTE(brandon) Test asset loading and importing
  */
 
 /**
  * A level editor for the "Project Sigma" game.
- * 
+ *
  * @author Brandon Quinn
  * @version 0.1
  * @since 8 Jun 2017
@@ -43,16 +43,16 @@ public class Main
 {
 	private static ProjectManager pc = ProjectManager.manager();
 	private static final String SYNTH_STYLE_FILE = "res/synth/synthStyle.xml";
-	
+
 	public static void main(String args[])
 	{
 		initialise();
-		
+
 		// allow user to open a recent project
 		RecentProjectsDialog rpg = new RecentProjectsDialog();
 		rpg.setVisible(true);
-		
-		MainWindow mainWindow = new MainWindow();		
+
+		MainWindow mainWindow = new MainWindow();
 		mainWindow.setVisible(true);
 	}
 
@@ -62,28 +62,11 @@ public class Main
 	 */
 	private static void initialise()
 	{
+		EditorConfiguration.init();
 		System.setProperty("-Dsun.java2d.opengl", "true");
 		setLookAndFeel(false);
-		
-		// load the configuration for the editor
-		try {
-			JSONObject editorConfig = JSON.read(Conf.DIR + Conf.EDITOR);
-			
-			// load recent projects
-			JSONArray recentProjects = (JSONArray) editorConfig.get("recentProjects");
-			for (Object rpObj : recentProjects) {
-				JSONObject recentProject = (JSONObject) rpObj;
-				String name = (String) recentProject.get("name");
-				String path = (String) recentProject.get("path");
-				// pc.addRecentProject(name, path);
-			}
-		} catch (ParseException | IOException e) {
-			Debug.debug.log(LogType.CRITICAL, "Failed to parse project configration JSON");
-			JOptionPane.showMessageDialog(null, "Failed to load editor configuration.", 
-					"ParseException", JOptionPane.ERROR_MESSAGE);
-		}
 	}
-	
+
 	/**
 	 * Set the look and feel.
 	 */
@@ -102,11 +85,11 @@ public class Main
 		} else { // system look and feel
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (ClassNotFoundException | InstantiationException | 
+			} catch (ClassNotFoundException | InstantiationException |
 				IllegalAccessException | UnsupportedLookAndFeelException e) {
 				ErrorDialog eDialog = new ErrorDialog("Could not load the system look and feel.",
 					StackTraceUtil.stackTraceToString(e));
-				eDialog.setVisible(true); // error dialog probably not needed
+					eDialog.setVisible(true); // error dialog probably not needed
 				return;
 			}
 		}

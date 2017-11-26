@@ -21,41 +21,47 @@ import com.google.gson.JsonParser;
 /**
  * ConfigReader
  *
- * Description: Provides methods for reading and writing JSON 
+ * Description: Provides methods for reading and writing JSON
  * configuration files.
  */
 public class JSON
 {
-	public static JSONObject read(File file) throws ParseException, FileNotFoundException, IOException 
+	public static JSONObject read(File file)
+		throws ParseException,
+		FileNotFoundException,
+		IOException
 	{
 		if (file.exists()) {
 			JSONParser parser = new JSONParser();
 			return (JSONObject) parser.parse(new FileReader(file));
 		}
-		
+
 		return null;
 	}
-	
-	public static JSONObject read(String file) throws ParseException, FileNotFoundException, IOException
+
+	public static JSONObject read(String file)
+		throws ParseException,
+		FileNotFoundException,
+		IOException
 	{
 		if (new File(file).exists()) {
 			JSONParser parser = new JSONParser();
 			return (JSONObject) parser.parse(new FileReader(file));
 		}
-		
 		return null;
 	}
 
 	/**
 	 * Write out the json, prettified.
 	 * @param string
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	public static void write(JSONObject object, String path) throws IOException
+	public static void write(JSONObject object, String path)
+		throws IOException
 	{
 		Files.write(new File(path).toPath(), makePretty(object.toJSONString()).getBytes());
 	}
-	
+
 	/**
 	 * Take in some json and make it pretty.
 	 * @param json

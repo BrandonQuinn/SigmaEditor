@@ -172,7 +172,7 @@ public class Assets
 	}
 
 	/**
-	 * Returns a script instance without the actual content
+	 * Returns a script instance without the actual content.
 	 */
 	public static Script readScriptMetaData(String name)
 	{
@@ -212,6 +212,10 @@ public class Assets
 		return script;
 	}
 
+	/**
+	 * Reads the meta data for the scripts, so everything other than the content
+	 * of the script.
+	 */
 	@SuppressWarnings("unchecked")
 	public static ArrayList<Script> readScriptsMetaData()
 	{
@@ -236,6 +240,10 @@ public class Assets
 		return scripts;
 	}
 
+	/**
+	 * Reads the scripts and their content in to memory and returns
+	 * them as a list.
+	 */
 	public static ArrayList<Script> readScripts()
 	{
 		ArrayList<Script> scripts = readScriptsMetaData();
@@ -306,6 +314,11 @@ public class Assets
 		return decal;
 	}
 
+	/**
+	 * Reads the decal meta data froms the assets directory, so this is
+	 * just the name and filename name essentially so that the user can
+	 * load the actual image later if needed.
+	 */
 	@SuppressWarnings("unchecked")
 	public static ArrayList<Texture> readDecalsMetaData()
 	{
