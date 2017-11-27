@@ -35,46 +35,47 @@ public class ImportAsset
 {
 	private static ProjectContext projCon = ProjectContext.projectContext();
 	private static ProjectConfiguration configuration = ProjectConfiguration.instance();
-	
-	public static Texture texture(File textureFile, String name) 
+
+	public static Texture texture(File textureFile, String name)
 		throws IOException
 	{
-		File destination = new File(projCon.projectPath() + File.pathSeparator + ProjectStruct.TEXTURE_DIR
-				+ File.pathSeparator + textureFile.getName());
+		File destination = new File(projCon.projectPath() + "/" + ProjectStruct.TEXTURE_DIR
+				+ "/" + textureFile.getName());
 		Files.copy(textureFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		Texture texture = new Texture(name, destination);
 		configuration.writeTexture(texture);
+		projCon.addTexture(texture);
 		return texture;
 	}
-	
+
 	public static Texture decal(File decalLocation, String name)
 			throws IOException
 	{
-		File destination = new File(projCon.projectPath() + File.pathSeparator + ProjectStruct.DECAL_DIR
-				+ File.pathSeparator + decalLocation.getName());
+		File destination = new File(projCon.projectPath() + "/" + ProjectStruct.DECAL_DIR
+				+ "/" + decalLocation.getName());
 		Files.copy(decalLocation.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		Texture texture = new Texture(name, destination);
 		configuration.writeDecal(texture);
 		return texture;
 	}
-	
+
 	public static Sound sound(File soundLocation, String name)
 	{
 		return null;
-		
+
 	}
-	
+
 	/**
 	 * Script importing behave a little different to most other
 	 * types of assets in that it does not copy the script from
 	 * and existing location, but rather it creates a new empty
 	 * script in the scripts asset directory.
-	 * 
+	 *
 	 * @param name
 	 */
 	public static Script script(String name, ScriptLang lang)
 	{
 		return null;
-		
+
 	}
 }

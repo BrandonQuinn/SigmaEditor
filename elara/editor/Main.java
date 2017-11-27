@@ -2,22 +2,17 @@
 package elara.editor;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.synth.SynthLookAndFeel;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import elara.editor.debug.Debug;
-import elara.editor.debug.LogType;
 import elara.editor.debug.StackTraceUtil;
 import elara.editor.ui.MainWindow;
 import elara.editor.ui.dialogs.ErrorDialog;
 import elara.editor.ui.dialogs.RecentProjectsDialog;
-import elara.editor.util.JSON;
-import elara.project.ProjectManager;
 
 
 /*
@@ -41,7 +36,6 @@ import elara.project.ProjectManager;
 
 public class Main
 {
-	private static ProjectManager pc = ProjectManager.manager();
 	private static final String SYNTH_STYLE_FILE = "res/synth/synthStyle.xml";
 
 	public static void main(String args[])
@@ -62,7 +56,16 @@ public class Main
 	 */
 	private static void initialise()
 	{
-		EditorConfiguration.init();
+		try {
+			EditorConfiguration.init();
+		} catch (FileNotFoundException e) {
+			Debug.error("Could not find editor configuration file");
+		} catch (IOException e) {
+			Debug.error("Could not open editor configuration file");
+		} catch (ParseException e) {
+			Debug.error("Failed to parse editor configuration, please check the JSON file");
+		}
+		
 		System.setProperty("-Dsun.java2d.opengl", "true");
 		setLookAndFeel(false);
 	}

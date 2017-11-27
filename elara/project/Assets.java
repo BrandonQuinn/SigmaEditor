@@ -57,9 +57,9 @@ public class Assets
 		try {
 			BufferedImage image = ImageIO.read(texture.file());
 			texture.assignImage(image);
+			Debug.info("Texture read: " + name);
 		} catch(IOException e) {
-			return (Texture) failedToRead("Failed to read image while reading texture: "
-				+ name);
+			return (Texture) failedToRead("Failed to read image while reading texture: " + name);
 		}
 		return texture;
 	}
@@ -84,6 +84,7 @@ public class Assets
 					return texture;
 				}
 			}
+			Debug.info("Texture meta data read: " + name);
 		} catch (IOException e) {
 			return (Texture) failedToRead("Failed to read configuration while "
 				+ "reading texture meta data");
@@ -115,6 +116,7 @@ public class Assets
 					+ ProjectStruct.TEXTURE_DIR + "/" + filename));
 				textures.add(newTexture);
 			}
+			Debug.info("All texture meta data read");
 		} catch (IOException e) {
 			return (ArrayList<Texture>) failedToRead("Failed to load texture list from "
 				+ "configuration file");
@@ -145,6 +147,7 @@ public class Assets
 				continue;
 			}
 		}
+		Debug.info("All textures read");
 		return textures;
 	}
 
@@ -168,6 +171,7 @@ public class Assets
 			Debug.error("IO Error reading script file: " + script.filename());
 		}
 		script.setContent(content);
+		Debug.info("Script read: " + name);
 		return script;
 	}
 
@@ -202,6 +206,7 @@ public class Assets
 					return script;
 				}
 			}
+			Debug.info("Script meta data read: " + name);
 		} catch (ParseException e) {
 			return (Script) failedToRead("Failed to parse configuration file "
 				+ "while trying to find script");
@@ -237,6 +242,7 @@ public class Assets
 			return (ArrayList<Script>) failedToRead("IO Error while trying to read "
 				+ "scripts meta data");
 		}
+		Debug.info("All script meta data read");
 		return scripts;
 	}
 
@@ -259,6 +265,7 @@ public class Assets
 			}
 			script.setContent(content);
 		}
+		Debug.info("All scripts read");
 		return scripts;
 	}
 
@@ -288,6 +295,7 @@ public class Assets
 					return decal;
 				}
 			}
+			Debug.info("Decal meta data read: " + name);
 		} catch (ParseException e) {
 			return (Texture) failedToRead("Could not parse configuration "
 				+ "file while reading decal");
@@ -308,6 +316,7 @@ public class Assets
 		try {
 			BufferedImage image = ImageIO.read(decal.file());
 			decal.assignImage(image);
+			Debug.info("Decal read: " + name);
 		} catch (IOException e) {
 			return (Texture) failedToRead("IO Error while reading decal image: " + name);
 		}
@@ -336,6 +345,7 @@ public class Assets
 				Texture texture = new Texture(name, textureFile);
 				decals.add(texture);
 			}
+			Debug.info("All decal meta data read");
 		} catch (IOException e) {
 			return (ArrayList<Texture>) failedToRead("IO Error while reading decals meta data");
 		} catch (ParseException e) {
@@ -358,6 +368,7 @@ public class Assets
 			try {
 				BufferedImage image = ImageIO.read(decalFile);
 				decal.assignImage(image);
+				Debug.info("All decals read");
 			} catch (IOException e) {
 				Debug.warning("Failed to load decal: " + decal.file().getName());
 				decal.assignImage(DefaultIcons.BLANK_ICON_32);
@@ -389,6 +400,7 @@ public class Assets
 					return sound;
 				}
 			}
+			Debug.info("Sound meta data read: " + name);
 		} catch (ParseException e) {
 			return (Sound) failedToRead("Could not parse configuration file "
 				+ "while trying to load sound meta data");
@@ -413,6 +425,7 @@ public class Assets
 			@SuppressWarnings("deprecation")
 			org.newdawn.slick.Sound slickSound = new org.newdawn.slick.Sound(soundFile.toURL());
 			sound.setSound(slickSound);
+			Debug.info("Sound read: " + name);
 		} catch (SlickException e) {
 			return (Sound) failedToRead("Failed to load sound: " + soundFile.getAbsolutePath());
 		} catch (MalformedURLException e) {
@@ -438,6 +451,7 @@ public class Assets
 				Sound sound = new Sound(name, filename);
 				sounds.add(sound);
 			}
+			Debug.info("All sound meta data read");
 		} catch (IOException e) {
 			return (ArrayList<Sound>) failedToRead("IO Error while trying to read sounds "
 				+ "from configuration");
@@ -466,6 +480,7 @@ public class Assets
 				org.newdawn.slick.Sound slickSound = new org.newdawn.slick.Sound(soundFile.toURL());
 				sound.setSound(slickSound);
 			}
+			Debug.info("All sounds read");
 		} catch (MalformedURLException e) {
 			return (ArrayList<Sound>) failedToRead("MalformedURLException while trying to "
 				+ "load sounds");

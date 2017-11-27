@@ -6,6 +6,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -55,7 +56,7 @@ import elara.scene.SceneLayer;
 
 /**
  * The main window which holds everything.
- * 
+ *
  * @author Brandon Quinn
  * @version 0.1
  * @since 11 Jun 2017
@@ -76,7 +77,7 @@ ActionListener
 	private JLabel statusLabel;
 	private JScrollPane leftScrollPane;
 	private JPanel propertiesPanel;
-	
+
 	/**
 	 * Misc panels or components needed
 	 */
@@ -84,7 +85,7 @@ ActionListener
 	private SoundPropsPanel soundPropertiesPanel = new SoundPropsPanel();
 	private DecalPropsPanel decalPropertiesPanel = new DecalPropsPanel();
 	private AssetsJList assetsList = new AssetsJList();
-	
+
 	/**
 	 * Buttons
 	 */
@@ -92,7 +93,7 @@ ActionListener
 	private JButton newLayerBtn;
 	private JButton deleteLayerBtn;
 	private JButton textureLayersBtn;
-	
+
 	/**
 	 * Toolbar buttons
 	 */
@@ -118,9 +119,9 @@ ActionListener
 	private JMenuItem openCodeEditorItem;
 	private JMenuItem sceneMenuItem;
 	private JMenuItem aboutItem;
-	
+
 	private JMenuItem graphTest; // TODO delete this
-	
+
 	/**
 	 * Get the default toolkit to resize the application.
 	 */
@@ -152,7 +153,7 @@ ActionListener
 		openProjectItem = new JMenuItem("Open Project...");
 		openProjectItem.addActionListener(this);
 		mnFile.add(openProjectItem);
-		
+
 		saveProjectItem = new JMenuItem("Save");
 		saveProjectItem.addActionListener(this);
 		mnFile.add(saveProjectItem);
@@ -163,36 +164,36 @@ ActionListener
 		loadTextureItem = new JMenuItem("Import Texture");
 		loadTextureItem.addActionListener(this);
 		mnAssets.add(loadTextureItem);
-		
+
 		loadDecalItem = new JMenuItem("Import Decal");
 		loadDecalItem.addActionListener(this);
 		mnAssets.add(loadDecalItem);
-		
+
 		loadSoundItem = new JMenuItem("Import Sound");
 		loadSoundItem.addActionListener(this);
 		mnAssets.add(loadSoundItem);
 
 		JMenu codeMenu = new JMenu("Scripting");
-		openCodeEditorItem = new JMenuItem("Script Editor"); 
+		openCodeEditorItem = new JMenuItem("Script Editor");
 		openCodeEditorItem.addActionListener(this);
 		codeMenu.add(openCodeEditorItem);
 		menuBar.add(codeMenu);
-		
+
 		JMenu sceneMenu = new JMenu("Scenes");
 		sceneMenu.addActionListener(this);
-		
+
 		sceneMenuItem = new JMenuItem("Edit Scenes");
 		sceneMenuItem.addActionListener(this);
 		sceneMenu.add(sceneMenuItem);
 		menuBar.add(sceneMenu);
-		
+
 		JMenu mnHelp = new JMenu("Help");
-		
+
 		aboutItem = new JMenuItem("About");
 		aboutItem.addActionListener(this);
 		mnHelp.add(aboutItem);
 		menuBar.add(mnHelp);
-		
+
 		graphTest = new JMenuItem("Graph (Beta)");
 		graphTest.addActionListener(new ActionListener()
 		{
@@ -256,7 +257,7 @@ ActionListener
 		comboBox.addItem("Texture Painting");
 		comboBox.addItem("Sounds");
 		comboBox.addItem("Decals");
-		
+
 		leftSideNorthPanel.add(comboBox,BorderLayout.NORTH);
 
 		leftScrollPane = new JScrollPane();
@@ -265,11 +266,11 @@ ActionListener
 		textureList = new TextureJList(this);
 		textureList.setVisibleRowCount(5);
 		leftScrollPane.setViewportView(textureList);
-		
+
 		soundList = new SoundJList(this);
 		layerList = new LayerJList(this);
 		decalList = new DecalJList(this);
-		
+
 		JPanel leftSideSouthPanel = new JPanel();
 		leftSideSouthPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
 		leftSplitPane.setRightComponent(leftSideSouthPanel);
@@ -292,7 +293,7 @@ ActionListener
 		rightSplitPane.setContinuousLayout(true);
 		rightSplitPane.setResizeWeight(0.5);
 		rightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		
+
 		renderPanel = new RenderPanel(this);
 
 		/*
@@ -309,12 +310,12 @@ ActionListener
 		JPanel layerPanel = new JPanel();
 		rightSplitPane.setLeftComponent(layerPanel);
 		layerPanel.setLayout(new BorderLayout(0, 0));
-		
+
 		rightSplitPane.setRightComponent(new JScrollPane(assetsList));
 
 		JToolBar layerToolBar = new JToolBar();
 		layerToolBar.setFloatable(false);
-		
+
 		// layer toolbar buttons
 		newLayerBtn = new JButton(DefaultIcons.newLayerIcon);
 		newLayerBtn.setToolTipText("Create object layer");
@@ -325,7 +326,7 @@ ActionListener
 		textureLayersBtn = new JButton(DefaultIcons.textureLayersIcon);
 		textureLayersBtn.addActionListener(this);
 		textureLayersBtn.setToolTipText("Create or delete texture layers");
-		
+
 		layerToolBar.add(newLayerBtn);
 		layerToolBar.add(deleteLayerBtn);
 		layerToolBar.add(textureLayersBtn);
@@ -357,7 +358,7 @@ ActionListener
 		/*==============================================*
 		 * CREATE NEW PROJECT
 		 *==============================================*/
-		
+
 		if (source == newProjectItem) {
 			NewProjectDialog npd = new NewProjectDialog();
 			npd.setVisible(true);
@@ -391,31 +392,31 @@ ActionListener
 				manager.open(npd.projectLocation() + "/" + npd.projectName());
 				textureList.loadFromContext();
 				waitingDialog.setVisible(false);
-			
+
 				statusLabel.setText(npd.projectName());
 			} catch (ElaraException e1) {
 				waitingDialog.setVisible(false);
-				
+
 				JOptionPane.showMessageDialog(null,
 						"Could not create project. " + e1.getMessage()
 								+ "\nCheck the logs.",
 						"Error",
 						JOptionPane.ERROR_MESSAGE);
 			}
-		} 
-		
+		}
+
 		/*==============================================*
 		 * OPEN EXISTING PROJECT
 		 *==============================================*/
-		
+
 		else if (source == openProjectItem) {
 			WaitingDialog waitingDialog = new WaitingDialog("Opening project...");
-			
+
 			// show a file dialog and get the chosen project directory
 			JFileChooser fc = new JFileChooser();
 			fc.setDialogTitle("Open Project");
 			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			
+
 			int fcResponse = fc.showOpenDialog(null);
 			if (fcResponse == JFileChooser.APPROVE_OPTION) {
 				File projectDirectory = fc.getSelectedFile();
@@ -427,7 +428,7 @@ ActionListener
 					soundList.loadFromContext();
 				} catch (ElaraException  e1) {
 					waitingDialog.setVisible(false);
-					
+
 					Debug.debug.log(LogType.CRITICAL,
 							"Failed to open project: " + e1.getMessage());
 					JOptionPane.showMessageDialog(null,
@@ -436,89 +437,83 @@ ActionListener
 							"Failure to Load",
 							JOptionPane.ERROR_MESSAGE);
 				}
-				
+
 				statusLabel.setText(ProjectContext.projectContext().projectName());
 			}
-			
+
 			waitingDialog.setVisible(false);
-		} 
-		
+		}
+
 		/*==============================================*
 		 * SAVE PROJECT
 		 *==============================================*/
-		
+
 		else if (source == saveProjectItem) {
 			WaitingDialog waitingDialog = new WaitingDialog("Saving project...");
 			waitingDialog.setVisible(true);
-			
+
 			try {
 				projMan.save();
 			} catch (ElaraException | NullPointerException ex) {
 				waitingDialog.setVisible(false);
-				Debug.debug.log(LogType.CRITICAL,
-						"Failed to save project: " + ex.getMessage());
-				JOptionPane.showMessageDialog(null,
-						"Failed to save project: " + ex.getMessage()
-								+ "\nCheck the logs.",
-						"Save failed",
-						JOptionPane.ERROR_MESSAGE);
+				Debug.debug.log(LogType.CRITICAL, "Failed to save project: " + ex.getMessage());
+				JOptionPane.showMessageDialog(null, "Failed to save project: " + ex.getMessage()
+					+ "\nCheck the logs.", "Save failed", JOptionPane.ERROR_MESSAGE);
 			}
-			
 			waitingDialog.setVisible(false);
 		}
-		
+
 		/*==============================================*
 		 * LOAD TEXTURE
 		 *==============================================*/
-		
+
 		else if (source == loadTextureItem) {
 			if (projCon.isProjectLoaded()) {
 				JFileChooser fc = new JFileChooser();
 				fc.setDialogTitle("Import Texture");
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				fc.setAcceptAllFileFilterUsed(false);
-				
+
 				// filter to only jpegs
-				FileNameExtensionFilter textureFilter 
-					= new FileNameExtensionFilter("Textures", "jpg", "jpeg", "png", "bmp");
+				FileNameExtensionFilter textureFilter = new FileNameExtensionFilter("Textures",
+						"jpg",
+						"jpeg",
+						"png",
+						"bmp"
+					);
 				fc.addChoosableFileFilter(textureFilter);
 
 				int fcResponse = fc.showOpenDialog(null);
 				if (fcResponse == JFileChooser.APPROVE_OPTION) {
 					File selectedImageFile = fc.getSelectedFile();
-					String texName = JOptionPane.showInputDialog(null,
-							"Enter the name of the texture:",
-							"Texture name",
-							JOptionPane.PLAIN_MESSAGE);
-
+					String texName = JOptionPane.showInputDialog(null,"Enter the name of the texture:",
+						"Texture name",
+						JOptionPane.PLAIN_MESSAGE);
 					try {
 						// add the texture to the project and to the texture list in the GUI
-						projMan.importTexture(texName, selectedImageFile);
+						ImportAsset.texture(selectedImageFile, texName);
 						textureList.loadFromContext();
-					} catch (ElaraException e2) {
-						JOptionPane.showMessageDialog(null,
-								"Failed to load texture: " + e2.getMessage(), "Elara Exception",
-								JOptionPane.ERROR_MESSAGE);
-						Debug.debug.log(LogType.ERROR,
-								"Failed to load texture: " + e2.getMessage());
+					} catch (IOException e2) {
+						JOptionPane.showMessageDialog(null, "Failed to load texture: " + e2.getMessage(),
+							"Elara Exception", JOptionPane.ERROR_MESSAGE);
+						Debug.debug.log(LogType.ERROR, "Failed to load texture: " + e2.getMessage());
 						return;
 					}
 				}
-				
+
 				setTitle(Constants.EDITOR_TITLE + " | " + projCon.projectName());
-			} else { 
-				// no project is loaded, show a warning
+			} else {
 				JOptionPane.showMessageDialog(null,
 						"There is currently no project loaded.",
 						"No Project",
 						JOptionPane.ERROR_MESSAGE);
 			}
-		} 
-		
+		}
+
 		/*==============================================*
 		 * LOAD DECAL
 		 *==============================================*/
-		
+
 		else if (source == loadDecalItem) {
 			if (projCon.isProjectLoaded()) {
 				JFileChooser fc = new JFileChooser();
@@ -526,7 +521,12 @@ ActionListener
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				fc.setAcceptAllFileFilterUsed(false);
 
-				FileNameExtensionFilter decalFilter = new FileNameExtensionFilter("Decals", "jpg", "jpeg", "png", "bmp");
+				FileNameExtensionFilter decalFilter = new FileNameExtensionFilter("Decals",
+						"jpg",
+						"jpeg",
+						"png",
+						"bmp"
+					);
 				fc.addChoosableFileFilter(decalFilter);
 
 				int fcResponse = fc.showOpenDialog(null);
@@ -538,12 +538,17 @@ ActionListener
 							JOptionPane.PLAIN_MESSAGE);
 
 					// add the texture to the project and to the texture list in the GUI
-					Texture decal = ImportAsset.decal(selectedImage, decalName);
-					decalList.addDecal(decal);
+					try {
+						Texture decal = ImportAsset.decal(selectedImage, decalName);
+						decalList.addDecal(decal);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
-				
+
 				setTitle(Constants.EDITOR_TITLE + " | " + projCon.projectName());
-			} else { 
+			} else {
 				// no project is loaded, show a warning
 				JOptionPane.showMessageDialog(null,
 						"There is currently no project loaded.",
@@ -551,33 +556,33 @@ ActionListener
 						JOptionPane.ERROR_MESSAGE);
 			}
 		}
-		
+
 		/*==============================================*
 		 * LOAD SOUND
 		 *==============================================*/
-		
+
 		else if (source == loadSoundItem) {
 			if (projCon.isProjectLoaded()) {
 				JFileChooser fc = new JFileChooser();
 				fc.setDialogTitle("Import Sound");
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				fc.setAcceptAllFileFilterUsed(false);
-				
+
 				FileNameExtensionFilter textureFilter = new FileNameExtensionFilter("Sounds", "ogg", "wav");
 				fc.addChoosableFileFilter(textureFilter);
-				
+
 				int choice = fc.showOpenDialog(this);
 				if (choice == JFileChooser.APPROVE_OPTION) {
 					File sourceSoundFile = fc.getSelectedFile();
-					
+
 					String soundName = JOptionPane.showInputDialog(null,
 							"Enter the name of the sound",
 							"Sound name",
 							JOptionPane.PLAIN_MESSAGE);
-					
+
 					Sound sound = new Sound(soundName, sourceSoundFile.getName());
 					soundList.addSound(sound);
-					
+
 					try {
 						projMan.importSound(soundName, sourceSoundFile);
 					} catch (ElaraException e1) {
@@ -593,14 +598,14 @@ ActionListener
 						JOptionPane.ERROR_MESSAGE);
 			}
 		}
-		
+
 		/*==============================================*
 		 * SWAP LISTS
 		 *==============================================*/
-		
+
 		else if (source == comboBox) {
 			String selectedItem = (String) comboBox.getSelectedItem();
-			
+
 			if (leftScrollPane != null) {
 				if (selectedItem.equals("Texture Painting")) {
 					leftScrollPane.setViewportView(textureList);
@@ -610,17 +615,17 @@ ActionListener
 					leftScrollPane.setViewportView(decalList);
 				}
 			}
-		} 
-		
+		}
+
 		/*==============================================*
 		 * LAYER MANAGEMENT
 		 *==============================================*/
-		
+
 		else if (source == textureLayersBtn) {
 			TextureLayerDialog tld = new TextureLayerDialog();
 			tld.setVisible(true);
-		} 
-		
+		}
+
 		else if (source == newLayerBtn) {
 			if (projCon.isProjectLoaded()) {
 				String name = JOptionPane.showInputDialog(this, "Enter layer name.");
@@ -634,33 +639,33 @@ ActionListener
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 		}
-		
+
 		else if (source == deleteLayerBtn) {
 			if (editCon.scene().numLayers() > 0 && layerList.getSelectedIndex() != -1) {
 				editCon.scene().deleteLayer(layerList.getSelectedValue());
 				layerList.removeLayer(layerList.getSelectedIndex());
 				layerList.setSelectedIndex(layerList.getModel().getSize() - 1);
 			}
-		} 
-		
+		}
+
 		/*==============================================*
 		 * SCENE MENU
 		 *==============================================*/
-		
+
 		else if (source == sceneMenuItem) {
 			if (projCon.isProjectLoaded()) {
 				SceneDialog sd = new SceneDialog();
 				sd.setVisible(true);
 			} else {
-				JOptionPane.showMessageDialog(null, "No project loaded.", "No Project", 
+				JOptionPane.showMessageDialog(null, "No project loaded.", "No Project",
 						JOptionPane.INFORMATION_MESSAGE);
 			}
-		} 
-		
+		}
+
 		/*==============================================*
 		 * TOOL BAR
 		 *==============================================*/
-		
+
 		else if (source == selectionToolBtn) {
 			editCon.assignState(EditingContext.EditingState.SELECT);
 			textureList.setSelectedIndices(new int[] {});
@@ -669,7 +674,7 @@ ActionListener
 		else if (source == playBtn) {
 			JFileChooser chooser = new JFileChooser();
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			
+
 			if (chooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
 				return;
 			}
@@ -680,31 +685,31 @@ ActionListener
 				Builder.build(projCon.projectDirectoryFile(), chosenFile);
 			} catch (ElaraException e1) {
 				Debug.error("Build failed or stopped: " + e1.message());
-				JOptionPane.showMessageDialog(null, "Build failed or stopped:\n" + e1.message(), 
-						"Build failed or stopped", 
+				JOptionPane.showMessageDialog(null, "Build failed or stopped:\n" + e1.message(),
+						"Build failed or stopped",
 						JOptionPane.ERROR_MESSAGE);
 			}
 		}
-		
+
 		/*==============================================*
 		 * CODE/SCRIPTS MENU
 		 *==============================================*/
-		
+
 		else if (source == openCodeEditorItem) {
 			CodeEditor codeEditor = new CodeEditor();
 			codeEditor.setVisible(true);
 		}
-		
+
 		/*==============================================*
 		 * HELP MENU
 		 *==============================================*/
-		
+
 		else if (source == aboutItem) {
 			AboutDialog ab = new AboutDialog();
 			ab.setVisible(true);
 		}
 	}
-	
+
 	/**
 	 * Changes the interface to reflect the current state it's in.
 	 * If you plan on calling this method, do not do it too frequently,
@@ -717,15 +722,15 @@ ActionListener
 	{
 		switch(editCon.state()) {
 			case SELECT:
-				
+
 				/*
 				 * This nice little feature makes sure that if we are in select mode
 				 * and selection objects that we can modify the properties of
 				 * any single selected entity.
-				 * 
+				 *
 				 * It will replace the properties panel to be for the currently selected
 				 * object.
-				 * 
+				 *
 				 * Perhaps I'll soo make it so that as long as the entities
 				 * selected are all the same then you can en-masse change properties
 				 * of all selected entities.
@@ -733,7 +738,7 @@ ActionListener
 				Iterator<Entity> iter = AssetSelector.selectedEntities().iterator();
 				if (AssetSelector.selectedEntities().size() == 1) {
 					Entity entity = iter.next();
-					
+
 					if (entity instanceof Sound) {
 						propertiesPanel.removeAll();
 						propertiesPanel.add(soundPropertiesPanel, BorderLayout.CENTER);
@@ -749,18 +754,18 @@ ActionListener
 					propertiesPanel.add(new JPanel(), BorderLayout.CENTER);
 					propertiesPanel.updateUI();
 				}
-				
+
 			break;
-			
+
 			case TEXTURE_PAINT:
 				propertiesPanel.removeAll();
 				propertiesPanel.add(texturePropertiesPanel, BorderLayout.CENTER);
 				propertiesPanel.updateUI();
 			break;
-			
+
 			case MOVE_WORLD:
 			break;
-			
+
 			case ADD_SOUND:
 				propertiesPanel.removeAll();
 				propertiesPanel.add(soundPropertiesPanel, BorderLayout.CENTER);
@@ -772,7 +777,7 @@ ActionListener
 				propertiesPanel.add(decalPropertiesPanel, BorderLayout.CENTER);
 				propertiesPanel.updateUI();
 			break;
-			
+
 			default:
 			break;
 		}

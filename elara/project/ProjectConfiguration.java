@@ -96,7 +96,7 @@ public class ProjectConfiguration
 		jsonObject.replace("textures", textureArray);
 		JSON.write(jsonObject, configFile.getAbsolutePath());
 	}
-	
+
 	/**
 	 * Write the information in the texture to the project configuration.
 	 * @param decal

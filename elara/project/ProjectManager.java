@@ -88,10 +88,7 @@ public class ProjectManager
 
 		// initialise configuration
 		try {
-			configuration.init(
-				new File(projectLocation + File.pathSeparator + ProjectStruct.CONFIG),
-				projectName
-			);
+			configuration.init(new File(projectLocation + "/" + ProjectStruct.CONFIG), projectName);
 		} catch (IOException e) {
 			Debug.error("Failed to initialise new project configuration");
 			throw new ElaraException("Failed to initialise new project configuration");
@@ -123,8 +120,7 @@ public class ProjectManager
 		// read the configuration file
 		try {
 			projectConfig = JSON.read(projectLocation + "/" + ProjectStruct.CONFIG);
-			configuration.initFromJSON(new File(projectLocation + "/" + ProjectStruct.CONFIG),
-					projectConfig);
+			configuration.initFromJSON(new File(projectLocation + "/" + ProjectStruct.CONFIG), projectConfig);
 		} catch (ParseException e) {
 			Debug.error("Could not parse configuration file");
 			throw new ElaraException("Could not parse configuration file");
@@ -140,21 +136,25 @@ public class ProjectManager
 		projCon.setProjectName(configuration.name());
 
 		ArrayList<Texture> textures = Assets.readTexturesMetaData();
-		for (Texture texture : textures)
-			projCon.addTexture(texture);
+		for (Texture texture : textures) projCon.addTexture(texture);
 
 		ArrayList<Texture> decals = Assets.readDecalsMetaData();
-		for (Texture decal : decals)
-			projCon.addDecal(decal);
+		for (Texture decal : decals) projCon.addDecal(decal);
 
 		ArrayList<Sound> sounds = Assets.readSoundsMetaData();
-		for (Sound sound : sounds)
-			projCon.addSound(sound);
+		for (Sound sound : sounds) projCon.addSound(sound);
 
 		ArrayList<Script> scripts = Assets.readScriptsMetaData();
-		for (Script script : scripts)
-			projCon.addScript(script);
+		for (Script script : scripts) projCon.addScript(script);
 
+		// add the project to recent projects, this will only
+		// work if the project doesn't already exist
+		try {
+			EditorConfiguration.addRecentProject(configuration.name(), new File(projectLocation));
+		} catch (IOException e) {
+			Debug.warning("Failed to add project to recent projects list on opening");
+		}
+		
 		projCon.setProjectLoaded(true);
 	}
 
