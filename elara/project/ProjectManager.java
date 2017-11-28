@@ -6,15 +6,10 @@
 
 package elara.project;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import javax.imageio.ImageIO;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import elara.assets.Script;
@@ -25,7 +20,6 @@ import elara.editor.debug.Debug;
 import elara.editor.debug.ElaraException;
 import elara.editor.debug.LogType;
 import elara.editor.util.JSON;
-import elara.scene.Scene;
 import elara.scene.SceneManager;
 
 /**
@@ -43,12 +37,6 @@ public class ProjectManager
 	private SceneManager sceneMan = SceneManager.manager();
 	private ProjectConfiguration configuration = ProjectConfiguration.instance();
 
-	/**
-	 * Store the project configuration in memory and write change to this
-	 * which will eliminate the need to keep reading it every time
-	 * a change is made.
-	 */
-	private static JSONObject projectConfig;
 	private static File configFile;
 
 	private ProjectManager() {}
@@ -95,7 +83,7 @@ public class ProjectManager
 		}
 
 		// create an initial scene
-		createScene("Default", 50, 50);
+		// NOTE(brandon) Create new scene on new project
 
 		projCon.setProjectLoaded(true);
 		projCon.setProjectDirectory(projDir.getAbsolutePath());
@@ -119,7 +107,7 @@ public class ProjectManager
 	{
 		// read the configuration file
 		try {
-			projectConfig = JSON.read(projectLocation + "/" + ProjectStruct.CONFIG);
+			JSONObject projectConfig = JSON.read(projectLocation + "/" + ProjectStruct.CONFIG);
 			configuration.initFromJSON(new File(projectLocation + "/" + ProjectStruct.CONFIG), projectConfig);
 		} catch (ParseException e) {
 			Debug.error("Could not parse configuration file");
@@ -131,7 +119,7 @@ public class ProjectManager
 			Debug.error("Could not perform IO operation on configruration file");
 			throw new ElaraException("Could not perform IO operation on configuration file");
 		}
-
+		
 		projCon.setProjectDirectory(projectLocation);
 		projCon.setProjectName(configuration.name());
 
@@ -154,8 +142,9 @@ public class ProjectManager
 		} catch (IOException e) {
 			Debug.warning("Failed to add project to recent projects list on opening");
 		}
-		
+
 		projCon.setProjectLoaded(true);
+		Debug.info("Project opened: " + projCon.projectDirectoryFile().getAbsolutePath());
 	}
 
 	public void save()
@@ -163,183 +152,7 @@ public class ProjectManager
 	{
 		// TODO save project
 	}
-
-	/*======================================================================== *
-	 *  ASSET IMPORTS/CREATION
-	 * ========================================================================*/
-
-	/**
-	 * Add a texture to the project. This copies the texture image to
-	 * the texture assets directory and adds it to the
-	 * list of available textures in the project configuration.
-	 *
-	 * Importing a texture, as in adding it to the config and copying it
-	 * to the assets directory are the same process, the two functions
-	 * should not be separated.
-	 */
-	@SuppressWarnings("unchecked")
-	public void importTexture(String name, File textureFile)
-			throws ElaraException
-	{
-		if (!projCon.isProjectLoaded()) {
-			Debug.info("No project loaded.");
-			throw new ElaraException("No project loaded.");
-		}
-
-		if (!textureFile.exists()) {
-			Debug.error("Texture does not exist: " + textureFile.getAbsolutePath());
-			throw new ElaraException("File does not exist: " + textureFile.getAbsolutePath());
-		}
-
-		// copy the file to the assets directory
-		File newtex = new File(projCon.projectPath() + "/" + ProjectStruct.TEXTURE_DIR
-				+ "/" + textureFile.getName());
-		try {
-			Files.createFile(newtex.toPath());
-		} catch (IOException e) {
-			Debug.error("Could not create new file: " + newtex.getAbsolutePath());
-			throw new ElaraException("Could not create new file: " + newtex.getAbsolutePath());
-		}
-
-		// copy the file over
-		try {
-			Files.copy(textureFile.toPath(), newtex.toPath(), StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			Debug.error("Could not copy new texture file to project.");
-			throw new ElaraException("Could not copy new texture file to project: " + name);
-		}
-
-		// add the texture to the the configuration
-		JSONArray textureList = (JSONArray) projectConfig.get("textures");
-		JSONObject newTexJo = new JSONObject();
-		newTexJo.put("name", name);
-		newTexJo.put("filename", newtex.getName());
-		textureList.add(newTexJo);
-		projectConfig.replace("textures", textureList);
-		try {
-			JSON.write(projectConfig, configFile.getAbsolutePath());
-		} catch(IOException e) {
-			Debug.error("Failed to write out project configuration while importing texture: " + name);
-			throw new ElaraException("Failed to write out project configuration while"
-					+ " importing texture: " + name);
-		}
-
-		// load the actual image and add it to the context
-		// NOTE(brandon) Consider only storing texture meta data, not whole image, bad on memory
-		try {
-			BufferedImage loadedIm = ImageIO.read(newtex);
-			Texture texture = new Texture(name, newtex, loadedIm);
-			projCon.addTexture(texture);
-		} catch (IOException e) {
-			Debug.error("Could not load image as Texture instance: " + newtex.getPath());
-			throw new ElaraException("Could not load image as Texture intance: " + newtex.getPath());
-		}
-	}
-
-	/**
-	 * Imports a sound by copying it to the assets directory and adding it to the
-	 * project configuration.
-	 */
-	@SuppressWarnings("unchecked")
-	public void importSound(String name, File soundFile)
-			throws ElaraException
-	{
-		if (!projCon.isProjectLoaded()) {
-			Debug.info("No project loaded.");
-			throw new ElaraException("No project loaded.");
-		}
-
-		if (!soundFile.exists()) {
-			Debug.error("Sound does not exist: "
-					+ soundFile.getAbsolutePath());
-			throw new ElaraException("File does not exist exists: "
-					+ soundFile.getAbsolutePath());
-		}
-
-		// copy the file to the assets directory
-		File newsound = new File(projCon.projectPath() + "/" + ProjectStruct.SOUND_DIR
-				+ "/" + soundFile.getName());
-		try {
-			Files.createFile(newsound.toPath());
-		} catch (IOException e) {
-			Debug.error("Could not create new file: "
-					+ newsound.getAbsolutePath());
-			throw new ElaraException("Could not create new file: "
-					+ newsound.getAbsolutePath());
-		}
-
-		// copy the file over
-		try {
-			Files.copy(soundFile.toPath(), newsound.toPath(),
-					StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			Debug.error("Could not copy new sound file to project.");
-			throw new ElaraException("Could not copy new sound file to project: "
-					+ newsound.getAbsolutePath());
-		}
-
-		// add the sound to the the configuration
-		JSONArray soundList = (JSONArray) projectConfig.get("sounds");
-		JSONObject newSoundJo = new JSONObject();
-		newSoundJo.put("name", name);
-		newSoundJo.put("filename", newsound.getName());
-		soundList.add(newSoundJo);
-		projectConfig.replace("sounds", soundList);
-		try {
-			JSON.write(projectConfig, configFile.getAbsolutePath());
-		} catch(IOException e) {
-			Debug.error("Failed to write out project configuration while importing sound: " + name);
-			throw new ElaraException("Failed to write out project configuration while"
-					+ " importing sound: " + name);
-		}
-
-		Sound sound = new Sound(name, newsound.getName());
-		projCon.addSound(sound);
-	}
-
-	/**
-	 * Adds the scene to the project configuration and to the project context.
-	 * @param name
-	 */
-	@SuppressWarnings("unchecked")
-	public Scene createScene(String name, int width, int height)
-			throws ElaraException
-	{
-		Scene newScene = null;
-		if (projCon.isProjectLoaded()) {
-			newScene = sceneMan.createScene(name, width, height);
-
-			try {
-				JSONArray sceneList = (JSONArray) projectConfig.get("scenes");
-
-				// add the scene to the project configuration
-				if (!sceneList.isEmpty() && sceneList != null) {
-					JSONObject newObj = new JSONObject();
-					newObj.put("name", name);
-					sceneList.add(newObj);
-					projectConfig.replace("scenes", sceneList);
-					JSON.write(projectConfig, configFile.getAbsolutePath());
-				}
-			} catch (IOException e) {
-				Debug.error("Could not write scene to project configuration: " + name);
-				throw new ElaraException("Could not write scene to project configuration: " + name);
-			}
-		}
-
-		projCon.registerScene(name);
-		return newScene;
-	}
-
-	/*======================================================================== *
-	 *  ASSET DELETION
-	 * ========================================================================*/
-
-	public void deleteScript(String script)
-			throws ElaraException
-	{
-		// TODO delete script
-	}
-
+	
 	/*======================================================================== *
 	 *  OTHER
 	 * ========================================================================*/
@@ -347,10 +160,5 @@ public class ProjectManager
 	public static ProjectManager manager()
 	{
 		return instance;
-	}
-
-	public JSONObject projectConfig()
-	{
-		return projectConfig;
 	}
 }

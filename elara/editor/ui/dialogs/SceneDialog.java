@@ -21,15 +21,12 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
-import elara.editor.debug.ElaraException;
 import elara.project.EditingContext;
 import elara.project.ProjectContext;
 import elara.project.ProjectManager;
-import elara.scene.Scene;
 
 /*****************************************************************
  *
@@ -119,16 +116,10 @@ public class SceneDialog extends JDialog
 			
 			// create the scene
 			if (nsd.isComplete()) {
-				try {
-					Scene newScene = projMan.createScene(nsd.name(), nsd.width(), nsd.height());
-					editCon.setSelectedLayer(0);
-					editCon.setSelectedScene(newScene);
-					evaluateList();
-				} catch (ElaraException e) {
-					JOptionPane.showMessageDialog(this, "Failed to create scene.\n" + e.message(), "Could not create scene", 
-							JOptionPane.ERROR_MESSAGE);
-					return;
-				}
+				// NOTE(brandon) Create new scene in scene dialog
+				editCon.setSelectedLayer(0);
+				// editCon.setSelectedScene(newScene);
+				evaluateList();
 			}
 		}
 	}

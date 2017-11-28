@@ -134,4 +134,15 @@ public class ProjectConfiguration
 	{
 		return (String) jsonObject.get("name");
 	}
+
+	/**
+	 * Returns a top level (at the top level of the hierarchy) array.
+	 * 
+	 * @param arrayName
+	 * @return
+	 */
+	public JSONArray getArray(String arrayName)
+	{
+		return (JSONArray) jsonObject.get(arrayName);
+	}
 }

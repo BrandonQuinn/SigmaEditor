@@ -43,6 +43,7 @@ public class Assets
 {
 	private static ProjectContext projCon = ProjectContext.projectContext();
 	private static ProjectManager projMan = ProjectManager.manager();
+	private static ProjectConfiguration projConf = ProjectConfiguration.instance();
 
 	/* =================================== *
 	 * TEXTURES
@@ -494,7 +495,7 @@ public class Assets
 		throws IOException,
 		ParseException
 	{
-		return (JSONArray) projMan.projectConfig().get(arrayName);
+		return (JSONArray) projConf.getArray(arrayName);
 	}
 
 	private static Object failedToRead(String message)

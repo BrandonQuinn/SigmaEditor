@@ -88,21 +88,24 @@ public class TextureJList extends JList<Texture>
 	{
 		model.clear();
 		for (Texture texture : projectContext.loadedTextures()) {
-			// if the scaled image is null, load the image and scale it
-			// then set the image to null to allow the garbage collector
-			// to free the memory for the main image so we don't waste space
-			if (texture.scaledTo(24, 24) == null) {
-				BufferedImage newImage = null;
+				// if the scaled image is null, load the image and scale it
+				// then set the image to null to allow the garbage collector
+				// to free the memory for the main image so we don't waste space
+			BufferedImage newImage = null;
+			if (!texture.hasCachedScaledImage()) {
 				try {
 					newImage = ImageIO.read(new File(projectContext.projectDirectoryFile().getAbsolutePath() + "/"
 						+ ProjectStruct.TEXTURE_DIR + "/" + texture.file().getName()));
 				} catch (IOException e) {
 					newImage = DefaultIcons.BLANK_ICON_16;
 				}
-				texture.assignImage(newImage);
-				texture.scaledTo(32, 32); // this will cache the scaled image internally
-				texture.assignImage(null); // replace the main image with nothing so that the gc can clear it
-			} // now there will be a smaller image of 32x32 inside the texture instance to use as an icon
+			} else {
+				newImage = DefaultIcons.BLANK_ICON_16;
+			}
+			
+			texture.assignImage(newImage);
+			texture.scaledTo(32, 32); // this will cache the scaled image internally
+			texture.assignImage(null); // replace the main image with nothing so that the gc can clear it
 			addTexture(texture);
 		}
 	}

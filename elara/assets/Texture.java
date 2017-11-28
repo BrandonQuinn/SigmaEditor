@@ -94,4 +94,14 @@ public class Texture
 		Debug.info("Texture chached: " + name);
 		return scaledBufferedImage;
 	}
+
+	/**
+	 * Returns whether or not there is a cached version of the image stored at a
+	 * smaller scale.
+	 * @return
+	 */
+	public boolean hasCachedScaledImage()
+	{
+		return cachedScaledImage != null;
+	}
 }

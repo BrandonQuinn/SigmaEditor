@@ -542,12 +542,9 @@ ActionListener
 						Texture decal = ImportAsset.decal(selectedImage, decalName);
 						decalList.addDecal(decal);
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						Debug.error("Failed to import texture because of an IO error: " + selectedImage.getAbsolutePath());
 					}
 				}
-
-				setTitle(Constants.EDITOR_TITLE + " | " + projCon.projectName());
 			} else {
 				// no project is loaded, show a warning
 				JOptionPane.showMessageDialog(null,
@@ -574,21 +571,13 @@ ActionListener
 				int choice = fc.showOpenDialog(this);
 				if (choice == JFileChooser.APPROVE_OPTION) {
 					File sourceSoundFile = fc.getSelectedFile();
-
-					String soundName = JOptionPane.showInputDialog(null,
-							"Enter the name of the sound",
-							"Sound name",
-							JOptionPane.PLAIN_MESSAGE);
-
+					String soundName = JOptionPane.showInputDialog(null, "Enter the name of the sound", 
+							"Sound name", JOptionPane.PLAIN_MESSAGE);
+					
+					// create and add the new sound
 					Sound sound = new Sound(soundName, sourceSoundFile.getName());
 					soundList.addSound(sound);
-
-					try {
-						projMan.importSound(soundName, sourceSoundFile);
-					} catch (ElaraException e1) {
-						JOptionPane.showMessageDialog(null, e1, "Exception",
-								JOptionPane.ERROR_MESSAGE);
-					}
+					ImportAsset.sound(sourceSoundFile, soundName);
 				}
 			} else {
 				// no project is loaded, show a warning

@@ -29,7 +29,6 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import elara.assets.DefaultIcons;
 import elara.assets.Script;
 import elara.assets.ScriptLang;
-import elara.editor.debug.ElaraException;
 import elara.editor.ui.ImportAsset;
 import elara.project.Assets;
 import elara.project.ProjectContext;
@@ -171,17 +170,11 @@ public class CodeEditor extends JFrame
 		} else if (source == deleteScript) {
 			int index = scriptList.getSelectedIndex();
 			if (index != -1) {
-				try {
-					String script = scriptListModel.get(index);
-					//Assets.deleteScript(script);
-					projCon.deleteScript(script);
-					projMan.deleteScript(script);
-					scriptListModel.remove(index);
-				} catch (ElaraException e) {
-					JOptionPane.showMessageDialog(this, "Failed to delete script: " 
-							+ e.getMessage(), "Exception", 
-							JOptionPane.ERROR_MESSAGE);
-				}
+				// NOTE(brandon) Delete script tool in code editor 
+				String script = scriptListModel.get(index);
+				//Assets.deleteScript(script);
+				projCon.deleteScript(script);
+				scriptListModel.remove(index);
 			}
 		}
 	}
