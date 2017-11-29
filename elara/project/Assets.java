@@ -42,7 +42,6 @@ import elara.editor.debug.Debug;
 public class Assets
 {
 	private static ProjectContext projCon = ProjectContext.projectContext();
-	private static ProjectManager projMan = ProjectManager.manager();
 	private static ProjectConfiguration projConf = ProjectConfiguration.instance();
 
 	/* =================================== *
@@ -60,6 +59,7 @@ public class Assets
 			texture.assignImage(image);
 			Debug.info("Texture read: " + name);
 		} catch(IOException e) {
+			Debug.error("Failed to read texture: " + name);
 			return (Texture) failedToRead("Failed to read image while reading texture: " + name);
 		}
 		return texture;
@@ -495,7 +495,7 @@ public class Assets
 		throws IOException,
 		ParseException
 	{
-		return (JSONArray) projConf.getArray(arrayName);
+		return projConf.getArray(arrayName);
 	}
 
 	private static Object failedToRead(String message)

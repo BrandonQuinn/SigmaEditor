@@ -10,6 +10,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -20,19 +22,24 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import elara.assets.DefaultIcons;
+import elara.editor.EditorConfiguration;
+import elara.editor.EditorConfiguration.RecentProject;
+import elara.editor.debug.Debug;
+import elara.editor.debug.ElaraException;
 import elara.project.ProjectManager;
 
 /**
  * RecentProjectsDialog
  *
- * Description:
+ * Description: A simple dialog displaying a list of all projects recently opened.
  */
 public class RecentProjectsDialog extends JDialog
 {
 	private static final long serialVersionUID = 1L;
-	
+
+	private ProjectManager projMan = ProjectManager.manager();
 	private final JPanel contentPanel = new JPanel();
-	
+
 	/**
 	 * Create the dialog.
 	 */
@@ -47,25 +54,26 @@ public class RecentProjectsDialog extends JDialog
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(new BorderLayout(0, 0));
-		
+
 		JScrollPane scrollPane = new JScrollPane();
 		contentPanel.add(scrollPane);
 		JList<String> list = new JList<String>();
-		
-		DefaultListModel<String> model = new DefaultListModel<String>(); 
-		ProjectManager pc = ProjectManager.manager();
-		//ArrayList<RecentProject> recentProjects = pc.recentProjects();
-		
-		/*for (RecentProject rp : recentProjects) {
-			model.addElement(rp.projectName);
-		}*/
-		
-		
+
+		DefaultListModel<String> model = new DefaultListModel<String>();
+
+		try {
+			ArrayList<EditorConfiguration.RecentProject> recentProjects = EditorConfiguration.recentProjects();
+			for (RecentProject rp : recentProjects) {
+				model.addElement(rp.name);
+			}
+		} catch (IOException e1) {
+			Debug.error("Failed to load recent proejects lists");
+		}
+
 		list.setModel(model);
 		list.setSelectedIndex(0);
-		
 		scrollPane.setViewportView(list);
-		
+
 		{
 			JPanel panel = new JPanel();
 			contentPanel.add(panel, BorderLayout.NORTH);
@@ -88,46 +96,52 @@ public class RecentProjectsDialog extends JDialog
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("Open");
-				
+
 				okButton.addActionListener(new ActionListener()
 				{
-					
+
 					@Override
 					public void actionPerformed(ActionEvent e)
 					{
 						if (list.getSelectedIndex() == -1) {
-							JOptionPane.showMessageDialog(null, "No project selected", "No project selected", 
+							JOptionPane.showMessageDialog(null, "No project selected", "No project selected",
 									JOptionPane.INFORMATION_MESSAGE);
 							return;
 						}
-						
+
 						setVisible(false);
-						/*try {
-							pc.open(recentProjects.get(list.getSelectedIndex()).projectPath);
+
+						// load project location from configuration and open it
+						try {
+							ArrayList<EditorConfiguration.RecentProject> recentProjects = EditorConfiguration.recentProjects();
+							projMan.open(recentProjects.get(list.getSelectedIndex()).projectLocation.getAbsolutePath());
 						} catch (ElaraException ex) {
-							JOptionPane.showMessageDialog(null, "Failed to open project", "Failure", 
-									JOptionPane.ERROR_MESSAGE);
-						}*/
+							Debug.error("Failed to open project: " + ex.message());
+							JOptionPane.showMessageDialog(null, "Failed to open project, check logs",
+								"Failed to open project, check logs", JOptionPane.ERROR_MESSAGE);
+						} catch (IOException ex2) {
+							Debug.error("Failed to read recent projects list when opening from recents");
+							JOptionPane.showMessageDialog(null, "Failed to open project, check logs",
+								"Failed to open project, check logs", JOptionPane.ERROR_MESSAGE);
+						}
 					}
 				});
-				
+
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Skip");
-				
 				cancelButton.addActionListener(new ActionListener()
 				{
-					
 					@Override
 					public void actionPerformed(ActionEvent e)
 					{
-						setVisible(false);	
+						setVisible(false);
 					}
 				});
-				
+
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}

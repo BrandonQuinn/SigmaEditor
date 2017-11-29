@@ -14,9 +14,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.EmptyBorder;
+import elara.assets.DefaultIcons;
 import elara.assets.Texture;
-import elara.editor.debug.LogType;
-import elara.editor.debug.Debug;
 
 /**
  * TextureListRenderer
@@ -36,9 +35,6 @@ public class TextureListRenderer extends JLabel
 		setOpaque(true);
 	}
 	
-	/* (non-Javadoc)
-	 * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
-	 */
 	@Override
 	public Component getListCellRendererComponent(JList<? extends Texture> list,
 			Texture texture,
@@ -46,17 +42,14 @@ public class TextureListRenderer extends JLabel
 			boolean isSelected,
 			boolean cellHasFocus)
 	{
-		
-		
-		// get the texture at a specific size
-		BufferedImage scaledImage = texture.scaledTo(TEXTURE_WIDTH, TEXTURE_HEIGHT);
-		
-		if (scaledImage == null) {
-			Debug.debug.log(LogType.ERROR, "Failed to scale texture: " + texture.name() + ", it's null");
+		BufferedImage scaledImage = null;
+		if(texture.hasCachedScaledImage()) {
+			scaledImage = texture.scaledTo(TEXTURE_WIDTH, TEXTURE_HEIGHT);
 		} else {
-			setIcon(new ImageIcon(scaledImage));
+			scaledImage = DefaultIcons.BLANK_ICON_32;
 		}
 		
+		setIcon(new ImageIcon(scaledImage));
 		setText(texture.name());
 		
 		if (isSelected) {

@@ -32,7 +32,6 @@ import elara.assets.ScriptLang;
 import elara.editor.ui.ImportAsset;
 import elara.project.Assets;
 import elara.project.ProjectContext;
-import elara.project.ProjectManager;
 
 /**
  * CodeEditor
@@ -46,8 +45,7 @@ public class CodeEditor extends JFrame
 	KeyListener
 {
 	private static final long serialVersionUID = 1L;
-	
-	private ProjectManager projMan = ProjectManager.manager();
+
 	private ProjectContext projCon = ProjectContext.projectContext();
 
 	private Toolkit toolkit = Toolkit.getDefaultToolkit();

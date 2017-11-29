@@ -35,7 +35,6 @@ public class JSON
 			JSONParser parser = new JSONParser();
 			return (JSONObject) parser.parse(new FileReader(file));
 		}
-
 		return null;
 	}
 

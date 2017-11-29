@@ -559,12 +559,17 @@ public class RenderPanel extends JComponent implements
 	
 			case TEXTURE_PAINT:
 				
-				BufferedImage selectedImage = editCon.selectedTexture().image();
-				g2d.setColor(new Color(255, 255, 255));
-				g2d.drawOval((int)(Mouse.x() - ((selectedImage.getWidth() * editCon.brushSize()) / 2)), 
-					(int)(Mouse.y() - ((selectedImage.getHeight() * editCon.brushSize()) / 2)), 
-					(int)(selectedImage.getWidth() * editCon.brushSize()), 
-					(int)(selectedImage.getHeight() * editCon.brushSize()));
+				
+				if (editCon.selectedTexture().image() != null) {
+					BufferedImage selectedImage = editCon.selectedTexture().image();
+					g2d.setColor(new Color(255, 255, 255));
+					g2d.drawOval((int)(Mouse.x() - ((selectedImage.getWidth() * editCon.brushSize()) / 2)), 
+						(int)(Mouse.y() - ((selectedImage.getHeight() * editCon.brushSize()) / 2)), 
+						(int)(selectedImage.getWidth() * editCon.brushSize()), 
+						(int)(selectedImage.getHeight() * editCon.brushSize()));
+				} else {
+					// RenderDebug.error("Current image selected for painting is null in the project context");
+				}
 				
 			break;
 	

@@ -7,10 +7,8 @@
 package elara.project;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import elara.assets.Script;
 import elara.assets.Sound;
@@ -19,8 +17,6 @@ import elara.editor.EditorConfiguration;
 import elara.editor.debug.Debug;
 import elara.editor.debug.ElaraException;
 import elara.editor.debug.LogType;
-import elara.editor.util.JSON;
-import elara.scene.SceneManager;
 
 /**
  * ProjectManager
@@ -34,10 +30,7 @@ public class ProjectManager
 {
 	private static ProjectManager instance = new ProjectManager();
 	private ProjectContext projCon = ProjectContext.projectContext();
-	private SceneManager sceneMan = SceneManager.manager();
 	private ProjectConfiguration configuration = ProjectConfiguration.instance();
-
-	private static File configFile;
 
 	private ProjectManager() {}
 
@@ -107,19 +100,15 @@ public class ProjectManager
 	{
 		// read the configuration file
 		try {
-			JSONObject projectConfig = JSON.read(projectLocation + "/" + ProjectStruct.CONFIG);
-			configuration.initFromJSON(new File(projectLocation + "/" + ProjectStruct.CONFIG), projectConfig);
+			configuration.initFromFile(new File(projectLocation + "/" + ProjectStruct.CONFIG));
 		} catch (ParseException e) {
 			Debug.error("Could not parse configuration file");
 			throw new ElaraException("Could not parse configuration file");
-		} catch (FileNotFoundException e) {
-			Debug.error("Could not find configuration file");
-			throw new ElaraException("Could not find configuration file");
 		} catch (IOException e) {
 			Debug.error("Could not perform IO operation on configruration file");
 			throw new ElaraException("Could not perform IO operation on configuration file");
 		}
-		
+
 		projCon.setProjectDirectory(projectLocation);
 		projCon.setProjectName(configuration.name());
 
@@ -144,15 +133,14 @@ public class ProjectManager
 		}
 
 		projCon.setProjectLoaded(true);
-		Debug.info("Project opened: " + projCon.projectDirectoryFile().getAbsolutePath());
+		Debug.info("Project opened: " + projectLocation);
 	}
 
-	public void save()
-			throws ElaraException
+	public void save() throws ElaraException
 	{
 		// TODO save project
 	}
-	
+
 	/*======================================================================== *
 	 *  OTHER
 	 * ========================================================================*/

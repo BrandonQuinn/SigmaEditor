@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 import elara.assets.Texture;
 import elara.editor.util.JSON;
 
@@ -71,12 +72,12 @@ public class ProjectConfiguration
 		JSON.write(jsonObject, configFile.getAbsolutePath());
 	}
 
-	public void initFromJSON(File configFile, JSONObject object)
-		throws IOException
+	public void initFromFile(File configFile)
+		throws IOException, 
+		ParseException
 	{
-		jsonObject = object;
-		this.configFile = configFile;
-		JSON.write(jsonObject, configFile.getAbsolutePath());
+		JSONObject newJSON = JSON.read(configFile);
+		jsonObject = newJSON;
 	}
 
 	/**
@@ -137,7 +138,7 @@ public class ProjectConfiguration
 
 	/**
 	 * Returns a top level (at the top level of the hierarchy) array.
-	 * 
+	 *
 	 * @param arrayName
 	 * @return
 	 */

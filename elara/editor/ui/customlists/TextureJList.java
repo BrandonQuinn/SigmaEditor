@@ -88,13 +88,13 @@ public class TextureJList extends JList<Texture>
 	{
 		model.clear();
 		for (Texture texture : projectContext.loadedTextures()) {
-				// if the scaled image is null, load the image and scale it
-				// then set the image to null to allow the garbage collector
-				// to free the memory for the main image so we don't waste space
+			// if the scaled image is null, load the image and scale it
+			// then set the image to null to allow the garbage collector
+			// to free the memory for the main image so we don't waste space
 			BufferedImage newImage = null;
 			if (!texture.hasCachedScaledImage()) {
 				try {
-					newImage = ImageIO.read(new File(projectContext.projectDirectoryFile().getAbsolutePath() + "/"
+					newImage = ImageIO.read(new File(projectContext.projectPath() + "/"
 						+ ProjectStruct.TEXTURE_DIR + "/" + texture.file().getName()));
 				} catch (IOException e) {
 					newImage = DefaultIcons.BLANK_ICON_16;

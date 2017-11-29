@@ -31,13 +31,15 @@ import elara.editor.util.JSON;
 
 public class EditorConfiguration
 {
-    public static final String CONFIG = "conf/editor.config";
-    public static final String CONFIG_DIR = "config/";
-    private static File configFile = new File(CONFIG);
+    public static final String CONFIG_DIR = "conf/";
     private static File configDir = new File(CONFIG_DIR);
+
+    public static final String CONFIG = "conf/editor.config";
+    private static File configFile = new File(CONFIG);
+
     private static JSONObject configObject;
 
-    static class RecentProject
+    public static class RecentProject
     {
         public String name;
         public File projectLocation;
@@ -71,7 +73,7 @@ public class EditorConfiguration
      * Adds a recent project to the editor configuration, however, if a project
      * with the same name and name only already exists then this method will
      * not make any changes to the editor configuration.
-     * 
+     *
      * @param name
      * @param projectLocation
      * @throws IOException
@@ -85,7 +87,7 @@ public class EditorConfiguration
             JSONObject rp = (JSONObject) recentProjects.get(i);
             String nameInFile = (String) rp.get("name");
 
-            if (nameInFile == name) {
+            if (nameInFile.equals(name)) {
                 return; // already exists, so skip
             }
         }
@@ -120,7 +122,7 @@ public class EditorConfiguration
 
     public static JSONArray getArray(String name)
     {
-        return (JSONArray) configObject.get("recentProjects");
+        return (JSONArray) configObject.get(name);
     }
 
     private static void save()
