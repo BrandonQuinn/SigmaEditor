@@ -104,6 +104,7 @@ public class ProjectContext
 	public void setProjectDirectory(String projectDirectory)
 	{
 		this.projectDirectory = projectDirectory;
+		this.projectDirFile = new File(projectDirectory);
 	}
 
 	/**

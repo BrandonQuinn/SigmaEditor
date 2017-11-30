@@ -31,6 +31,7 @@ import elara.assets.DefaultIcons;
 import elara.assets.Entity;
 import elara.assets.Sound;
 import elara.assets.Texture;
+import elara.editor.debug.RenderDebug;
 import elara.editor.imageprocessing.ImageProcessor;
 import elara.editor.input.KeyState;
 import elara.editor.input.Keyboard;
@@ -44,7 +45,7 @@ import elara.scene.Scene;
 /**
  * Component which actually holds the level being rendered and everything
  * that will be in the game. The main editor area.
- * 
+ *
  * @author Brandon Quinn
  * @version 0.1
  * @since 12 Jun 2017
@@ -69,7 +70,7 @@ public class RenderPanel extends JComponent implements
 	/*
 	 * Selection rectangle
 	 */
-	private SelectionRectangle selectionRectangle 
+	private SelectionRectangle selectionRectangle
 		= new SelectionRectangle();
 
 	public RenderPanel(MainWindow mainWindow)
@@ -100,36 +101,40 @@ public class RenderPanel extends JComponent implements
 	public void paint(Graphics g)
 	{
 		Graphics2D g2d = (Graphics2D) g;
-		
+
 		RenderStats.startClock();
 		drawDefaultBackground(g2d);
+		
 		setup(g2d);
 		editCon.scene().draw(editCon.xOffset(), editCon.yOffset(), g2d);
 		handleInput();
 		drawMouseCursor(g2d);
 		handleEditingState(g2d);
 		drawDebugInfo(g2d);
+		
 		RenderStats.finaliseClock();
+		ErrorListDialog.update();
+		RenderDebug.clear();
 	}
-	
+
 	/**
 	 * Prepare the renderer
 	 * @param g2d
 	 */
-	private void setup(Graphics2D g2d) 
+	private void setup(Graphics2D g2d)
 	{
 		g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
-				RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-		
+			RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
-				RenderingHints.VALUE_RENDER_SPEED);
-		
+			RenderingHints.VALUE_RENDER_SPEED);
+
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-		
+			RenderingHints.VALUE_ANTIALIAS_ON);
+
 		g2d.setColor(Color.white);
 		g2d.setFont(new Font("Consolas", Font.BOLD, 12));
 	}
@@ -143,9 +148,9 @@ public class RenderPanel extends JComponent implements
 		g2d.drawString("Tool: " + editCon.state().toString() + " | "
 				+ "Selected Texture Layer: " + (editCon.getSelectedGroundLayerIndex() + 1)
 				+ " | Offset x:" + editCon.xOffset() + ", y: " + editCon.yOffset()
-				+ " | Memory Usage: " + Runtime.getRuntime().totalMemory()/1000000 + "MB/" 
+				+ " | Memory Usage: " + Runtime.getRuntime().totalMemory()/1000000 + "MB/"
 				+ Runtime.getRuntime().maxMemory()/1000000 + "MB", 5, 15);
-		
+
 		g2d.drawString("Frame Rate (FPS): " + RenderStats.FPS(), 5, 30);
 	}
 
@@ -159,49 +164,49 @@ public class RenderPanel extends JComponent implements
 				&& editCon.state() != EditingState.MOVE_WORLD) {
 			editCon.assignState(EditingState.MOVE_WORLD);
 		}
-		
+
 		if (Keyboard.S == KeyState.PRESSED) {
 			editCon.assignState(EditingState.SELECT);
 		}
-		
+
 		// state controlled input, no privatisation here!
 		switch (editCon.state()) {
 			case SELECT:
 			break;
-			
+
 			case TEXTURE_PAINT:
 				// comma and period keys control opacity
 				if (Keyboard.PERIOD == KeyState.PRESSED) {
 					editCon.assignTextureBrushOpacity(editCon.textureBrushOpacity() + 0.01f);
 					mainWindow.evaluateState();
 				}
-				
+
 				if (Keyboard.COMMA == KeyState.PRESSED) {
 					editCon.assignTextureBrushOpacity(editCon.textureBrushOpacity() - 0.01f);
 					mainWindow.evaluateState();
 				}
 			break;
-			
+
 			case MOVE_WORLD:
 			break;
-			
+
 			case ADD_SOUND:
 			break;
 
 			default:
 			break;
-			
+
 		}
 	}
-	
-	/*	 
-	 * All this stuff is essentially anything that we may not 
-	 * want to be recreating all the time in the loop. 
+
+	/*
+	 * All this stuff is essentially anything that we may not
+	 * want to be recreating all the time in the loop.
 	 */
 
 	private Integer moveStartX = null;
 	private Integer moveStartY = null;
-	
+
 	private BufferedImage paintTexture;
 	private BufferedImage buffIm;
 	private Graphics2D buffG;
@@ -209,15 +214,15 @@ public class RenderPanel extends JComponent implements
 	private Graphics2D ng;
 	private int paintx = 0;
 	private int painty = 0;
-	
+
 	private BufferedImage placeDecalImage = null;
 	private boolean doPaint = true;
 	private boolean selectionMoved = false;
-	
+
 	/**
 	 * Basically switch throw all the editing states and make the
 	 * edits
-	 * 
+	 *
 	 * @param g2d
 	 */
 	private void handleEditingState(Graphics2D g2d)
@@ -226,15 +231,15 @@ public class RenderPanel extends JComponent implements
 			case SELECT:
 
 				// click and hold down on non-selection
-				if (Mouse.isLeftButtonDown() 
-						&& !selectionRectangle.isDrawn() 
+				if (Mouse.isLeftButtonDown()
+						&& !selectionRectangle.isDrawn()
 						&& !AssetSelector.isMouseOnSelection()) {
 					AssetSelector.deselectAll();
 					AssetSelector.checkSelections(Mouse.x(), Mouse.y());
 				}
-				
+
 				// click and hold on selection
-				if (Mouse.isLeftButtonDown() 
+				if (Mouse.isLeftButtonDown()
 						&& !selectionRectangle.isDrawn() && AssetSelector.isMouseOnSelection()) {
 					AssetSelector.moveSelection();
 				} else {
@@ -242,15 +247,15 @@ public class RenderPanel extends JComponent implements
 					AssetSelector.checkSelections(selectionRectangle);
 					selectionRectangle.draw(g2d);
 				}
-				
+
 				if (!Mouse.isLeftButtonDown() && !selectionRectangle.isDrawn()) {
 					AssetSelector.resetMouseStart();
 				}
-				
+
 				if (Mouse.isLeftButtonClicked()) {
 					mainWindow.evaluateState();
 				}
-				
+
 				// allow the user to move the selection a single pixel at a time using the arrow keys
 				if (Keyboard.UP == KeyState.PRESSED) {
 					if (!selectionMoved) {
@@ -283,132 +288,132 @@ public class RenderPanel extends JComponent implements
 				} else {
 					selectionMoved = false;
 				}
-				
+
 			break;
-	
+
 			case TEXTURE_PAINT:
-				
+
 				if (Keyboard.BRACKET_LEFT == KeyState.PRESSED) {
 					editCon.assignBrushSize(editCon.brushSize() - 0.01f);
 				}
-				
+
 				if (Keyboard.BRACKET_RIGHT == KeyState.PRESSED) {
 					editCon.assignBrushSize(editCon.brushSize() + 0.01f);
 				}
-				
+
 				if (Mouse.isLeftButtonDown() && editCon.getSelectedGroundLayerIndex() != -1 && doPaint) {
 					paintTexture = editCon.selectedTexture().image();
-					
+
 					// only change the buffered image if a different one has been selected
 					if (buffIm != editCon.groundTextures().get(editCon.getSelectedGroundLayerIndex())) {
 						buffIm = editCon.groundTextures().get(editCon.getSelectedGroundLayerIndex());
 						buffG = buffIm.createGraphics();
 					}
-					
+
 					int newImgWidth = (int)(paintTexture.getWidth() * editCon.brushSize());
 					int newImgHeight = (int)(paintTexture.getHeight() * editCon.brushSize());
-					
-					newImage = new BufferedImage( newImgWidth, newImgHeight, 
+
+					newImage = new BufferedImage( newImgWidth, newImgHeight,
 							BufferedImage.TYPE_INT_ARGB);
 					ng = newImage.createGraphics();
 					ng.drawImage(paintTexture, 0, 0, null);
-					
+
 					paintx = (Mouse.x() - (newImgWidth >> 1)) + editCon.xOffset() * -1;
 					painty = (Mouse.y() - (newImgHeight >> 1)) + editCon.yOffset() * -1;
-					
+
 					// create a new image which handles tiling
 					if (editCon.tiledPaintingEnabled()) {
 						// number of times to repeat the texture
 						int numTexRpt = (int) (editCon.brushSize() + 1);
-						
+
 						for (int xt = 0; xt < numTexRpt+1; xt++) {
 							for (int yt = 0; yt < numTexRpt+1; yt++) {
 							// left to right
-							ng.drawImage(paintTexture, 
-									(0 - (paintx % paintTexture.getWidth()) + (paintTexture.getWidth() * xt)), 
+							ng.drawImage(paintTexture,
+									(0 - (paintx % paintTexture.getWidth()) + (paintTexture.getWidth() * xt)),
 									(0 - (painty % paintTexture.getHeight()) + (paintTexture.getHeight() * yt)),
 									null);
 							}
 						}
 					}
-	
+
 					// BRUSH TYPE
 					switch (editCon.selectedBrushFilter()) {
 						case RADIAL_FALLOFF:
-							
+
 							newImage = ImageProcessor.radialAlphaFalloff(newImage);
-							
+
 						break;
-						
+
 						case NONE:
 							// Do nothing
 						break;
-						
+
 						default:
 						break;
 					}
-					
+
 					BufferedImage subBuffIm;
-					
+
 					// BLEND MODE
 					switch (editCon.selectedBlendMode()) {
 						case OVERLAP:
 							// Do nothing
 						break;
-					
+
 						case MULTIPLY:
-							
-							subBuffIm = ImageProcessor.subImg(buffIm, paintx, painty, 
+
+							subBuffIm = ImageProcessor.subImg(buffIm, paintx, painty,
 									newImgWidth, newImgHeight);
 							newImage = ImageProcessor.multiply(newImage, subBuffIm);
-						
+
 						break;
-						
+
 						case OVERLAY:
-							
-							subBuffIm = ImageProcessor.subImg(buffIm, paintx, painty, 
+
+							subBuffIm = ImageProcessor.subImg(buffIm, paintx, painty,
 									newImgWidth, newImgHeight);
 							newImage = ImageProcessor.overlay(newImage, subBuffIm);
-							
+
 						break;
-						
+
 						case SCREEN:
 						break;
-						
+
 						default:
 						break;
 					}
-					
+
 					newImage = ImageProcessor.setOpacity(newImage, editCon.textureBrushOpacity());
 					buffG.drawImage(newImage, paintx, painty, null);
 					doPaint = false;
 				}
-				
+
 				if (!doPaint && Mouse.mouseMoved()) {
 					doPaint = true;
 				}
 
 			break;
-	
+
 			case MOVE_WORLD:
-				
+
 				if (moveStartX == null) {
 					moveStartX = Mouse.x();
 				}
-				
+
 				if (moveStartY == null) {
 					moveStartY = Mouse.y();
 				}
-	
-				/* 
+
+				/*
 				 * Detect a change and add it, what a might fine mess, but it works
 				 * This code is complicated because it's blocking the user from moving
 				 * too for left, right, above or bellow the game world. It's limited
 				 * to half the width or high, so at least half of the size of the editor
 				 * window will always have the actual game or level visible. Can't go farther.
 				 */
-				
-				if (Mouse.x() - moveStartX != 0 
+
+				if (Mouse.x() - moveStartX != 0
 						&& editCon.xOffset() <= (getWidth() >> 1) &&
 						editCon.xOffset() >= -1 * editCon.scene().widthPixels() + (getWidth() >> 1)) {
 					editCon.addToXOffset(Mouse.x() - moveStartX);
@@ -418,8 +423,8 @@ public class RenderPanel extends JComponent implements
 				} else if (editCon.xOffset() <= -1 * editCon.scene().widthPixels() + (getWidth() >> 1)) {
 					editCon.addToXOffset(-editCon.xOffset() + -1 * editCon.scene().widthPixels() + (getWidth() >> 1));
 				}
-				
-				if (Mouse.y() - moveStartY != 0 
+
+				if (Mouse.y() - moveStartY != 0
 						&& editCon.xOffset() <= (getHeight()) &&
 						editCon.yOffset() >= -1 * editCon.scene().heightPixels() + (getHeight() >> 1)) {
 					editCon.addToYOffset(Mouse.y() - moveStartY);
@@ -429,44 +434,44 @@ public class RenderPanel extends JComponent implements
 				} else if (editCon.yOffset() <= -1 * editCon.scene().heightPixels() + (getHeight() >> 1)) {
 					editCon.addToYOffset(-editCon.yOffset() + -1 * editCon.scene().heightPixels() + (getHeight() >> 1));
 				}
-				
+
 				if (Keyboard.SPACE_BAR == KeyState.RELEASED) {
 					moveStartX = null;
 					moveStartY = null;
-					Keyboard.SPACE_BAR = KeyState.NOT_PRESSED;	
+					Keyboard.SPACE_BAR = KeyState.NOT_PRESSED;
 					editCon.assignState(editCon.previousState());
 				}
-				
+
 			break;
-			
+
 			case ADD_SOUND:
-				
+
 				// check if clicked and then add a new sound the curretly selected layer
 				if (Mouse.isLeftButtonClicked() && editCon.scene().numLayers() != 0) {
 					Sound s = new Sound(editCon.selectedSound());
-					s.setPosition(new Vector2f(Mouse.x() - editCon.xOffset(), 
+					s.setPosition(new Vector2f(Mouse.x() - editCon.xOffset(),
 							Mouse.y() - editCon.yOffset()));
 					editCon.selectedLayer().addSound(s);
 					mainWindow.evaluateState();
 				}
-					
+
 			break;
-			
+
 			case DECAL_PLACEMENT:
-				
+
 				// you spin me right 'round baby right 'round
 				if (Mouse.isMiddleButtonDown()) {
 					editCon.assignDecalRotation(editCon.decalRotation() + (0.1 + editCon.rotationSpeed()));
 					mainWindow.evaluateState();
 				}
-				
+
 				if (Mouse.isLeftButtonClicked()) {
-					
+
 					Texture decal = editCon.selectedDecal();
 					int groundLayerIndex = editCon.getSelectedGroundLayerIndex();
 					if (groundLayerIndex != -1) {
 						BufferedImage texLayer = editCon.groundTextures().get(groundLayerIndex);
-						
+
 						// get the positon to place the decal.
 						paintx = (Mouse.x() - (decal.image().getWidth() >> 1)) + editCon.xOffset() * -1;
 						painty = (Mouse.y() - (decal.image().getHeight() >> 1)) + editCon.yOffset() * -1;
@@ -478,34 +483,34 @@ public class RenderPanel extends JComponent implements
 						 * going across the width and will overun. Thus, the width of the new image needs to be
 						 * the length of the diagnal.
 						 */
-						
-						int hypotenuse = (int) Math.sqrt((decal.image().getWidth() << 1) 
+
+						int hypotenuse = (int) Math.sqrt((decal.image().getWidth() << 1)
 								* (decal.image().getHeight() << 1));
-						
-						placeDecalImage = new BufferedImage(hypotenuse, 
-								hypotenuse, 
+
+						placeDecalImage = new BufferedImage(hypotenuse,
+								hypotenuse,
 								BufferedImage.TYPE_INT_ARGB);
-						
+
 						// create the new image we are going to place and rotate it
 						Graphics2D pgi = placeDecalImage.createGraphics();
-						pgi.rotate(Math.toRadians(editCon.decalRotation()), 
-								placeDecalImage.getWidth() >> 1, 
+						pgi.rotate(Math.toRadians(editCon.decalRotation()),
+								placeDecalImage.getWidth() >> 1,
 								placeDecalImage.getHeight() >> 1);
-						pgi.drawImage(decal.image(), 
-								(placeDecalImage.getWidth() >> 1) - (decal.image().getWidth() >> 1), 
-								(placeDecalImage.getHeight() >> 1) - (decal.image().getHeight() >> 1), 
+						pgi.drawImage(decal.image(),
+								(placeDecalImage.getWidth() >> 1) - (decal.image().getWidth() >> 1),
+								(placeDecalImage.getHeight() >> 1) - (decal.image().getHeight() >> 1),
 								null);
-						
+
 						Graphics2D dest = texLayer.createGraphics();
-						dest.drawImage(placeDecalImage, 
-								(paintx + (decal.image().getHeight() >> 1)) - (placeDecalImage.getWidth() >> 1), 
-								(painty + (decal.image().getWidth() >> 1)) - (placeDecalImage.getHeight() >> 1), 
+						dest.drawImage(placeDecalImage,
+								(paintx + (decal.image().getHeight() >> 1)) - (placeDecalImage.getWidth() >> 1),
+								(painty + (decal.image().getWidth() >> 1)) - (placeDecalImage.getHeight() >> 1),
 								null);
 					}
 				}
-				
+
 			break;
-				
+
 			default:
 			break;
 		}
@@ -513,16 +518,16 @@ public class RenderPanel extends JComponent implements
 
 	/**
 	 * Just draws a static background so as to not be boring.
-	 * 
+	 *
 	 * This displays when there is no project loaded.
-	 * 
+	 *
 	 * @param g2d
 	 */
 	private void drawDefaultBackground(Graphics2D g2d)
 	{
 		g2d.setColor(Color.BLACK);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
-		
+
 		g2d.setColor(new Color(10, 10, 10));
 		g2d.fillRect(editCon.xOffset(),
 				editCon.yOffset(),
@@ -537,7 +542,7 @@ public class RenderPanel extends JComponent implements
 				g2d.drawLine(x + editCon.xOffset(), 0 + editCon.yOffset(),
 					x + editCon.xOffset(), editCon.scene().heightPixels() + editCon.yOffset());
 
-				g2d.drawLine(0 + editCon.xOffset(), y + editCon.yOffset(), 
+				g2d.drawLine(0 + editCon.xOffset(), y + editCon.yOffset(),
 						editCon.scene().widthPixels() + editCon.xOffset(), y + editCon.yOffset());
 			}
 		}
@@ -554,53 +559,53 @@ public class RenderPanel extends JComponent implements
 				if (Mouse.isLeftButtonDown())
 					cur = cursorImageDown.getImage();
 				g2d.drawImage(cur, Mouse.x() - 8, Mouse.y() - 8, null);
-				
+
 			break;
-	
+
 			case TEXTURE_PAINT:
-				
-				
+
+
 				if (editCon.selectedTexture().image() != null) {
 					BufferedImage selectedImage = editCon.selectedTexture().image();
 					g2d.setColor(new Color(255, 255, 255));
-					g2d.drawOval((int)(Mouse.x() - ((selectedImage.getWidth() * editCon.brushSize()) / 2)), 
-						(int)(Mouse.y() - ((selectedImage.getHeight() * editCon.brushSize()) / 2)), 
-						(int)(selectedImage.getWidth() * editCon.brushSize()), 
+					g2d.drawOval((int)(Mouse.x() - ((selectedImage.getWidth() * editCon.brushSize()) / 2)),
+						(int)(Mouse.y() - ((selectedImage.getHeight() * editCon.brushSize()) / 2)),
+						(int)(selectedImage.getWidth() * editCon.brushSize()),
 						(int)(selectedImage.getHeight() * editCon.brushSize()));
 				} else {
 					// RenderDebug.error("Current image selected for painting is null in the project context");
 				}
-				
+
 			break;
-	
+
 			case MOVE_WORLD:
-				
-				g2d.drawImage(DefaultIcons.moveWorldIcon.getImage(), 
-						Mouse.x() - (DefaultIcons.moveWorldIcon.getIconWidth() >> 1), 
+
+				g2d.drawImage(DefaultIcons.moveWorldIcon.getImage(),
+						Mouse.x() - (DefaultIcons.moveWorldIcon.getIconWidth() >> 1),
 						Mouse.y() - (DefaultIcons.moveWorldIcon.getIconHeight() >> 1), null);
-				
+
 			break;
-			
+
 			case ADD_SOUND:
-				
+
 				g2d.drawImage(DefaultIcons.soundIcon.getImage(),
-					Mouse.x()  - (DefaultIcons.soundIcon.getIconWidth() >> 1), 
+					Mouse.x()  - (DefaultIcons.soundIcon.getIconWidth() >> 1),
 					Mouse.y() - (DefaultIcons.soundIcon.getIconHeight() >> 1), null);
-				
+
 			break;
-	
+
 			case DECAL_PLACEMENT:
 
 				g2d.rotate(Math.toRadians(editCon.decalRotation()), Mouse.x(), Mouse.y());
-				
-				g2d.drawImage(editCon.selectedDecal().image(), 
-						Mouse.x() - (editCon.selectedDecal().image().getWidth() >> 1), 
+
+				g2d.drawImage(editCon.selectedDecal().image(),
+						Mouse.x() - (editCon.selectedDecal().image().getWidth() >> 1),
 						Mouse.y() - (editCon.selectedDecal().image().getHeight() >> 1), null);
 
 				g2d.rotate(Math.toRadians(-editCon.decalRotation()), Mouse.x(), Mouse.y());
-				
+
 			break;
-			
+
 			default:
 				g2d.drawImage(cursorImage.getImage(), Mouse.x() - 8, Mouse.y() - 8, null);
 		}
@@ -622,7 +627,7 @@ public class RenderPanel extends JComponent implements
 	public void mouseEntered(MouseEvent e)
 	{
 		grabFocus();
-		
+
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			Mouse.setLeftButtonState(MouseState.NOT_PRESSED);
 		} else if (e.getButton() == MouseEvent.BUTTON2) {
@@ -726,7 +731,7 @@ public class RenderPanel extends JComponent implements
 	public void keyTyped(KeyEvent e)
 	{
 		int keyCode = e.getKeyCode();
-		
+
 		switch (keyCode) {
 			case KeyEvent.VK_SPACE:
 				Keyboard.SPACE_BAR = KeyState.TYPED;

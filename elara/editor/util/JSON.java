@@ -26,6 +26,9 @@ import com.google.gson.JsonParser;
  */
 public class JSON
 {
+	/**
+	 * Parse the given file and return the JSONObject.
+	 */
 	public static JSONObject read(File file)
 		throws ParseException,
 		FileNotFoundException,
@@ -38,6 +41,9 @@ public class JSON
 		return null;
 	}
 
+	/**
+	 * Parse the given file and return the JSONObject.
+	 */
 	public static JSONObject read(String file)
 		throws ParseException,
 		FileNotFoundException,

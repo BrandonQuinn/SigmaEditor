@@ -119,6 +119,7 @@ ActionListener
 	private JMenuItem openCodeEditorItem;
 	private JMenuItem sceneMenuItem;
 	private JMenuItem aboutItem;
+	private JMenuItem errorListItem;
 
 	private JMenuItem graphTest; // TODO delete this
 
@@ -186,6 +187,12 @@ ActionListener
 		sceneMenuItem.addActionListener(this);
 		sceneMenu.add(sceneMenuItem);
 		menuBar.add(sceneMenu);
+
+		JMenu debugMenu = new JMenu("Debug");
+		errorListItem = new JMenuItem("Errors/Warnings");
+		errorListItem.addActionListener(this);
+		debugMenu.add(errorListItem);
+		menuBar.add(debugMenu);
 
 		JMenu mnHelp = new JMenu("Help");
 
@@ -571,9 +578,9 @@ ActionListener
 				int choice = fc.showOpenDialog(this);
 				if (choice == JFileChooser.APPROVE_OPTION) {
 					File sourceSoundFile = fc.getSelectedFile();
-					String soundName = JOptionPane.showInputDialog(null, "Enter the name of the sound", 
+					String soundName = JOptionPane.showInputDialog(null, "Enter the name of the sound",
 							"Sound name", JOptionPane.PLAIN_MESSAGE);
-					
+
 					// create and add the new sound
 					Sound sound = new Sound(soundName, sourceSoundFile.getName());
 					soundList.addSound(sound);
@@ -649,6 +656,14 @@ ActionListener
 				JOptionPane.showMessageDialog(null, "No project loaded.", "No Project",
 						JOptionPane.INFORMATION_MESSAGE);
 			}
+		}
+
+		/*==============================================*
+		 * DEBUG MENU
+		 *==============================================*/
+
+		else if (source == errorListItem) {
+			ErrorListDialog.display();
 		}
 
 		/*==============================================*

@@ -31,12 +31,13 @@ import java.util.Date;
  * will be used as the location and the hash will be used to check
  * if we have a new message or an existing one.
  * 
- *
+ * NOTE(brandon) Hash table borken, no linking on collisions
  *****************************************************************/
 
 public class RenderDebug
 {
-	private volatile static ArrayList<Log> hashTable = new ArrayList<Log>(2048);
+	private static final int TABLE_LENGTH = 0b00000000000000000000011111111111; // 2047
+	private volatile static Log[] hashTable = new Log[TABLE_LENGTH];
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
 
 	public synchronized static void error(String message)
@@ -44,7 +45,7 @@ public class RenderDebug
 		Date date = new Date();	
 		String dateStr = dateFormat.format(date);
 		Log log = new Log(LogType.ERROR, dateStr, message);
-		hashTable.set(hash(message), log);
+		hashTable[hash(message)] = log;
 	}
 	
 	public synchronized static void warning(String message)
@@ -52,7 +53,7 @@ public class RenderDebug
 		Date date = new Date();	
 		String dateStr = dateFormat.format(date);
 		Log log = new Log(LogType.WARNING, dateStr, message);
-		hashTable.set(hash(message), log);
+		hashTable[hash(message)] = log;
 	}
 	
 	public synchronized static void info(String message)
@@ -60,12 +61,39 @@ public class RenderDebug
 		Date date = new Date();	
 		String dateStr = dateFormat.format(date);
 		Log log = new Log(LogType.INFO, dateStr, message);
-		hashTable.set(hash(message), log);
+		hashTable[hash(message)] = log;
+	}
+	
+	/**
+	 * Return the list of all logs.
+	 * @return
+	 */
+	public synchronized static ArrayList<Log> logs()
+	{
+		ArrayList<Log> logs = new ArrayList<Log>();
+		
+		// convert to normal sequential list
+		for (int i = 0; i < TABLE_LENGTH; i++) {
+			if (hashTable[i] != null) {
+				logs.add(hashTable[i]);
+			}
+		}
+		return logs;
+	}
+	
+	/**
+	 * Call this method at the bottom of the render loop.
+	 */
+	public synchronized static void clear()
+	{
+		for (int i = 0; i < TABLE_LENGTH; i++) {
+			hashTable[i] = null;
+		}
 	}
 	
 	private static int hash(String message)
 	{
 		// leaves the 11 bits at the front, moving them to the right, 2^11 is 2048
-		return message.hashCode() >> 21;
+		return message.hashCode() & TABLE_LENGTH;
 	}
 }
